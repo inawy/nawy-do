@@ -1,11 +1,28 @@
 import { isCivilDate } from './civil';
 import { err, ok, type Result } from './result';
-import type { Task } from './types';
+import { MAX_STEPS, MAX_STEP_TITLE, type Step, type Task } from './types';
 
 const MAX_TITLE = 1000;
 const MAX_NOTES = 20_000;
 
 const isTime = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v) && v >= 0;
+
+function parseSteps(raw: unknown): Step[] | undefined {
+  if (!Array.isArray(raw) || raw.length > MAX_STEPS) return undefined;
+  const seen = new Set<string>();
+  const out: Step[] = [];
+  for (const item of raw as unknown[]) {
+    if (typeof item !== 'object' || item === null) return undefined;
+    const o = item as Record<string, unknown>;
+    const { id, title, done } = o;
+    if (typeof id !== 'string' || id === '' || id.length > 100 || seen.has(id)) return undefined;
+    if (typeof title !== 'string' || title.length > MAX_STEP_TITLE) return undefined;
+    if (typeof done !== 'boolean') return undefined;
+    seen.add(id);
+    out.push({ id, title, done });
+  }
+  return out;
+}
 
 /**
  * The only gate for data coming from outside (import, storage): anything it accepts, the app
@@ -40,6 +57,11 @@ export function parseTask(raw: unknown): Result<Task, string> {
   if (r['due'] !== undefined) {
     if (typeof r['due'] !== 'string' || !isCivilDate(r['due'])) return err('due');
     task.due = r['due'];
+  }
+  if (r['steps'] !== undefined) {
+    const steps = parseSteps(r['steps']);
+    if (!steps) return err('steps');
+    task.steps = steps;
   }
   if (r['doneAt'] !== undefined) {
     if (!isTime(r['doneAt'])) return err('doneAt');
