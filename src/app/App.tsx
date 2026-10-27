@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useSyncExternalStore } from 'react';
 import { useTasks } from '@/features/useTasks';
 import type { NawyDoDb } from '@/data';
 import { Composer } from '@/ui/Composer';
@@ -9,6 +9,7 @@ import { ViewTabs, type View } from '@/ui/ViewTabs';
 import '@/ui/styles.css';
 import { systemClock, systemToday } from './clock';
 import { getDb } from './db';
+import { updateSignal } from './updateSignal';
 
 interface Props {
   db?: NawyDoDb;
@@ -19,6 +20,7 @@ interface Props {
 export function App({ db, now = systemClock, today = systemToday }: Props) {
   const database = useMemo(() => db ?? getDb(), [db]);
   const api = useTasks(database, now);
+  const applyUpdate = useSyncExternalStore(updateSignal.subscribe, updateSignal.get);
   const [view, setView] = useState<View>('all');
   const [openId, setOpenId] = useState<string | null>(null);
   // The sheet shows the task as it is now; if it was deleted elsewhere it simply closes.
@@ -26,6 +28,14 @@ export function App({ db, now = systemClock, today = systemToday }: Props) {
 
   return (
     <main className="app">
+      {applyUpdate && (
+        <div className="update" role="status">
+          <span>في نسخة جديدة من ناوي دو.</span>
+          <button type="button" onClick={applyUpdate}>
+            حدّث
+          </button>
+        </div>
+      )}
       <h1>ناوي دو</h1>
       <Composer onAdd={(title) => void api.add(title)} />
       <ViewTabs view={view} onChange={setView} />

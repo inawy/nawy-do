@@ -243,3 +243,20 @@ h2 {
 .actions button {
   padding-inline: 1rem;
 }
+.update {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.25rem 0.25rem 0.25rem 1rem;
+  margin-block-end: 1rem;
+  background: var(--card);
+  border: 1px solid var(--brand);
+  border-radius: 12px;
+}
+.update button {
+  background: var(--brand);
+  color: var(--on-brand);
+  border-color: var(--brand);
+  padding-inline: 1rem;
+}

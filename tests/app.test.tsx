@@ -1,5 +1,5 @@
 import 'fake-indexeddb/auto';
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { App } from '@/app/App';
 import { allRecords, createDb, type NawyDoDb } from '@/data';
@@ -86,5 +86,19 @@ describe('App', () => {
     await waitFor(() => expect(screen.queryByText('بكرة')).toBeNull());
     fireEvent.click(screen.getByRole('button', { name: 'مجدولة' }));
     await screen.findByText(/مفيش نوايا بتاريخ/);
+  });
+});
+
+describe('update banner', () => {
+  it('shows only when a new version is waiting and applies it on click', async () => {
+    const { updateSignal } = await import('@/app/updateSignal');
+    render(<App db={db} now={now} today={today} />);
+    expect(screen.queryByText('في نسخة جديدة من ناوي دو.')).toBeNull();
+    let applied = 0;
+    act(() => updateSignal.set(() => applied++));
+    await screen.findByText('في نسخة جديدة من ناوي دو.');
+    fireEvent.click(screen.getByRole('button', { name: 'حدّث' }));
+    expect(applied).toBe(1);
+    act(() => updateSignal.set(undefined));
   });
 });
