@@ -13,6 +13,7 @@ describe('parseTask', () => {
     [{ ...t, id: '' }, 'id'],
     [{ ...t, status: 'x' }, 'status'],
     [{ ...t, due: '2026-13-01' }, 'due'],
+    [{ ...t, due: '2026-02-31' }, 'due'],
     [{ ...t, updatedAt: -1 }, 'updatedAt'],
     [{ ...t, title: 5 }, 'title'],
   ])('rejects %j', (raw, field) => {
