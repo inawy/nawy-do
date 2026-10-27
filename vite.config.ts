@@ -1,0 +1,11 @@
+import { fileURLToPath, URL } from 'node:url';
+import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vitest/config';
+
+// base './' lets the build run under a sub-path (GitHub Pages, nawy.to/do).
+export default defineConfig({
+  base: './',
+  plugins: [react()],
+  resolve: { alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) } },
+  test: { environment: 'jsdom', include: ['tests/**/*.test.{ts,tsx}'] },
+});
