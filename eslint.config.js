@@ -53,7 +53,12 @@ export default tseslint.config(
   },
   {
     files: ['src/**/*.{ts,tsx}'],
+    ignores: ['src/app/clock.ts'],
     rules: { 'no-restricted-syntax': ['error', noInnerHtml, ...noRawDate] },
+  },
+  {
+    files: ['src/app/clock.ts'],
+    rules: { 'no-restricted-syntax': ['error', noInnerHtml] },
   },
   {
     files: ['src/data/**/*.{ts,tsx}'],

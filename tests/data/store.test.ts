@@ -13,6 +13,7 @@ import {
   listTasks,
   purgeTombstones,
   removeTask,
+  restoreRemoved,
   reopenTaskById,
   TOMBSTONE_TTL_MS,
   type NawyDoDb,
@@ -107,5 +108,21 @@ describe('backup', () => {
     const file = await exportBackup(db, 1);
     const r = await importBackup(db, file);
     expect(r.ok && r.value.changed).toBe(0);
+  });
+});
+
+describe('undo of a delete', () => {
+  it('restores the task and the restore wins over the tombstone in a merge', async () => {
+    const t = await addTask(db, 'a', 'x', 100);
+    const dead = await removeTask(db, 'a', 200);
+    const back = await restoreRemoved(db, t, 210);
+    expect(back?.deletedAt).toBeUndefined();
+    expect((await listTasks(db)).map((x) => x.id)).toEqual(['a']);
+    if (dead) expect(await applyRecords(db, [dead])).toBe(0);
+    expect(await listTasks(db)).toHaveLength(1);
+  });
+  it('does nothing when the task is not deleted', async () => {
+    const t = await addTask(db, 'a', 'x', 100);
+    expect(await restoreRemoved(db, t, 200)).toBeUndefined();
   });
 });

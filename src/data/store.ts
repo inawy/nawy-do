@@ -4,6 +4,7 @@ import {
   isDeleted,
   mergeTask,
   reopenTask,
+  restoreTask,
   tombstoneTask,
   updateTask,
   type Task,
@@ -68,5 +69,20 @@ export async function applyRecords(db: NawyDoDb, incoming: readonly Task[]): Pro
       }
     }
     return changed;
+  });
+}
+
+/** Undo of a delete. Does nothing if the record is gone or was already restored. */
+export async function restoreRemoved(
+  db: NawyDoDb,
+  previous: Task,
+  now: number,
+): Promise<Task | undefined> {
+  return db.transaction('rw', db.tasks, async () => {
+    const current = await db.tasks.get(previous.id);
+    if (!current || !isDeleted(current)) return undefined;
+    const next = restoreTask(previous, current, now);
+    await db.tasks.put(next);
+    return next;
   });
 }
