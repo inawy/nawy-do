@@ -58,3 +58,13 @@ export function tombstoneTask(task: Task, now: number): Task {
 }
 
 export const isDeleted = (task: Task): boolean => task.deletedAt !== undefined;
+
+/**
+ * Undo of a delete: the previous live record again, stamped newer than the tombstone so the
+ * restore wins every merge (D-006).
+ */
+export function restoreTask(previous: Task, current: Task, now: number): Task {
+  const next: Task = { ...previous, updatedAt: nextUpdatedAt(current.updatedAt, now) };
+  delete next.deletedAt;
+  return next;
+}

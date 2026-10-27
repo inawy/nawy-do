@@ -1,10 +1,40 @@
-// Placeholder shell (phase 0). No feature is shown that does not work yet.
-export function App() {
+import { useMemo } from 'react';
+import { useTasks } from '@/features/useTasks';
+import type { NawyDoDb } from '@/data';
+import { Composer } from '@/ui/Composer';
+import { TaskList } from '@/ui/TaskList';
+import { UndoToast } from '@/ui/UndoToast';
+import '@/ui/styles.css';
+import { systemClock } from './clock';
+import { getDb } from './db';
+
+export function App({ db, now = systemClock }: { db?: NawyDoDb; now?: () => number }) {
+  const database = useMemo(() => db ?? getDb(), [db]);
+  const api = useTasks(database, now);
   return (
-    <main style={{ padding: '2rem', maxWidth: '40rem', margin: '0 auto' }}>
+    <main className="app">
       <h1>ناوي دو</h1>
-      <p>ناوي تعمل إيه؟</p>
-      <p>قيد البناء.</p>
+      <Composer onAdd={(title) => void api.add(title)} />
+      {api.failed ? (
+        <p className="status" role="alert">
+          مش قادر أفتح التخزين على الجهاز. لو فاتح تصفح خاص جرّب نافذة عادية.
+        </p>
+      ) : !api.ready ? (
+        <p className="status">جاري التحميل…</p>
+      ) : (
+        <TaskList
+          tasks={api.tasks}
+          onToggle={(t) => void api.toggle(t)}
+          onRemove={(t) => void api.remove(t)}
+        />
+      )}
+      {api.lastRemoved && (
+        <UndoToast
+          title={api.lastRemoved.title}
+          onUndo={() => void api.undoRemove()}
+          onDismiss={api.dismissUndo}
+        />
+      )}
     </main>
   );
 }
