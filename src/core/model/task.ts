@@ -37,8 +37,9 @@ export function completeTask(task: Task, now: number): Task {
 
 export function reopenTask(task: Task, now: number): Task {
   if (task.status === 'open') return task;
-  const { doneAt: _doneAt, ...rest } = task;
-  return { ...rest, status: 'open', updatedAt: nextUpdatedAt(task.updatedAt, now) };
+  const next: Task = { ...task, status: 'open', updatedAt: nextUpdatedAt(task.updatedAt, now) };
+  delete next.doneAt;
+  return next;
 }
 
 /** Deleting never removes a record; it replaces it with a tombstone that keeps no content. */
