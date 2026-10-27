@@ -21,7 +21,8 @@ test('adds an intention and it survives a reload', async ({ page }) => {
 
 test('completes, then deletes with undo', async ({ page }) => {
   await add(page, 'مهمة اختبار');
-  await page.getByRole('checkbox').check();
+  // click, not check(): the task leaves the list at once, so there is no state left to verify.
+  await page.getByRole('checkbox').click();
   await expect(page.getByText('المنجزة (1)')).toBeVisible();
   await page.getByText('المنجزة (1)').click();
   await page.getByRole('button', { name: 'حذف: مهمة اختبار' }).click();
