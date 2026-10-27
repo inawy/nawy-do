@@ -260,3 +260,35 @@ h2 {
   border-color: var(--brand);
   padding-inline: 1rem;
 }
+.steps {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+.steps legend {
+  color: var(--muted);
+  font-size: 0.875rem;
+  padding: 0;
+  margin-block-end: 0.25rem;
+}
+.step {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.done-title {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+.add-step {
+  display: flex;
+  gap: 0.5rem;
+}
+.add-step input {
+  flex: 1;
+}
+.add-step button {
+  padding-inline: 1rem;
+}

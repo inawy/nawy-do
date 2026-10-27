@@ -88,6 +88,21 @@ describe('App', () => {
     await screen.findByText(/مفيش نوايا بتاريخ/);
   });
 });
+describe('steps', () => {
+  it('adds steps in the sheet, shows progress, and keeps a typed step on save', async () => {
+    render(<App db={db} now={now} today={today} />);
+    await addIntention('سفر');
+    fireEvent.click(screen.getByRole('button', { name: 'تفاصيل: سفر' }));
+    const input = screen.getByLabelText('خطوة جديدة');
+    fireEvent.change(input, { target: { value: 'احجز التذكرة' } });
+    fireEvent.click(screen.getByRole('button', { name: 'أضف خطوة' }));
+    fireEvent.click(screen.getByRole('checkbox', { name: 'احجز التذكرة' }));
+    fireEvent.change(screen.getByLabelText('خطوة جديدة'), { target: { value: 'جهّز الشنطة' } });
+    fireEvent.click(screen.getByRole('button', { name: 'حفظ' }));
+    await screen.findByText('خطوات 1/2');
+    expect((await allRecords(db))[0]?.steps).toHaveLength(2);
+  });
+});
 
 describe('update banner', () => {
   it('shows only when a new version is waiting and applies it on click', async () => {

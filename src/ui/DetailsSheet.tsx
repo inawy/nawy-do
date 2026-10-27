@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import type { Task, TaskPatch } from '@/core/model';
+import { MAX_STEPS, MAX_STEP_TITLE, type Step, type Task, type TaskPatch } from '@/core/model';
 
 interface Props {
   task: Task;
@@ -12,6 +12,15 @@ export function DetailsSheet({ task, onSave, onClose }: Props) {
   const [title, setTitle] = useState(task.title);
   const [notes, setNotes] = useState(task.notes ?? '');
   const [due, setDue] = useState(task.due ?? '');
+  const [steps, setSteps] = useState<Step[]>(task.steps ?? []);
+  const [newStep, setNewStep] = useState('');
+
+  const addStep = () => {
+    const title = newStep.trim();
+    if (title === '' || steps.length >= MAX_STEPS) return;
+    setSteps([...steps, { id: crypto.randomUUID(), title, done: false }]);
+    setNewStep('');
+  };
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -31,7 +40,13 @@ export function DetailsSheet({ task, onSave, onClose }: Props) {
         onClick={(e) => e.stopPropagation()}
         onSubmit={(e) => {
           e.preventDefault();
-          onSave({ title, notes, due });
+          // A step typed but not added yet is added on save, so it is never silently lost.
+          const pending = newStep.trim();
+          const all =
+            pending !== '' && steps.length < MAX_STEPS
+              ? [...steps, { id: crypto.randomUUID(), title: pending, done: false }]
+              : steps;
+          onSave({ title, notes, due, steps: all });
           onClose();
         }}
       >
@@ -44,6 +59,52 @@ export function DetailsSheet({ task, onSave, onClose }: Props) {
             autoFocus
           />
         </label>
+        <fieldset className="steps">
+          <legend>الخطوات</legend>
+          <ul className="list" aria-label="الخطوات">
+            {steps.map((st) => (
+              <li key={st.id} className="step">
+                <label className="check">
+                  <input
+                    type="checkbox"
+                    checked={st.done}
+                    onChange={() =>
+                      setSteps(steps.map((x) => (x.id === st.id ? { ...x, done: !x.done } : x)))
+                    }
+                  />
+                  <span className={st.done ? 'title done-title' : 'title'}>{st.title}</span>
+                </label>
+                <button
+                  type="button"
+                  className="icon"
+                  aria-label={`حذف الخطوة: ${st.title}`}
+                  onClick={() => setSteps(steps.filter((x) => x.id !== st.id))}
+                >
+                  ✕
+                </button>
+              </li>
+            ))}
+          </ul>
+          <div className="add-step">
+            <input
+              value={newStep}
+              onChange={(e) => setNewStep(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  addStep();
+                }
+              }}
+              placeholder="خطوة جديدة"
+              aria-label="خطوة جديدة"
+              maxLength={MAX_STEP_TITLE}
+              disabled={steps.length >= MAX_STEPS}
+            />
+            <button type="button" onClick={addStep} disabled={newStep.trim() === ''}>
+              أضف خطوة
+            </button>
+          </div>
+        </fieldset>
         <label>
           ملاحظات
           <textarea

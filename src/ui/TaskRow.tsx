@@ -1,4 +1,4 @@
-import { dueState, formatDue, type Task } from '@/core/model';
+import { dueState, formatDue, stepProgress, type Task } from '@/core/model';
 
 interface Props {
   task: Task;
@@ -10,6 +10,7 @@ interface Props {
 
 export function TaskRow({ task, today, onToggle, onOpen, onRemove }: Props) {
   const done = task.status === 'done';
+  const progress = stepProgress(task);
   const state = task.due ? dueState(task.due, today) : undefined;
   return (
     <li className={done ? 'row done' : 'row'}>
@@ -17,11 +18,16 @@ export function TaskRow({ task, today, onToggle, onOpen, onRemove }: Props) {
         <input type="checkbox" checked={done} onChange={() => onToggle(task)} />
         <span className="text">
           <span className="title">{task.title}</span>
-          {(task.due || task.notes) && (
+          {(task.due || task.notes || progress) && (
             <span className="meta">
               {task.due && (
                 <span className={done ? 'chip' : `chip ${state ?? ''}`}>
                   {formatDue(task.due, today)}
+                </span>
+              )}
+              {progress && (
+                <span className="chip">
+                  خطوات {progress.done}/{progress.total}
                 </span>
               )}
               {task.notes && <span className="chip">ملاحظات</span>}
