@@ -1,7 +1,7 @@
+import { isCivilDate } from './civil';
 import { err, ok, type Result } from './result';
 import type { Task } from './types';
 
-const DATE = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
 const MAX_TITLE = 1000;
 const MAX_NOTES = 20_000;
 
@@ -38,7 +38,7 @@ export function parseTask(raw: unknown): Result<Task, string> {
     task.notes = r['notes'];
   }
   if (r['due'] !== undefined) {
-    if (typeof r['due'] !== 'string' || !DATE.test(r['due'])) return err('due');
+    if (typeof r['due'] !== 'string' || !isCivilDate(r['due'])) return err('due');
     task.due = r['due'];
   }
   if (r['doneAt'] !== undefined) {

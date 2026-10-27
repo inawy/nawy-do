@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
-import type { Task } from '@/core/model';
+import type { Task, TaskPatch } from '@/core/model';
 import {
   addTask,
   completeTaskById,
+  editTask,
   removeTask,
   reopenTaskById,
   restoreRemoved,
@@ -20,6 +21,7 @@ export interface TasksApi {
   lastRemoved: Task | null;
   add: (title: string) => Promise<void>;
   toggle: (task: Task) => Promise<void>;
+  edit: (task: Task, patch: TaskPatch) => Promise<void>;
   remove: (task: Task) => Promise<void>;
   undoRemove: () => Promise<void>;
   dismissUndo: () => void;
@@ -72,6 +74,13 @@ export function useTasks(db: NawyDoDb, now: () => number): TasksApi {
     [db, now, guard],
   );
 
+  const edit = useCallback(
+    async (task: Task, patch: TaskPatch) => {
+      await guard(() => editTask(db, task.id, patch, now()));
+    },
+    [db, now, guard],
+  );
+
   const remove = useCallback(
     async (task: Task) => {
       await guard(async () => {
@@ -91,5 +100,5 @@ export function useTasks(db: NawyDoDb, now: () => number): TasksApi {
 
   const dismissUndo = useCallback(() => setLastRemoved(null), []);
 
-  return { tasks, ready, failed, lastRemoved, add, toggle, remove, undoRemove, dismissUndo };
+  return { tasks, ready, failed, lastRemoved, add, toggle, edit, remove, undoRemove, dismissUndo };
 }

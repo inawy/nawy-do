@@ -149,3 +149,97 @@ button:disabled {
   border-color: currentColor;
   padding-inline: 1rem;
 }
+.text {
+  display: grid;
+  gap: 0.125rem;
+  padding-block: 0.375rem;
+}
+.meta {
+  display: flex;
+  gap: 0.375rem;
+  flex-wrap: wrap;
+}
+.chip {
+  font-size: 0.8125rem;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0 0.5rem;
+}
+.chip.overdue {
+  color: #dc2626;
+  border-color: #dc2626;
+}
+.chip.today {
+  color: var(--brand);
+  border-color: var(--brand);
+}
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-block-end: 1rem;
+}
+.tab[aria-pressed='true'] {
+  background: var(--ink);
+  color: var(--page);
+  border-color: var(--ink);
+}
+.tab {
+  padding-inline: 1rem;
+}
+h2 {
+  font-size: 1rem;
+  color: var(--muted);
+  margin: 1.25rem 0 0.5rem;
+}
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgb(0 0 0 / 0.45);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.sheet {
+  inline-size: 100%;
+  max-inline-size: 40rem;
+  background: var(--card);
+  color: var(--ink);
+  border-radius: 16px 16px 0 0;
+  padding: 1rem 1rem calc(1rem + env(safe-area-inset-bottom));
+  display: grid;
+  gap: 0.75rem;
+  max-block-size: 90dvh;
+  overflow: auto;
+}
+.sheet label {
+  display: grid;
+  gap: 0.25rem;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+.sheet input,
+.sheet textarea {
+  font: inherit;
+  font-size: 16px;
+  min-block-size: 44px;
+  padding: 0.5rem 0.75rem;
+  color: var(--ink);
+  background: var(--page);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+.actions .primary {
+  background: var(--brand);
+  color: var(--on-brand);
+  border-color: var(--brand);
+  padding-inline: 1.25rem;
+}
+.actions button {
+  padding-inline: 1rem;
+}

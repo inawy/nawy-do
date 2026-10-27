@@ -1,3 +1,4 @@
+import { isCivilDate } from './civil';
 import type { Task } from './types';
 
 /**
@@ -23,9 +24,27 @@ export function createTask(id: string, title: string, now: number, sortOrder = n
 
 export type TaskPatch = Partial<Pick<Task, 'title' | 'notes' | 'starred' | 'due' | 'sortOrder'>>;
 
+/**
+ * Applies a patch. An empty title or an invalid date is ignored (the old value stays); `notes`
+ * or `due` set to `undefined` or `''` removes the field.
+ */
 export function updateTask(task: Task, patch: TaskPatch, now: number): Task {
   const next: Task = { ...task, ...patch, updatedAt: nextUpdatedAt(task.updatedAt, now) };
-  if (patch.title !== undefined) next.title = patch.title.trim();
+  if (patch.title !== undefined) {
+    const title = patch.title.trim();
+    if (title === '') next.title = task.title;
+    else next.title = title;
+  }
+  if ('notes' in patch && (patch.notes === undefined || patch.notes.trim() === '')) {
+    delete next.notes;
+  }
+  if ('due' in patch) {
+    if (patch.due === undefined || patch.due === '') delete next.due;
+    else if (!isCivilDate(patch.due)) {
+      if (task.due === undefined) delete next.due;
+      else next.due = task.due;
+    }
+  }
   return next;
 }
 

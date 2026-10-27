@@ -15,3 +15,21 @@ export function groupTasks(tasks: readonly Task[]): TaskGroups {
     .sort((a, b) => (b.doneAt ?? 0) - (a.doneAt ?? 0) || a.id.localeCompare(b.id));
   return { open, done };
 }
+
+export interface ScheduledGroups {
+  overdue: Task[];
+  today: Task[];
+  upcoming: Task[];
+}
+
+/** Open tasks that have a due date, split by how they relate to `today` and sorted by date. */
+export function groupScheduled(tasks: readonly Task[], today: string): ScheduledGroups {
+  const dated = tasks
+    .filter((t) => t.status === 'open' && t.deletedAt === undefined && t.due !== undefined)
+    .sort((a, b) => (a.due ?? '').localeCompare(b.due ?? '') || a.sortOrder - b.sortOrder);
+  return {
+    overdue: dated.filter((t) => (t.due ?? '') < today),
+    today: dated.filter((t) => t.due === today),
+    upcoming: dated.filter((t) => (t.due ?? '') > today),
+  };
+}
