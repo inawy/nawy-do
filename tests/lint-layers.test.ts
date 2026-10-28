@@ -40,12 +40,23 @@ describe('layering', () => {
 
   it('allows the normal direction', async () => {
     expect(
-      await rules('src/ui/tasks/x.ts', "import { groupTasks } from '@/core/model';\n"),
+      await rules(
+        'src/ui/tasks/x.ts',
+        "import { groupTasks } from '@/core/model';\nexport const x = groupTasks;\n",
+      ),
     ).toEqual([]);
-    expect(await rules('src/app/x.ts', "import { TasksScreen } from '@/ui/shell';\n")).toEqual([]);
-    expect(await rules('src/features/tasks/x.ts', "import { addTask } from '@/data';\n")).toEqual(
-      [],
-    );
+    expect(
+      await rules(
+        'src/app/x.ts',
+        "import { TasksScreen } from '@/ui/shell';\nexport const x = TasksScreen;\n",
+      ),
+    ).toEqual([]);
+    expect(
+      await rules(
+        'src/features/tasks/x.ts',
+        "import { addTask } from '@/data';\nexport const x = addTask;\n",
+      ),
+    ).toEqual([]);
   });
 });
 
