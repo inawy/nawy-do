@@ -33,3 +33,15 @@ export function groupScheduled(tasks: readonly Task[], today: string): Scheduled
     upcoming: dated.filter((t) => (t.due ?? '') > today),
   };
 }
+
+export type ViewId = 'all' | 'starred' | 'scheduled';
+
+/** Open-task counts shown on the navigation. */
+export function viewCounts(tasks: readonly Task[]): Record<ViewId, number> {
+  const open = tasks.filter((t) => t.status === 'open' && t.deletedAt === undefined);
+  return {
+    all: open.length,
+    starred: open.filter((t) => t.starred).length,
+    scheduled: open.filter((t) => t.due !== undefined).length,
+  };
+}

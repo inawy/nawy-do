@@ -25,10 +25,20 @@ test('completes, then deletes with undo', async ({ page }) => {
   await page.getByRole('checkbox').click();
   await expect(page.getByText('المنجزة (1)')).toBeVisible();
   await page.getByText('المنجزة (1)').click();
-  await page.getByRole('button', { name: 'حذف: مهمة اختبار' }).click();
+  await page.getByRole('button', { name: 'تفاصيل: مهمة اختبار' }).click();
+  await page.getByRole('button', { name: 'حذف النية' }).click();
   await expect(page.getByText('اتحذفت: مهمة اختبار')).toBeVisible();
   await page.getByRole('button', { name: 'تراجع' }).click();
   await expect(page.getByText('المنجزة (1)')).toBeVisible();
+});
+
+test('a starred intention appears in the favourites view', async ({ page }) => {
+  await add(page, 'مهمة مميزة');
+  await add(page, 'مهمة عادية');
+  await page.getByRole('button', { name: 'تمييز: مهمة مميزة' }).click();
+  await page.getByRole('button', { name: 'المفضلة' }).click();
+  await expect(page.getByText('مهمة مميزة', { exact: true })).toBeVisible();
+  await expect(page.getByText('مهمة عادية', { exact: true })).toHaveCount(0);
 });
 
 test('a due date shows in the scheduled view', async ({ page }) => {

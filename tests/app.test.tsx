@@ -49,7 +49,8 @@ describe('App', () => {
   it('deletes with a tombstone and undo brings it back', async () => {
     render(<App db={db} now={now} today={today} />);
     await addIntention('سر');
-    fireEvent.click(screen.getByRole('button', { name: 'حذف: سر' }));
+    fireEvent.click(screen.getByRole('button', { name: 'تفاصيل: سر' }));
+    fireEvent.click(screen.getByRole('button', { name: 'حذف النية' }));
     await screen.findByText('اتحذفت: سر');
     await waitFor(async () => expect((await allRecords(db))[0]?.deletedAt).toBeDefined());
     fireEvent.click(screen.getByRole('button', { name: 'تراجع' }));
@@ -64,12 +65,12 @@ describe('App', () => {
     fireEvent.change(screen.getByLabelText('تاريخ الاستحقاق'), { target: { value: '2026-10-27' } });
     fireEvent.change(screen.getByLabelText('ملاحظات'), { target: { value: 'من التطبيق' } });
     fireEvent.click(screen.getByRole('button', { name: 'حفظ' }));
-    await screen.findByText('ملاحظات');
+    await screen.findByText('من التطبيق');
     expect(screen.getAllByText('النهارده').length).toBeGreaterThan(0);
 
     fireEvent.click(screen.getByRole('button', { name: 'مجدولة' }));
     await screen.findByRole('heading', { name: 'النهارده' });
-    fireEvent.click(screen.getByRole('button', { name: 'الكل' }));
+    fireEvent.click(screen.getByRole('button', { name: 'نواياي' }));
     expect(screen.queryByRole('heading', { name: 'النهارده' })).toBeNull();
   });
 
@@ -88,6 +89,31 @@ describe('App', () => {
     await screen.findByText(/مفيش نوايا بتاريخ/);
   });
 });
+describe('stars', () => {
+  it('marks an intention and lists it in the favourites view', async () => {
+    render(<App db={db} now={now} today={today} />);
+    await addIntention('عادية');
+    await addIntention('مهمة');
+    fireEvent.click(screen.getByRole('button', { name: 'تمييز: مهمة' }));
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'تمييز: مهمة' }).getAttribute('aria-pressed')).toBe(
+        'true',
+      ),
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'المفضلة' }));
+    await screen.findByRole('heading', { name: 'المفضلة' });
+    expect(screen.queryByText('عادية')).toBeNull();
+    expect(screen.getByText('مهمة')).toBeTruthy();
+  });
+
+  it('shows an honest empty state for favourites', async () => {
+    render(<App db={db} now={now} today={today} />);
+    await screen.findByText(/مفيش نوايا لسه/);
+    fireEvent.click(screen.getByRole('button', { name: 'المفضلة' }));
+    await screen.findByText(/مفيش نوايا مميزة/);
+  });
+});
+
 describe('steps', () => {
   it('adds steps in the sheet, shows progress, and keeps a typed step on save', async () => {
     render(<App db={db} now={now} today={today} />);
