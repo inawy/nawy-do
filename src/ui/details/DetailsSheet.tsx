@@ -1,9 +1,18 @@
 import { useEffect, useState } from 'react';
-import { MAX_STEPS, MAX_STEP_TITLE, type Step, type Task, type TaskPatch } from '@/core/model';
+import {
+  listOf,
+  MAX_STEPS,
+  MAX_STEP_TITLE,
+  type Step,
+  type Task,
+  type TaskList,
+  type TaskPatch,
+} from '@/core/model';
 import { CloseIcon, StarIcon, TrashIcon } from '../primitives';
 
 interface Props {
   task: Task;
+  lists: TaskList[];
   onSave: (patch: TaskPatch) => void;
   onRemove: () => void;
   onClose: () => void;
@@ -13,13 +22,15 @@ interface Props {
  * Details of one intention: a bottom sheet on phones, a centred card on wide screens. Saving an
  * empty title keeps the old one; clearing the date or notes removes them.
  */
-export function DetailsSheet({ task, onSave, onRemove, onClose }: Props) {
+export function DetailsSheet({ task, lists, onSave, onRemove, onClose }: Props) {
   const [title, setTitle] = useState(task.title);
   const [notes, setNotes] = useState(task.notes ?? '');
   const [due, setDue] = useState(task.due ?? '');
   const [starred, setStarred] = useState(task.starred);
   const [steps, setSteps] = useState<Step[]>(task.steps ?? []);
   const [newStep, setNewStep] = useState('');
+  // A task whose list was deleted shows (and saves) as belonging to the main list.
+  const [listId, setListId] = useState(listOf(task, lists) ?? '');
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -52,7 +63,7 @@ export function DetailsSheet({ task, onSave, onRemove, onClose }: Props) {
             pending !== '' && steps.length < MAX_STEPS
               ? [...steps, { id: crypto.randomUUID(), title: pending, done: false }]
               : steps;
-          onSave({ title, notes, due, steps: all, starred });
+          onSave({ title, notes, due, steps: all, starred, listId });
           onClose();
         }}
       >
@@ -89,6 +100,20 @@ export function DetailsSheet({ task, onSave, onRemove, onClose }: Props) {
             maxLength={20000}
           />
         </label>
+
+        {lists.length > 0 && (
+          <label className="field">
+            <span>القائمة</span>
+            <select aria-label="القائمة" value={listId} onChange={(e) => setListId(e.target.value)}>
+              <option value="">نواياي</option>
+              {lists.map((l) => (
+                <option key={l.id} value={l.id}>
+                  {l.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
 
         <label className="field">
           <span>تاريخ الاستحقاق</span>

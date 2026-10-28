@@ -18,16 +18,18 @@ core  ←  data  ←  features  ←  ui  ←  app
 
 ```text
 src/
-  core/model/          نموذج المهمة (types · task · group · order · merge · validate · envelope · civil)
-  data/                schema · store · live · backup · purge
-  features/<ميزة>/     index.ts + ملفاتها (مثلًا tasks/)
+  core/model/          نموذج المهمة والقوائم (types · task · lists · selection · group · order · merge · validate · envelope · civil)
+  data/                schema · store · lists · live · backup · purge · migrate
+  features/<ميزة>/     index.ts + ملفاتها (tasks/ · lists/)
   ui/
     primitives/        أيقونات وعناصر صغيرة بلا منطق
     tasks/             Composer · TaskRow · TaskList · UndoToast
+    lists/             ListSheet
+    sortable/          useSortable
     details/           DetailsSheet
     shell/             TasksScreen · Nav (تركيب الشاشة)
     styles/            tokens · base · shell · tasks · details · feedback (index.css يجمعها)
-  app/                 App · clock · db · updateSignal
+  app/                 App · bootstrap · clock · db · updateSignal
 ```
 
 **قاعدة الوحدة:** كل وحدة في `ui/` و`features/` تُستخدم **عبر `index.ts` فقط** (`@/ui/shell` نعم، `@/ui/shell/Nav` لا). داخل الوحدة تُستخدم المسارات النسبية. القاعدة مفروضة بـ lint (D-015).

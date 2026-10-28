@@ -135,3 +135,37 @@
     box-shadow: 0 12px 40px rgb(0 0 0 / 0.3);
   }
 }
+
+.sheet-heading {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+.field select {
+  font-size: 16px;
+  min-block-size: 44px;
+  padding: 0.5rem 0.75rem;
+  color: var(--ink);
+  background: var(--page);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.form-error {
+  margin: 0;
+  color: var(--danger);
+  font-size: 0.875rem;
+}
+.form-warn {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+.actions .danger.solid {
+  background: var(--danger);
+  color: var(--on-brand);
+  border-color: var(--danger);
+}
+.actions .primary:disabled {
+  opacity: 0.5;
+  cursor: default;
+}

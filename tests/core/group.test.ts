@@ -28,13 +28,18 @@ describe('restoreTask', () => {
   });
 });
 
-describe('viewCounts', () => {
+describe('countsFor', () => {
   it('counts open tasks per view and ignores done and deleted ones', async () => {
-    const { viewCounts } = await import('@/core/model');
+    const { countsFor } = await import('@/core/model');
     const a = { ...createTask('a', 'a', 1), starred: true, due: '2026-11-01' };
     const b = createTask('b', 'b', 2);
     const done = completeTask({ ...createTask('c', 'c', 3), starred: true }, 4);
     const dead = tombstoneTask(createTask('d', 'd', 5), 6);
-    expect(viewCounts([a, b, done, dead])).toEqual({ all: 2, starred: 1, scheduled: 1 });
+    expect(countsFor([a, b, done, dead], [])).toEqual({
+      main: 2,
+      starred: 1,
+      scheduled: 1,
+      lists: {},
+    });
   });
 });

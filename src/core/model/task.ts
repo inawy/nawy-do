@@ -23,7 +23,7 @@ export function createTask(id: string, title: string, now: number, sortOrder = n
 }
 
 export type TaskPatch = Partial<
-  Pick<Task, 'title' | 'notes' | 'starred' | 'due' | 'sortOrder' | 'steps'>
+  Pick<Task, 'title' | 'notes' | 'starred' | 'due' | 'sortOrder' | 'steps' | 'listId'>
 >;
 
 /** Trims titles, drops empty ones and duplicate ids, and caps the count. */
@@ -59,6 +59,9 @@ export function updateTask(task: Task, patch: TaskPatch, now: number): Task {
   }
   if ('notes' in patch && (patch.notes === undefined || patch.notes.trim() === '')) {
     delete next.notes;
+  }
+  if ('listId' in patch && (patch.listId === undefined || patch.listId === '')) {
+    delete next.listId;
   }
   if ('steps' in patch) {
     const steps = cleanSteps(patch.steps ?? []);

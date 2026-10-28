@@ -26,8 +26,23 @@ export function allRecords(db: NawyDoDb): Promise<Task[]> {
   return db.tasks.toArray();
 }
 
-export async function addTask(db: NawyDoDb, id: string, title: string, now: number): Promise<Task> {
+export interface NewTaskOptions {
+  listId?: string;
+  starred?: boolean;
+  due?: string;
+}
+
+export async function addTask(
+  db: NawyDoDb,
+  id: string,
+  title: string,
+  now: number,
+  options: NewTaskOptions = {},
+): Promise<Task> {
   const task = createTask(id, title, now);
+  if (options.listId) task.listId = options.listId;
+  if (options.starred) task.starred = true;
+  if (options.due) task.due = options.due;
   await db.tasks.add(task);
   return task;
 }

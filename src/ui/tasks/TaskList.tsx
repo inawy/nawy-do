@@ -1,5 +1,11 @@
 import { useState } from 'react';
-import { groupScheduled, groupTasks, type Task, type ViewId } from '@/core/model';
+import {
+  groupScheduled,
+  groupTasks,
+  selectedListId,
+  type Selection,
+  type Task,
+} from '@/core/model';
 import { ChevronIcon } from '../primitives';
 import { useSortable } from '../sortable';
 import { TaskRow } from './TaskRow';
@@ -7,24 +13,27 @@ import { TaskRow } from './TaskRow';
 interface Props {
   tasks: Task[];
   today: string;
-  view: ViewId;
+  view: Selection;
   onToggle: (task: Task) => void;
   onStar: (task: Task) => void;
   onOpen: (task: Task) => void;
   onMove: (id: string, toIndex: number) => void;
 }
 
-const EMPTY: Record<ViewId, string> = {
-  all: 'مفيش نوايا لسه. اكتب أول نية فوق.',
+const EMPTY = {
+  main: 'مفيش نوايا لسه. اكتب أول نية فوق.',
+  list: 'القائمة فاضية. اكتب أول نية فيها فوق.',
   starred: 'مفيش نوايا مميزة. دوس على النجمة جنب أي نية.',
   scheduled: 'مفيش نوايا بتاريخ. افتح نية وحدد لها يوم.',
-};
+} as const;
 
 export function TaskList({ tasks, today, view, onToggle, onStar, onOpen, onMove }: Props) {
   const grouped = groupTasks(view === 'starred' ? tasks.filter((t) => t.starred) : tasks);
   const [announcement, setAnnouncement] = useState('');
-  // Only the "all" view can be re-ordered: it shows every open task, so a move is unambiguous.
-  const canSort = view === 'all' && grouped.open.length > 1;
+  // Only the main list and a single list can be re-ordered: each shows all of its open tasks, so a
+  // move is unambiguous. The favourites and scheduled views are filtered or sorted by date.
+  const canSort =
+    (view === 'main' || selectedListId(view) !== undefined) && grouped.open.length > 1;
   const sortable = useSortable({
     ids: grouped.open.map((t) => t.id),
     enabled: canSort,
@@ -100,7 +109,9 @@ export function TaskList({ tasks, today, view, onToggle, onStar, onOpen, onMove 
   return (
     <>
       {open.length === 0 && done.length === 0 ? (
-        <Empty text={EMPTY[view]} />
+        <Empty
+          text={EMPTY[selectedListId(view) !== undefined ? 'list' : (view as 'main' | 'starred')]}
+        />
       ) : (
         open.length > 0 && rows(open, 'النوايا', true)
       )}

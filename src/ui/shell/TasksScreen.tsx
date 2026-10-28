@@ -1,27 +1,41 @@
-import type { Task, TaskPatch, ViewId } from '@/core/model';
-import { viewCounts } from '@/core/model';
+import { useState } from 'react';
+import {
+  countsFor,
+  listSelection,
+  selectedListId,
+  tasksIn,
+  type Selection,
+  type Task,
+  type TaskList,
+  type TaskPatch,
+} from '@/core/model';
 import { DetailsSheet } from '../details';
-import { Composer, TaskList, UndoToast } from '../tasks';
+import { ListSheet } from '../lists';
+import { MoreIcon } from '../primitives';
+import { Composer, TaskList as Tasks, UndoToast } from '../tasks';
 import '../styles/index.css';
 import { Nav } from './Nav';
 
-const TITLES: Record<ViewId, string> = {
-  all: 'نواياي',
-  starred: 'المفضلة',
-  scheduled: 'مجدولة',
-};
+const TITLES = { main: 'نواياي', starred: 'المفضلة', scheduled: 'مجدولة' } as const;
+
+const LIST_ERRORS = {
+  limit: 'وصلت للحد الأقصى من القوائم.',
+  failed: 'مقدرتش أحفظ القائمة. جرّب تاني.',
+} as const;
 
 export interface TasksScreenProps {
   tasks: Task[];
+  lists: TaskList[];
   today: string;
-  view: ViewId;
+  selection: Selection;
   ready: boolean;
   failed: boolean;
   editing: Task | undefined;
-  lastRemoved: Task | null;
+  /** The task or list just deleted (at most one is offered for undo). */
+  removed: { kind: 'task' | 'list'; label: string } | null;
   /** Set when a new app version is waiting. */
   applyUpdate: (() => void) | undefined;
-  onView: (v: ViewId) => void;
+  onSelect: (s: Selection) => void;
   onAdd: (title: string) => void;
   onToggle: (t: Task) => void;
   onStar: (t: Task) => void;
@@ -30,20 +44,48 @@ export interface TasksScreenProps {
   onClose: () => void;
   onSave: (t: Task, patch: TaskPatch) => void;
   onRemove: (t: Task) => void;
+  onAddList: (name: string) => Promise<TaskList | 'empty' | 'limit' | 'failed'>;
+  onRenameList: (list: TaskList, name: string) => void;
+  onDeleteList: (list: TaskList) => void;
   onUndo: () => void;
   onDismissUndo: () => void;
 }
 
+type Sheet = { mode: 'create' } | { mode: 'edit'; id: string } | null;
+
 /** The whole screen as a function of its props: easy to test and to preview without a database. */
 export function TasksScreen(p: TasksScreenProps) {
-  const counts = viewCounts(p.tasks);
+  const [sheet, setSheet] = useState<Sheet>(null);
+  const [sheetError, setSheetError] = useState<string | undefined>();
+
+  // A list deleted elsewhere while it is open: fall back to the main list.
+  const listId = selectedListId(p.selection);
+  const list = listId === undefined ? undefined : p.lists.find((l) => l.id === listId);
+  const selection: Selection = listId !== undefined && !list ? 'main' : p.selection;
+
+  const counts = countsFor(p.tasks, p.lists);
+  const visible = tasksIn(p.tasks, p.lists, selection);
+  const title = list ? list.name : TITLES[selection as keyof typeof TITLES];
+  const editingList = sheet?.mode === 'edit' ? p.lists.find((l) => l.id === sheet.id) : undefined;
   const { editing } = p;
+
+  const closeSheet = () => {
+    setSheet(null);
+    setSheetError(undefined);
+  };
+
   return (
     <div className="shell">
       <header className="side-head">
         <p className="brand">ناوي دو</p>
       </header>
-      <Nav view={p.view} counts={counts} onChange={p.onView} />
+      <Nav
+        selection={selection}
+        counts={counts}
+        lists={p.lists}
+        onSelect={p.onSelect}
+        onNewList={() => setSheet({ mode: 'create' })}
+      />
       <main className="main">
         {p.applyUpdate && (
           <div className="update" role="status">
@@ -53,7 +95,19 @@ export function TasksScreen(p: TasksScreenProps) {
             </button>
           </div>
         )}
-        <h1>{TITLES[p.view]}</h1>
+        <div className="title-row">
+          <h1>{title}</h1>
+          {list && (
+            <button
+              type="button"
+              className="icon"
+              aria-label="خيارات القائمة"
+              onClick={() => setSheet({ mode: 'edit', id: list.id })}
+            >
+              <MoreIcon />
+            </button>
+          )}
+        </div>
         <Composer onAdd={p.onAdd} />
         {p.failed ? (
           <p className="status" role="alert">
@@ -62,10 +116,10 @@ export function TasksScreen(p: TasksScreenProps) {
         ) : !p.ready ? (
           <p className="status">جاري التحميل…</p>
         ) : (
-          <TaskList
-            tasks={p.tasks}
+          <Tasks
+            tasks={visible}
             today={p.today}
-            view={p.view}
+            view={selection}
             onToggle={p.onToggle}
             onStar={p.onStar}
             onOpen={p.onOpen}
@@ -77,6 +131,7 @@ export function TasksScreen(p: TasksScreenProps) {
         <DetailsSheet
           key={editing.id}
           task={editing}
+          lists={p.lists}
           onSave={(patch) => p.onSave(editing, patch)}
           onRemove={() => {
             p.onRemove(editing);
@@ -85,8 +140,50 @@ export function TasksScreen(p: TasksScreenProps) {
           onClose={p.onClose}
         />
       )}
-      {p.lastRemoved && (
-        <UndoToast title={p.lastRemoved.title} onUndo={p.onUndo} onDismiss={p.onDismissUndo} />
+      {sheet?.mode === 'create' && (
+        <ListSheet
+          mode="create"
+          initialName=""
+          error={sheetError}
+          onClose={closeSheet}
+          onSave={(name) => {
+            void p.onAddList(name).then((result) => {
+              if (typeof result === 'object') {
+                p.onSelect(listSelection(result.id));
+                closeSheet();
+              } else if (result !== 'empty') {
+                setSheetError(LIST_ERRORS[result]);
+              }
+            });
+          }}
+        />
+      )}
+      {editingList && (
+        <ListSheet
+          mode="edit"
+          initialName={editingList.name}
+          onClose={closeSheet}
+          onSave={(name) => {
+            p.onRenameList(editingList, name);
+            closeSheet();
+          }}
+          onDelete={() => {
+            p.onDeleteList(editingList);
+            p.onSelect('main');
+            closeSheet();
+          }}
+        />
+      )}
+      {p.removed && (
+        <UndoToast
+          message={
+            p.removed.kind === 'list'
+              ? `اتحذفت القائمة: ${p.removed.label}`
+              : `اتحذفت: ${p.removed.label}`
+          }
+          onUndo={p.onUndo}
+          onDismiss={p.onDismissUndo}
+        />
       )}
     </div>
   );
