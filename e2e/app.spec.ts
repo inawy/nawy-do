@@ -32,6 +32,27 @@ test('completes, then deletes with undo', async ({ page }) => {
   await expect(page.getByText('المنجزة (1)')).toBeVisible();
 });
 
+/** What is really stored (the screen shows a preview of the new order before the write ends). */
+const stored = (page: Page) =>
+  page.evaluate(
+    () =>
+      new Promise<string[]>((resolve, reject) => {
+        const open = indexedDB.open('nawy-do');
+        open.onerror = () => reject(open.error);
+        open.onsuccess = () => {
+          const db = open.result;
+          const all = db.transaction('tasks').objectStore('tasks').getAll();
+          all.onsuccess = () => {
+            db.close();
+            const live = (all.result as { title: string; sortOrder: number; deletedAt?: number }[])
+              .filter((t) => t.deletedAt === undefined)
+              .sort((a, b) => b.sortOrder - a.sortOrder);
+            resolve(live.map((t) => t.title));
+          };
+        };
+      }),
+  );
+
 const titles = (page: Page) => page.locator('.list[aria-label="النوايا"] .title').allTextContents();
 
 test('drags an intention to a new place and the order survives a reload', async ({ page }) => {
@@ -50,7 +71,7 @@ test('drags an intention to a new place and the order survives a reload', async 
   await page.mouse.move(box.x + box.width / 2, last.y + last.height - 4, { steps: 15 });
   await page.mouse.up();
 
-  await expect.poll(() => titles(page)).toEqual(['الثانية', 'الأولى', 'الثالثة']);
+  await expect.poll(() => stored(page)).toEqual(['الثانية', 'الأولى', 'الثالثة']);
   await page.reload();
   expect(await titles(page)).toEqual(['الثانية', 'الأولى', 'الثالثة']);
 });
