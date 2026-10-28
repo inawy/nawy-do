@@ -1,0 +1,30 @@
+/* Design tokens: the only place colours, radii and sizes are defined. */
+:root {
+  color-scheme: light dark;
+  --page: #f8fafc;
+  --card: #ffffff;
+  --hover: #eef2f8;
+  --ink: #0f172a;
+  --muted: #5b6b82;
+  --line: #e3e8ef;
+  --brand: #3d7bff;
+  --brand-soft: #e4edff;
+  --on-brand: #ffffff;
+  --danger: #d93025;
+  --radius: 16px;
+  --nav-h: 64px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --page: #121212;
+    --card: #1c1c1e;
+    --hover: #26262a;
+    --ink: #f1f5f9;
+    --muted: #9aa8bd;
+    --line: #2c2c31;
+    --brand: #6b9bff;
+    --brand-soft: #1d2a47;
+    --on-brand: #0b1020;
+    --danger: #ff8a80;
+  }
+}

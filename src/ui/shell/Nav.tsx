@@ -1,5 +1,5 @@
 import type { ViewId } from '@/core/model';
-import { AllIcon, CalendarIcon, StarredNavIcon } from './icons';
+import { AllIcon, CalendarIcon, StarredNavIcon } from '../primitives';
 
 const ITEMS: { id: ViewId; label: string; icon: () => React.JSX.Element }[] = [
   { id: 'all', label: 'نواياي', icon: AllIcon },

@@ -1,5 +1,5 @@
 import { groupScheduled, groupTasks, type Task, type ViewId } from '@/core/model';
-import { ChevronIcon } from './icons';
+import { ChevronIcon } from '../primitives';
 import { TaskRow } from './TaskRow';
 
 interface Props {

@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { PlusIcon } from './icons';
+import { PlusIcon } from '../primitives';
 
 /** The "add" row at the top of the list: one line, Enter or the plus button adds. */
 export function Composer({ onAdd }: { onAdd: (title: string) => void }) {
