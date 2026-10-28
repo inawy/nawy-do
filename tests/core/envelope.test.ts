@@ -32,7 +32,7 @@ describe('envelope', () => {
     expect(parseEnvelope('{')).toEqual({ ok: false, error: { code: 'not-json' } });
     const wrong = parseEnvelope(text({ ...base, app: 'nawy-today' }));
     expect(!wrong.ok && wrong.error.code).toBe('wrong-app');
-    const newer = parseEnvelope(text({ ...base, schemaVersion: 2 }));
+    const newer = parseEnvelope(text({ ...base, schemaVersion: 3 }));
     expect(!newer.ok && newer.error.code).toBe('newer-version');
     const bad = parseEnvelope(text({ ...base, tasks: [{ ...t, status: 'zzz' }] }));
     expect(!bad.ok && bad.error).toEqual({ code: 'invalid-record', index: 0, reason: 'status' });
