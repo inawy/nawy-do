@@ -1,5 +1,5 @@
 import { dueState, formatDue, stepProgress, type Task } from '@/core/model';
-import { StarIcon } from './icons';
+import { StarIcon } from '../primitives';
 
 interface Props {
   task: Task;

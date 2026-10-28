@@ -1,8 +1,8 @@
 import { useMemo, useState, useSyncExternalStore } from 'react';
 import type { ViewId } from '@/core/model';
 import type { NawyDoDb } from '@/data';
-import { useTasks } from '@/features/useTasks';
-import { TasksScreen } from '@/ui/TasksScreen';
+import { useTasks } from '@/features/tasks';
+import { TasksScreen } from '@/ui/shell';
 import { systemClock, systemToday } from './clock';
 import { getDb } from './db';
 import { updateSignal } from './updateSignal';

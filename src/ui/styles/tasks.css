@@ -1,0 +1,223 @@
+/* ---------- add row ---------- */
+.composer {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-block-end: 0.75rem;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding-inline: 0.75rem 0.375rem;
+  min-block-size: 56px;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
+}
+.composer:focus-within {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--brand-soft);
+}
+.composer-plus {
+  color: var(--brand);
+  display: grid;
+  place-items: center;
+}
+.composer input {
+  flex: 1;
+  min-inline-size: 0;
+  border: 0;
+  background: transparent;
+  font-size: 16px;
+  min-block-size: 48px;
+  padding-inline: 0.5rem;
+  outline: none;
+}
+.composer input::placeholder {
+  color: var(--muted);
+}
+.composer-add {
+  border: 0;
+  border-radius: 999px;
+  background: var(--brand);
+  color: var(--on-brand);
+  min-block-size: 40px;
+  padding-inline: 1.125rem;
+  font-weight: 600;
+}
+.composer-add:disabled {
+  background: transparent;
+  color: var(--muted);
+  cursor: default;
+  font-weight: 400;
+}
+
+/* ---------- rows ---------- */
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.125rem;
+  padding-inline-end: 0.25rem;
+  border-block-end: 1px solid var(--line);
+}
+.row:hover {
+  background: var(--hover);
+}
+.hit {
+  display: grid;
+  place-items: center;
+  min-inline-size: 48px;
+  min-block-size: 48px;
+  cursor: pointer;
+}
+.circle {
+  appearance: none;
+  -webkit-appearance: none;
+  margin: 0;
+  inline-size: 22px;
+  block-size: 22px;
+  border: 2px solid var(--muted);
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+.circle.small {
+  inline-size: 18px;
+  block-size: 18px;
+}
+.circle:hover {
+  border-color: var(--brand);
+}
+.circle:checked {
+  background: var(--brand)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='white' d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E")
+    center / 80% no-repeat;
+  border-color: var(--brand);
+}
+.body {
+  flex: 1;
+  min-inline-size: 0;
+  display: grid;
+  gap: 2px;
+  text-align: start;
+  border: 0;
+  background: none;
+  padding-block: 0.75rem;
+  padding-inline: 0.25rem;
+  min-block-size: 48px;
+}
+.title {
+  font-size: 1rem;
+  overflow-wrap: anywhere;
+}
+.snippet {
+  color: var(--muted);
+  font-size: 0.875rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.meta {
+  display: flex;
+  gap: 0.375rem;
+  flex-wrap: wrap;
+  margin-block-start: 2px;
+}
+.chip {
+  font-size: 0.8125rem;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0 0.5rem;
+  line-height: 1.5rem;
+  background: var(--card);
+}
+.chip.overdue {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+.chip.today {
+  color: var(--brand);
+  border-color: var(--brand);
+}
+.row.done .title {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+.star,
+.icon {
+  display: grid;
+  place-items: center;
+  inline-size: 44px;
+  block-size: 44px;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  border-radius: 50%;
+  flex: none;
+}
+.star:hover,
+.icon:hover {
+  background: var(--hover);
+}
+.star.on {
+  color: #f5b301;
+}
+
+.done-section {
+  margin-block-start: 1rem;
+}
+.done-section summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-block-size: 48px;
+  color: var(--ink);
+  font-weight: 500;
+  cursor: pointer;
+}
+.done-section summary::-webkit-details-marker {
+  display: none;
+}
+.chev {
+  display: grid;
+  transition: transform 0.15s;
+  transform: rotate(90deg);
+}
+[dir='ltr'] .chev {
+  transform: rotate(-90deg);
+}
+.done-section[open] .chev,
+[dir='ltr'] .done-section[open] .chev {
+  transform: rotate(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .chev {
+    transition: none;
+  }
+}
+
+.empty {
+  display: grid;
+  justify-items: center;
+  gap: 0.5rem;
+  color: var(--muted);
+  padding: 3rem 1rem;
+  text-align: center;
+}
+.empty p {
+  margin: 0;
+}
+.empty svg {
+  color: var(--line);
+}
+.status {
+  color: var(--muted);
+  text-align: center;
+  padding: 2rem 0;
+}

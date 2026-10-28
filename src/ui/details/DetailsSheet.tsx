@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { MAX_STEPS, MAX_STEP_TITLE, type Step, type Task, type TaskPatch } from '@/core/model';
-import { CloseIcon, StarIcon, TrashIcon } from './icons';
+import { CloseIcon, StarIcon, TrashIcon } from '../primitives';
 
 interface Props {
   task: Task;

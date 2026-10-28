@@ -21,6 +21,13 @@ const noHardDelete = {
   message: 'Hard deletes are only allowed in src/data/purge.ts (D-006).',
 };
 
+// A module (src/ui/tasks, src/features/tasks, ...) is used only through its index.ts. Inside a
+// module, files import each other with relative paths, which this rule does not touch.
+const deepImport = {
+  group: ['@/ui/*/*', '@/features/*/*'],
+  message: 'Import a module through its index.ts, not a file inside it (D-015).',
+};
+
 const layer = (name, forbiddenLayers, forbiddenPackages = []) => ({
   files: [`src/${name}/**/*.{ts,tsx}`],
   rules: {
@@ -28,6 +35,7 @@ const layer = (name, forbiddenLayers, forbiddenPackages = []) => ({
       'error',
       {
         patterns: [
+          deepImport,
           ...forbiddenPackages.map((p) => ({
             group: [p, `${p}/**`],
             message: `src/${name} must not import "${p}" (D-004).`,
@@ -69,4 +77,5 @@ export default tseslint.config(
   layer('data', ['features', 'ui', 'app'], ['react', 'react-dom']),
   layer('features', ['ui', 'app'], ['dexie']),
   layer('ui', ['data', 'app'], ['dexie']),
+  layer('app', [], []),
 );

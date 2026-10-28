@@ -1,11 +1,9 @@
 import type { Task, TaskPatch, ViewId } from '@/core/model';
 import { viewCounts } from '@/core/model';
-import { Composer } from './Composer';
-import { DetailsSheet } from './DetailsSheet';
+import { DetailsSheet } from '../details';
+import { Composer, TaskList, UndoToast } from '../tasks';
+import '../styles/index.css';
 import { Nav } from './Nav';
-import { TaskList } from './TaskList';
-import { UndoToast } from './UndoToast';
-import './styles.css';
 
 const TITLES: Record<ViewId, string> = {
   all: 'نواياي',
