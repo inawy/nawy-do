@@ -64,7 +64,8 @@ describe('envelope with lists (version 2)', () => {
     const file = text(buildEnvelope([t], [list], 5));
     const r = parseEnvelope(file);
     expect(r.ok && r.value.lists).toEqual([list]);
-    const { lists: _omit, ...withoutLists } = JSON.parse(file) as Record<string, unknown>;
+    const withoutLists = JSON.parse(file) as Record<string, unknown>;
+    delete withoutLists['lists'];
     const missing = parseEnvelope(text(withoutLists));
     expect(!missing.ok && missing.error.code).toBe('not-an-envelope');
   });
