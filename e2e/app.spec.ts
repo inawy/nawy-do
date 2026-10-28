@@ -32,6 +32,60 @@ test('completes, then deletes with undo', async ({ page }) => {
   await expect(page.getByText('المنجزة (1)')).toBeVisible();
 });
 
+/** What is really stored (the screen shows a preview of the new order before the write ends). */
+const stored = (page: Page) =>
+  page.evaluate(
+    () =>
+      new Promise<string[]>((resolve, reject) => {
+        const open = indexedDB.open('nawy-do');
+        open.onerror = () => reject(open.error);
+        open.onsuccess = () => {
+          const db = open.result;
+          const all = db.transaction('tasks').objectStore('tasks').getAll();
+          all.onsuccess = () => {
+            db.close();
+            const live = (all.result as { title: string; sortOrder: number; deletedAt?: number }[])
+              .filter((t) => t.deletedAt === undefined)
+              .sort((a, b) => b.sortOrder - a.sortOrder);
+            resolve(live.map((t) => t.title));
+          };
+        };
+      }),
+  );
+
+const titles = (page: Page) => page.locator('.list[aria-label="النوايا"] .title').allTextContents();
+
+test('drags an intention to a new place and the order survives a reload', async ({ page }) => {
+  await add(page, 'الأولى');
+  await add(page, 'الثانية');
+  await add(page, 'الثالثة');
+  expect(await titles(page)).toEqual(['الثالثة', 'الثانية', 'الأولى']);
+
+  const row = page.locator('.row', { hasText: 'الثالثة' });
+  await row.hover();
+  const grip = row.getByRole('button', { name: 'تحريك: الثالثة' });
+  const box = (await grip.boundingBox())!;
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.down();
+  const last = (await page.locator('.row', { hasText: 'الأولى' }).boundingBox())!;
+  await page.mouse.move(box.x + box.width / 2, last.y + last.height - 4, { steps: 15 });
+  await page.mouse.up();
+
+  await expect.poll(() => stored(page)).toEqual(['الثانية', 'الأولى', 'الثالثة']);
+  await page.reload();
+  expect(await titles(page)).toEqual(['الثانية', 'الأولى', 'الثالثة']);
+});
+
+test('moves an intention with the keyboard (Alt+Arrow on its handle)', async ({ page }) => {
+  await add(page, 'أ');
+  await add(page, 'ب');
+  const grip = page.getByRole('button', { name: 'تحريك: ب' });
+  await grip.focus();
+  await page.keyboard.press('Alt+ArrowDown');
+  await expect.poll(() => titles(page)).toEqual(['أ', 'ب']);
+  await expect(page.getByRole('button', { name: 'تحريك: ب' })).toBeFocused();
+});
+
 test('a starred intention appears in the favourites view', async ({ page }) => {
   await add(page, 'مهمة مميزة');
   await add(page, 'مهمة عادية');

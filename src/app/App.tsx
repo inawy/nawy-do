@@ -37,6 +37,7 @@ export function App({ db, now = systemClock, today = systemToday }: Props) {
       onToggle={(t) => void api.toggle(t)}
       onStar={(t) => void api.edit(t, { starred: !t.starred })}
       onOpen={(t) => setOpenId(t.id)}
+      onMove={(id, to) => void api.move(id, to)}
       onClose={() => setOpenId(null)}
       onSave={(t, patch) => void api.edit(t, patch)}
       onRemove={(t) => void api.remove(t)}

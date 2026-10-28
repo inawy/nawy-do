@@ -3,6 +3,7 @@ import {
   createTask,
   isDeleted,
   mergeTask,
+  type OrderChange,
   reopenTask,
   restoreTask,
   tombstoneTask,
@@ -84,5 +85,23 @@ export async function restoreRemoved(
     const next = restoreTask(previous, current, now);
     await db.tasks.put(next);
     return next;
+  });
+}
+
+/** Writes new `sortOrder` values in one transaction; missing or deleted tasks are skipped. */
+export async function saveOrder(
+  db: NawyDoDb,
+  changes: readonly OrderChange[],
+  now: number,
+): Promise<number> {
+  return db.transaction('rw', db.tasks, async () => {
+    let written = 0;
+    for (const change of changes) {
+      const current = await db.tasks.get(change.id);
+      if (!current || isDeleted(current)) continue;
+      await db.tasks.put(updateTask(current, { sortOrder: change.sortOrder }, now));
+      written++;
+    }
+    return written;
   });
 }
