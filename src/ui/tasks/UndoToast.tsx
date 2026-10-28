@@ -3,21 +3,21 @@ import { useEffect } from 'react';
 const VISIBLE_MS = 7000;
 
 export function UndoToast({
-  title,
+  message,
   onUndo,
   onDismiss,
 }: {
-  title: string;
+  message: string;
   onUndo: () => void;
   onDismiss: () => void;
 }) {
   useEffect(() => {
     const id = setTimeout(onDismiss, VISIBLE_MS);
     return () => clearTimeout(id);
-  }, [title, onDismiss]);
+  }, [message, onDismiss]);
   return (
     <div className="toast" role="status">
-      <span>اتحذفت: {title}</span>
+      <span>{message}</span>
       <button type="button" onClick={onUndo}>
         تراجع
       </button>

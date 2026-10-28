@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { groupTasks, planMove, type Task, type TaskPatch } from '@/core/model';
 import {
   addTask,
+  type NewTaskOptions,
   completeTaskById,
   editTask,
   removeTask,
@@ -20,7 +21,7 @@ export interface TasksApi {
   failed: boolean;
   /** The task just deleted, available to undo until dismissed. */
   lastRemoved: Task | null;
-  add: (title: string) => Promise<void>;
+  add: (title: string, options?: NewTaskOptions) => Promise<void>;
   toggle: (task: Task) => Promise<void>;
   edit: (task: Task, patch: TaskPatch) => Promise<void>;
   /** Moves an open task to `toIndex` of the displayed (newest-first) list. */
@@ -59,9 +60,9 @@ export function useTasks(db: NawyDoDb, now: () => number): TasksApi {
   }, []);
 
   const add = useCallback(
-    async (title: string) => {
+    async (title: string, options?: NewTaskOptions) => {
       if (title.trim() === '') return;
-      await guard(() => addTask(db, crypto.randomUUID(), title, now()));
+      await guard(() => addTask(db, crypto.randomUUID(), title, now(), options));
     },
     [db, now, guard],
   );

@@ -92,7 +92,10 @@ describe('backup', () => {
 
     const other = createDb(`test-${n++}`);
     const r = await importBackup(other, file);
-    expect(r).toEqual({ ok: true, value: { total: 2, changed: 2 } });
+    expect(r).toEqual({
+      ok: true,
+      value: { total: 2, changed: 2, lists: 0, listsChanged: 0 },
+    });
     expect((await listTasks(other)).map((t) => t.id)).toEqual(['a']);
     expect((await allRecords(other)).find((t) => t.id === 'b')?.deletedAt).toBe(200);
   });

@@ -86,6 +86,32 @@ test('moves an intention with the keyboard (Alt+Arrow on its handle)', async ({ 
   await expect(page.getByRole('button', { name: 'تحريك: ب' })).toBeFocused();
 });
 
+test('creates a list, adds a task to it, and it survives a reload', async ({ page }) => {
+  await page.getByRole('button', { name: 'قائمة جديدة' }).click();
+  await page.getByLabel('اسم القائمة').fill('العمل');
+  await page.getByRole('button', { name: 'حفظ' }).click();
+  await expect(page.getByRole('heading', { name: 'العمل' })).toBeVisible();
+  await add(page, 'تقرير الأسبوع');
+  await page.reload();
+  await page.getByRole('button', { name: 'العمل' }).click();
+  await expect(page.getByText('تقرير الأسبوع', { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'نواياي' }).click();
+  await expect(page.getByText('تقرير الأسبوع', { exact: true })).toHaveCount(0);
+});
+
+test('deleting a list returns its tasks to main; undo restores the list', async ({ page }) => {
+  await page.getByRole('button', { name: 'قائمة جديدة' }).click();
+  await page.getByLabel('اسم القائمة').fill('مؤقتة');
+  await page.getByRole('button', { name: 'حفظ' }).click();
+  await add(page, 'بداخلها');
+  await page.getByRole('button', { name: 'خيارات القائمة' }).click();
+  await page.getByRole('button', { name: 'حذف القائمة' }).click();
+  await page.getByRole('button', { name: 'تأكيد الحذف' }).click();
+  await expect(page.getByText('بداخلها', { exact: true })).toBeVisible(); // main now
+  await page.getByRole('button', { name: 'تراجع' }).click();
+  await expect(page.getByRole('button', { name: 'مؤقتة' })).toBeVisible();
+});
+
 test('a starred intention appears in the favourites view', async ({ page }) => {
   await add(page, 'مهمة مميزة');
   await add(page, 'مهمة عادية');

@@ -1,6 +1,13 @@
 import { isCivilDate } from './civil';
 import { err, ok, type Result } from './result';
-import { MAX_STEPS, MAX_STEP_TITLE, type Step, type Task } from './types';
+import {
+  MAX_LIST_NAME,
+  MAX_STEPS,
+  MAX_STEP_TITLE,
+  type Step,
+  type Task,
+  type TaskList,
+} from './types';
 
 const MAX_TITLE = 1000;
 const MAX_NOTES = 20_000;
@@ -63,6 +70,12 @@ export function parseTask(raw: unknown): Result<Task, string> {
     if (!steps) return err('steps');
     task.steps = steps;
   }
+  if (r['listId'] !== undefined) {
+    if (typeof r['listId'] !== 'string' || r['listId'] === '' || r['listId'].length > 100) {
+      return err('listId');
+    }
+    task.listId = r['listId'];
+  }
   if (r['doneAt'] !== undefined) {
     if (!isTime(r['doneAt'])) return err('doneAt');
     task.doneAt = r['doneAt'];
@@ -72,4 +85,29 @@ export function parseTask(raw: unknown): Result<Task, string> {
     task.deletedAt = r['deletedAt'];
   }
   return ok(task);
+}
+
+/** Same gate for lists. Unknown fields are dropped. */
+export function parseList(raw: unknown): Result<TaskList, string> {
+  if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) return err('not-an-object');
+  const r = raw as Record<string, unknown>;
+  const id = r['id'];
+  if (typeof id !== 'string' || id === '' || id.length > 100) return err('id');
+  if (typeof r['name'] !== 'string' || r['name'].length > MAX_LIST_NAME) return err('name');
+  if (typeof r['sortOrder'] !== 'number' || !Number.isFinite(r['sortOrder']))
+    return err('sortOrder');
+  if (!isTime(r['createdAt'])) return err('createdAt');
+  if (!isTime(r['updatedAt'])) return err('updatedAt');
+  const list: TaskList = {
+    id,
+    name: r['name'],
+    sortOrder: r['sortOrder'],
+    createdAt: r['createdAt'],
+    updatedAt: r['updatedAt'],
+  };
+  if (r['deletedAt'] !== undefined) {
+    if (!isTime(r['deletedAt'])) return err('deletedAt');
+    list.deletedAt = r['deletedAt'];
+  }
+  return ok(list);
 }

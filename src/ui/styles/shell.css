@@ -124,3 +124,48 @@ h2 {
     padding: 2rem 2rem 4rem;
   }
 }
+
+/* ---------- lists in the navigation ---------- */
+.nav {
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.nav::-webkit-scrollbar {
+  display: none;
+}
+.nav-item {
+  min-inline-size: 76px;
+  white-space: nowrap;
+}
+.nav-sep {
+  display: none;
+}
+.nav-new {
+  color: var(--brand);
+}
+.title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.title-row h1 {
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}
+@media (min-width: 880px) {
+  .nav {
+    overflow: visible;
+  }
+  .nav-item {
+    min-inline-size: 0;
+    white-space: normal;
+  }
+  .nav-sep {
+    display: block;
+    inline-size: 100%;
+    margin: 0.5rem 0;
+    border: 0;
+    border-block-start: 1px solid var(--line);
+  }
+}

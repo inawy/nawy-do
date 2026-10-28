@@ -18,10 +18,26 @@ export interface Task {
   /** Due date, civil `YYYY-MM-DD`, no time zone. */
   due?: string;
   steps?: Step[];
+  /** The list it belongs to. Absent = the main list. A list that no longer exists = main too. */
+  listId?: string;
   sortOrder: number;
   createdAt: number;
   updatedAt: number;
   doneAt?: number;
   /** Set only on a tombstone (D-006). A tombstone keeps no content. */
+  deletedAt?: number;
+}
+
+export const MAX_LISTS = 50;
+export const MAX_LIST_NAME = 100;
+
+/** A named list of tasks (D-017). The main list is implicit: it has no record. */
+export interface TaskList {
+  id: string;
+  name: string;
+  sortOrder: number;
+  createdAt: number;
+  updatedAt: number;
+  /** Set only on a tombstone (D-006). */
   deletedAt?: number;
 }

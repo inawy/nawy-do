@@ -130,6 +130,83 @@ describe('steps', () => {
   });
 });
 
+describe('lists', () => {
+  const createListNamed = async (name: string) => {
+    fireEvent.click(screen.getByRole('button', { name: 'قائمة جديدة' }));
+    fireEvent.change(screen.getByLabelText('اسم القائمة'), { target: { value: name } });
+    fireEvent.click(screen.getByRole('button', { name: 'حفظ' }));
+    await screen.findByRole('heading', { name });
+  };
+
+  it('creates a list, adds into it, and keeps its tasks out of the main list', async () => {
+    render(<App db={db} now={now} today={today} />);
+    await screen.findByText(/مفيش نوايا لسه/);
+    await createListNamed('العمل');
+    await addIntention('تقرير');
+    fireEvent.click(screen.getByRole('button', { name: 'نواياي' }));
+    await screen.findByText(/مفيش نوايا لسه/);
+    expect(screen.queryByText('تقرير')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'العمل' }));
+    await screen.findByText('تقرير');
+  });
+
+  it('moves a task to a list from its details', async () => {
+    render(<App db={db} now={now} today={today} />);
+    await screen.findByText(/مفيش نوايا لسه/);
+    await createListNamed('البيت');
+    fireEvent.click(screen.getByRole('button', { name: 'نواياي' }));
+    await addIntention('اغسل');
+    fireEvent.click(screen.getByRole('button', { name: 'تفاصيل: اغسل' }));
+    const id = screen.getByRole('option', { name: 'البيت' }).getAttribute('value') ?? '';
+    fireEvent.change(screen.getByLabelText('القائمة'), { target: { value: id } });
+    fireEvent.click(screen.getByRole('button', { name: 'حفظ' }));
+    await waitFor(() => expect(screen.queryByText('اغسل')).toBeNull());
+    fireEvent.click(screen.getByRole('button', { name: 'البيت' }));
+    await screen.findByText('اغسل');
+  });
+
+  it('deleting a list sends its tasks to main, and undo brings the list back with them', async () => {
+    render(<App db={db} now={now} today={today} />);
+    await screen.findByText(/مفيش نوايا لسه/);
+    await createListNamed('مؤقتة');
+    await addIntention('بداخلها');
+    fireEvent.click(screen.getByRole('button', { name: 'خيارات القائمة' }));
+    fireEvent.click(screen.getByRole('button', { name: 'حذف القائمة' }));
+    expect(screen.getByText(/ونواياها هترجع/)).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'تأكيد الحذف' }));
+    await screen.findByText('اتحذفت القائمة: مؤقتة');
+    await screen.findByRole('heading', { name: 'نواياي' });
+    await screen.findByText('بداخلها'); // now in the main list
+    fireEvent.click(screen.getByRole('button', { name: 'تراجع' }));
+    await waitFor(() => expect(screen.queryByText('بداخلها')).toBeNull()); // back in its list
+    fireEvent.click(await screen.findByRole('button', { name: 'مؤقتة' }));
+    await screen.findByText('بداخلها');
+  });
+
+  it('renames a list', async () => {
+    render(<App db={db} now={now} today={today} />);
+    await screen.findByText(/مفيش نوايا لسه/);
+    await createListNamed('قديم');
+    fireEvent.click(screen.getByRole('button', { name: 'خيارات القائمة' }));
+    fireEvent.change(screen.getByLabelText('اسم القائمة'), { target: { value: 'جديد' } });
+    fireEvent.click(screen.getByRole('button', { name: 'حفظ' }));
+    await screen.findByRole('heading', { name: 'جديد' });
+  });
+
+  it('a task added in favourites is starred, and in scheduled is due today', async () => {
+    render(<App db={db} now={now} today={today} />);
+    await screen.findByText(/مفيش نوايا لسه/);
+    fireEvent.click(screen.getByRole('button', { name: 'المفضلة' }));
+    await addIntention('مميزة جديدة');
+    expect(
+      screen.getByRole('button', { name: 'تمييز: مميزة جديدة' }).getAttribute('aria-pressed'),
+    ).toBe('true');
+    fireEvent.click(screen.getByRole('button', { name: 'مجدولة' }));
+    await addIntention('اليوم');
+    await screen.findByRole('heading', { name: 'النهارده' });
+  });
+});
+
 describe('update banner', () => {
   it('shows only when a new version is waiting and applies it on click', async () => {
     const { updateSignal } = await import('@/app/updateSignal');
