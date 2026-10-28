@@ -1,12 +1,8 @@
 import { useMemo, useState, useSyncExternalStore } from 'react';
-import { useTasks } from '@/features/useTasks';
+import type { ViewId } from '@/core/model';
 import type { NawyDoDb } from '@/data';
-import { Composer } from '@/ui/Composer';
-import { DetailsSheet } from '@/ui/DetailsSheet';
-import { TaskList } from '@/ui/TaskList';
-import { UndoToast } from '@/ui/UndoToast';
-import { ViewTabs, type View } from '@/ui/ViewTabs';
-import '@/ui/styles.css';
+import { useTasks } from '@/features/useTasks';
+import { TasksScreen } from '@/ui/TasksScreen';
 import { systemClock, systemToday } from './clock';
 import { getDb } from './db';
 import { updateSignal } from './updateSignal';
@@ -21,55 +17,31 @@ export function App({ db, now = systemClock, today = systemToday }: Props) {
   const database = useMemo(() => db ?? getDb(), [db]);
   const api = useTasks(database, now);
   const applyUpdate = useSyncExternalStore(updateSignal.subscribe, updateSignal.get);
-  const [view, setView] = useState<View>('all');
+  const [view, setView] = useState<ViewId>('all');
   const [openId, setOpenId] = useState<string | null>(null);
   // The sheet shows the task as it is now; if it was deleted elsewhere it simply closes.
   const editing = api.tasks.find((t) => t.id === openId);
 
   return (
-    <main className="app">
-      {applyUpdate && (
-        <div className="update" role="status">
-          <span>في نسخة جديدة من ناوي دو.</span>
-          <button type="button" onClick={applyUpdate}>
-            حدّث
-          </button>
-        </div>
-      )}
-      <h1>ناوي دو</h1>
-      <Composer onAdd={(title) => void api.add(title)} />
-      <ViewTabs view={view} onChange={setView} />
-      {api.failed ? (
-        <p className="status" role="alert">
-          مش قادر أفتح التخزين على الجهاز. لو فاتح تصفح خاص جرّب نافذة عادية.
-        </p>
-      ) : !api.ready ? (
-        <p className="status">جاري التحميل…</p>
-      ) : (
-        <TaskList
-          tasks={api.tasks}
-          today={today()}
-          view={view}
-          onToggle={(t) => void api.toggle(t)}
-          onOpen={(t) => setOpenId(t.id)}
-          onRemove={(t) => void api.remove(t)}
-        />
-      )}
-      {editing && (
-        <DetailsSheet
-          key={editing.id}
-          task={editing}
-          onSave={(patch) => void api.edit(editing, patch)}
-          onClose={() => setOpenId(null)}
-        />
-      )}
-      {api.lastRemoved && (
-        <UndoToast
-          title={api.lastRemoved.title}
-          onUndo={() => void api.undoRemove()}
-          onDismiss={api.dismissUndo}
-        />
-      )}
-    </main>
+    <TasksScreen
+      tasks={api.tasks}
+      today={today()}
+      view={view}
+      ready={api.ready}
+      failed={api.failed}
+      editing={editing}
+      lastRemoved={api.lastRemoved}
+      applyUpdate={applyUpdate}
+      onView={setView}
+      onAdd={(title) => void api.add(title)}
+      onToggle={(t) => void api.toggle(t)}
+      onStar={(t) => void api.edit(t, { starred: !t.starred })}
+      onOpen={(t) => setOpenId(t.id)}
+      onClose={() => setOpenId(null)}
+      onSave={(t, patch) => void api.edit(t, patch)}
+      onRemove={(t) => void api.remove(t)}
+      onUndo={() => void api.undoRemove()}
+      onDismissUndo={api.dismissUndo}
+    />
   );
 }

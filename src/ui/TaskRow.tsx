@@ -1,55 +1,62 @@
 import { dueState, formatDue, stepProgress, type Task } from '@/core/model';
+import { StarIcon } from './icons';
 
 interface Props {
   task: Task;
   today: string;
   onToggle: (task: Task) => void;
+  onStar: (task: Task) => void;
   onOpen: (task: Task) => void;
-  onRemove: (task: Task) => void;
 }
 
-export function TaskRow({ task, today, onToggle, onOpen, onRemove }: Props) {
+/** One intention: circle to complete, the text opens the details, the star marks it. */
+export function TaskRow({ task, today, onToggle, onStar, onOpen }: Props) {
   const done = task.status === 'done';
-  const progress = stepProgress(task);
   const state = task.due ? dueState(task.due, today) : undefined;
+  const progress = stepProgress(task);
+  const hasMeta = Boolean(task.due) || progress !== undefined;
   return (
     <li className={done ? 'row done' : 'row'}>
-      <label className="check">
-        <input type="checkbox" checked={done} onChange={() => onToggle(task)} />
-        <span className="text">
-          <span className="title">{task.title}</span>
-          {(task.due || task.notes || progress) && (
-            <span className="meta">
-              {task.due && (
-                <span className={done ? 'chip' : `chip ${state ?? ''}`}>
-                  {formatDue(task.due, today)}
-                </span>
-              )}
-              {progress && (
-                <span className="chip">
-                  خطوات {progress.done}/{progress.total}
-                </span>
-              )}
-              {task.notes && <span className="chip">ملاحظات</span>}
-            </span>
-          )}
-        </span>
+      <label className="hit">
+        <input
+          type="checkbox"
+          className="circle"
+          checked={done}
+          onChange={() => onToggle(task)}
+          aria-label={`${done ? 'إلغاء إنجاز' : 'إنجاز'}: ${task.title}`}
+        />
       </label>
       <button
         type="button"
-        className="icon"
+        className="body"
         aria-label={`تفاصيل: ${task.title}`}
         onClick={() => onOpen(task)}
       >
-        ✎
+        <span className="title">{task.title}</span>
+        {task.notes && <span className="snippet">{task.notes}</span>}
+        {hasMeta && (
+          <span className="meta">
+            {task.due && (
+              <span className={done ? 'chip' : `chip ${state ?? ''}`}>
+                {formatDue(task.due, today)}
+              </span>
+            )}
+            {progress && (
+              <span className="chip">
+                خطوات {progress.done}/{progress.total}
+              </span>
+            )}
+          </span>
+        )}
       </button>
       <button
         type="button"
-        className="icon"
-        aria-label={`حذف: ${task.title}`}
-        onClick={() => onRemove(task)}
+        className={task.starred ? 'star on' : 'star'}
+        aria-label={`تمييز: ${task.title}`}
+        aria-pressed={task.starred}
+        onClick={() => onStar(task)}
       >
-        ✕
+        <StarIcon on={task.starred} />
       </button>
     </li>
   );
