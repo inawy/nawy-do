@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import type { Task, TaskPatch } from '@/core/model';
+import { groupTasks, planMove, type Task, type TaskPatch } from '@/core/model';
 import {
   addTask,
   completeTaskById,
@@ -7,6 +7,7 @@ import {
   removeTask,
   reopenTaskById,
   restoreRemoved,
+  saveOrder,
   watchTasks,
   type NawyDoDb,
 } from '@/data';
@@ -22,6 +23,8 @@ export interface TasksApi {
   add: (title: string) => Promise<void>;
   toggle: (task: Task) => Promise<void>;
   edit: (task: Task, patch: TaskPatch) => Promise<void>;
+  /** Moves an open task to `toIndex` of the displayed (newest-first) list. */
+  move: (id: string, toIndex: number) => Promise<void>;
   remove: (task: Task) => Promise<void>;
   undoRemove: () => Promise<void>;
   dismissUndo: () => void;
@@ -81,6 +84,15 @@ export function useTasks(db: NawyDoDb, now: () => number): TasksApi {
     [db, now, guard],
   );
 
+  const move = useCallback(
+    async (id: string, toIndex: number) => {
+      const changes = planMove(groupTasks(tasks).open, id, toIndex);
+      if (changes.length === 0) return;
+      await guard(() => saveOrder(db, changes, now()));
+    },
+    [db, now, guard, tasks],
+  );
+
   const remove = useCallback(
     async (task: Task) => {
       await guard(async () => {
@@ -100,5 +112,17 @@ export function useTasks(db: NawyDoDb, now: () => number): TasksApi {
 
   const dismissUndo = useCallback(() => setLastRemoved(null), []);
 
-  return { tasks, ready, failed, lastRemoved, add, toggle, edit, remove, undoRemove, dismissUndo };
+  return {
+    tasks,
+    ready,
+    failed,
+    lastRemoved,
+    add,
+    toggle,
+    edit,
+    move,
+    remove,
+    undoRemove,
+    dismissUndo,
+  };
 }

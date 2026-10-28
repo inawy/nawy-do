@@ -1,5 +1,6 @@
 import { dueState, formatDue, stepProgress, type Task } from '@/core/model';
-import { StarIcon } from '../primitives';
+import type { HTMLAttributes } from 'react';
+import { GripIcon, StarIcon } from '../primitives';
 
 interface Props {
   task: Task;
@@ -7,16 +8,25 @@ interface Props {
   onToggle: (task: Task) => void;
   onStar: (task: Task) => void;
   onOpen: (task: Task) => void;
+  /** Present only when the row can be re-ordered. */
+  sort?: {
+    rowRef: (el: HTMLElement | null) => void;
+    handle: HTMLAttributes<HTMLButtonElement> & { ref: (el: HTMLButtonElement | null) => void };
+    dragging: boolean;
+  };
 }
 
 /** One intention: circle to complete, the text opens the details, the star marks it. */
-export function TaskRow({ task, today, onToggle, onStar, onOpen }: Props) {
+export function TaskRow({ task, today, onToggle, onStar, onOpen, sort }: Props) {
   const done = task.status === 'done';
   const state = task.due ? dueState(task.due, today) : undefined;
   const progress = stepProgress(task);
   const hasMeta = Boolean(task.due) || progress !== undefined;
   return (
-    <li className={done ? 'row done' : 'row'}>
+    <li
+      ref={sort?.rowRef}
+      className={['row', done && 'done', sort?.dragging && 'dragging'].filter(Boolean).join(' ')}
+    >
       <label className="hit">
         <input
           type="checkbox"
@@ -58,6 +68,17 @@ export function TaskRow({ task, today, onToggle, onStar, onOpen }: Props) {
       >
         <StarIcon on={task.starred} />
       </button>
+      {sort && (
+        <button
+          type="button"
+          className="grip"
+          aria-label={`تحريك: ${task.title}`}
+          aria-keyshortcuts="Alt+ArrowUp Alt+ArrowDown"
+          {...sort.handle}
+        >
+          <GripIcon />
+        </button>
+      )}
     </li>
   );
 }

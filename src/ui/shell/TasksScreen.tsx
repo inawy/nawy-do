@@ -26,6 +26,7 @@ export interface TasksScreenProps {
   onToggle: (t: Task) => void;
   onStar: (t: Task) => void;
   onOpen: (t: Task) => void;
+  onMove: (id: string, toIndex: number) => void;
   onClose: () => void;
   onSave: (t: Task, patch: TaskPatch) => void;
   onRemove: (t: Task) => void;
@@ -68,6 +69,7 @@ export function TasksScreen(p: TasksScreenProps) {
             onToggle={p.onToggle}
             onStar={p.onStar}
             onOpen={p.onOpen}
+            onMove={p.onMove}
           />
         )}
       </main>

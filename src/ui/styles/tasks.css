@@ -221,3 +221,58 @@
   text-align: center;
   padding: 2rem 0;
 }
+
+/* ---------- re-ordering ---------- */
+.grip {
+  display: grid;
+  place-items: center;
+  inline-size: 44px;
+  block-size: 44px;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  border-radius: 50%;
+  flex: none;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+.grip:hover {
+  background: var(--hover);
+}
+/* On a mouse the handle appears on hover/focus; on touch it is always there. */
+@media (hover: hover) {
+  .grip {
+    opacity: 0;
+  }
+  .row:hover .grip,
+  .grip:focus-visible,
+  .row.dragging .grip {
+    opacity: 1;
+  }
+}
+.list.sorting {
+  user-select: none;
+}
+.row.dragging {
+  position: relative;
+  z-index: 3;
+  background: var(--card);
+  border-radius: 12px;
+  cursor: grabbing;
+  box-shadow: 0 6px 20px rgb(0 0 0 / 0.22);
+}
+.row.dragging .grip {
+  cursor: grabbing;
+}
+.sr-only {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}

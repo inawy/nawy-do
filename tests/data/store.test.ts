@@ -14,6 +14,7 @@ import {
   purgeTombstones,
   removeTask,
   restoreRemoved,
+  saveOrder,
   reopenTaskById,
   TOMBSTONE_TTL_MS,
   type NawyDoDb,
@@ -124,5 +125,26 @@ describe('undo of a delete', () => {
   it('does nothing when the task is not deleted', async () => {
     const t = await addTask(db, 'a', 'x', 100);
     expect(await restoreRemoved(db, t, 200)).toBeUndefined();
+  });
+});
+
+describe('saveOrder', () => {
+  it('writes new sortOrder values, bumps updatedAt, and skips missing or deleted tasks', async () => {
+    await addTask(db, 'a', 'a', 100);
+    await addTask(db, 'b', 'b', 200);
+    await removeTask(db, 'b', 300);
+    const written = await saveOrder(
+      db,
+      [
+        { id: 'a', sortOrder: 5 },
+        { id: 'b', sortOrder: 6 },
+        { id: 'nope', sortOrder: 7 },
+      ],
+      400,
+    );
+    expect(written).toBe(1);
+    const records = await allRecords(db);
+    expect(records.find((t) => t.id === 'a')).toMatchObject({ sortOrder: 5, updatedAt: 400 });
+    expect(records.find((t) => t.id === 'b')?.deletedAt).toBe(300);
   });
 });
