@@ -19,6 +19,9 @@ jobs:
           node-version: 22
       # No lockfile yet: it could not be generated offline. Replace with `npm ci` once committed.
       - run: npm install --no-audit --no-fund
+      - name: Type check (errors as annotations)
+        run: |
+          npx tsc --noEmit --pretty false | sed -E 's/^([^()]+)\(([0-9]+),([0-9]+)\): (.*)$/::error file=\1,line=\2,col=\3::\4/' ; test "${PIPESTATUS[0]}" -eq 0
       - run: npm run lint
       - run: npm run format:check
       - run: npm test
