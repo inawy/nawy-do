@@ -8,13 +8,27 @@ interface Props {
   /** Why the last save was refused, shown under the field. */
   error?: string | undefined;
   onSave: (name: string) => void;
+  /** Edit mode: whether the list can move earlier / later, and the move itself. */
+  canMoveEarlier?: boolean;
+  canMoveLater?: boolean;
+  onMove?: (delta: -1 | 1) => void;
   /** Only in edit mode. */
   onDelete?: () => void;
   onClose: () => void;
 }
 
 /** Create or rename a list; deleting asks for one more tap and says what happens to the tasks. */
-export function ListSheet({ mode, initialName, error, onSave, onDelete, onClose }: Props) {
+export function ListSheet({
+  mode,
+  initialName,
+  error,
+  canMoveEarlier,
+  canMoveLater,
+  onMove,
+  onSave,
+  onDelete,
+  onClose,
+}: Props) {
   const [name, setName] = useState(initialName);
   const [confirming, setConfirming] = useState(false);
 
@@ -56,6 +70,16 @@ export function ListSheet({ mode, initialName, error, onSave, onDelete, onClose 
             autoComplete="off"
           />
         </label>
+        {mode === 'edit' && onMove && (
+          <div className="move-row" role="group" aria-label="ترتيب القائمة">
+            <button type="button" disabled={!canMoveEarlier} onClick={() => onMove(-1)}>
+              قدّم القائمة
+            </button>
+            <button type="button" disabled={!canMoveLater} onClick={() => onMove(1)}>
+              أخّر القائمة
+            </button>
+          </div>
+        )}
         {error && (
           <p className="form-error" role="alert">
             {error}

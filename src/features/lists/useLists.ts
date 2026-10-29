@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
-import type { TaskList } from '@/core/model';
+import { planListMove, type TaskList } from '@/core/model';
 import {
   addList,
   removeList,
   renameListById,
   restoreRemovedList,
+  saveListOrder,
   watchLists,
   type NawyDoDb,
 } from '@/data';
@@ -17,6 +18,8 @@ export interface ListsApi {
   add: (name: string) => Promise<TaskList | 'empty' | 'limit' | 'failed'>;
   rename: (list: TaskList, name: string) => Promise<void>;
   remove: (list: TaskList) => Promise<void>;
+  /** One place earlier (-1) or later (+1) in the navigation. */
+  move: (list: TaskList, delta: -1 | 1) => Promise<void>;
   undoRemove: () => Promise<void>;
   dismissUndo: () => void;
 }
@@ -55,6 +58,13 @@ export function useLists(db: NawyDoDb, now: () => number): ListsApi {
     [db, now],
   );
 
+  const move = useCallback(
+    async (list: TaskList, delta: -1 | 1) => {
+      await saveListOrder(db, planListMove(lists, list.id, delta), now()).catch(() => undefined);
+    },
+    [db, now, lists],
+  );
+
   const undoRemove = useCallback(async () => {
     if (!lastRemoved) return;
     const list = lastRemoved;
@@ -64,5 +74,5 @@ export function useLists(db: NawyDoDb, now: () => number): ListsApi {
 
   const dismissUndo = useCallback(() => setLastRemoved(null), []);
 
-  return { lists, lastRemoved, add, rename, remove, undoRemove, dismissUndo };
+  return { lists, lastRemoved, add, rename, remove, move, undoRemove, dismissUndo };
 }

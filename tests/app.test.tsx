@@ -1,5 +1,5 @@
 import 'fake-indexeddb/auto';
-import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { App } from '@/app/App';
 import { allRecords, createDb, type NawyDoDb } from '@/data';
@@ -181,6 +181,25 @@ describe('lists', () => {
     await waitFor(() => expect(screen.queryByText('بداخلها')).toBeNull()); // back in its list
     fireEvent.click(await screen.findByRole('button', { name: 'مؤقتة' }));
     await screen.findByText('بداخلها');
+  });
+
+  it('moves a list earlier from its options', async () => {
+    render(<App db={db} now={now} today={today} />);
+    await screen.findByText(/مفيش نوايا لسه/);
+    await createListNamed('الأولى');
+    await createListNamed('الثانية');
+    const names = () =>
+      within(screen.getByRole('navigation', { name: 'العرض' }))
+        .getAllByRole('button')
+        .map((b) => b.textContent ?? '');
+    const at = (label: string) => names().findIndex((t) => t.includes(label));
+    expect(at('الأولى')).toBeLessThan(at('الثانية'));
+    fireEvent.click(screen.getByRole('button', { name: 'خيارات القائمة' })); // on «الثانية»
+    expect(
+      (screen.getByRole('button', { name: 'أخّر القائمة' }) as HTMLButtonElement).disabled,
+    ).toBe(true);
+    fireEvent.click(screen.getByRole('button', { name: 'قدّم القائمة' }));
+    await waitFor(() => expect(at('الثانية')).toBeLessThan(at('الأولى')));
   });
 
   it('renames a list', async () => {

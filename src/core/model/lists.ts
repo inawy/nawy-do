@@ -55,3 +55,36 @@ export function listOf(task: Task, lists: readonly TaskList[]): string | undefin
     ? task.listId
     : undefined;
 }
+
+/** A new `sortOrder` for one list. */
+export interface ListOrderChange {
+  id: string;
+  sortOrder: number;
+}
+
+/**
+ * Moves a list one place earlier (`-1`) or later (`+1`) in the display order by swapping its
+ * `sortOrder` with its neighbour's, so only two records change. When the two values are equal (a
+ * tie broken by id) the whole list is renumbered instead, so the result is always exact.
+ * `lists` is the live lists in display order. Pure.
+ */
+export function planListMove(
+  lists: readonly TaskList[],
+  id: string,
+  delta: -1 | 1,
+): ListOrderChange[] {
+  const from = lists.findIndex((l) => l.id === id);
+  const other = lists[from + delta];
+  const me = lists[from];
+  if (from === -1 || !other || !me) return [];
+  if (me.sortOrder !== other.sortOrder) {
+    return [
+      { id: me.id, sortOrder: other.sortOrder },
+      { id: other.id, sortOrder: me.sortOrder },
+    ];
+  }
+  const next = [...lists];
+  next[from] = other;
+  next[from + delta] = me;
+  return next.map((l, i) => ({ id: l.id, sortOrder: (i + 1) * 1000 }));
+}

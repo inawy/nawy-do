@@ -169,3 +169,13 @@
   opacity: 0.5;
   cursor: default;
 }
+
+.move-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.move-row button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
