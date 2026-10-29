@@ -169,3 +169,9 @@ h2 {
     border-block-start: 1px solid var(--line);
   }
 }
+
+.title-actions {
+  display: flex;
+  align-items: center;
+  flex: none;
+}

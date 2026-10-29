@@ -8,3 +8,7 @@ export function systemToday(): string {
   const dd = String(d.getDate()).padStart(2, '0');
   return `${d.getFullYear()}-${mm}-${dd}`;
 }
+
+/** A readable local date and time for a stored timestamp (this file is the only one that reads `Date`). */
+export const formatWhen = (ms: number): string =>
+  new Date(ms).toLocaleString('ar', { dateStyle: 'medium', timeStyle: 'short' });

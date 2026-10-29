@@ -1,11 +1,13 @@
 import { useMemo, useState, useSyncExternalStore } from 'react';
 import { selectedListId, type Selection } from '@/core/model';
 import type { NawyDoDb, NewTaskOptions } from '@/data';
+import { useBackup } from '@/features/backup';
 import { useLists } from '@/features/lists';
 import { useTasks } from '@/features/tasks';
 import { TasksScreen } from '@/ui/shell';
-import { systemClock, systemToday } from './clock';
+import { formatWhen, systemClock, systemToday } from './clock';
 import { getDb } from './db';
+import { downloadText } from './files';
 import { updateSignal } from './updateSignal';
 
 interface Props {
@@ -19,6 +21,7 @@ export function App({ db, now = systemClock, today = systemToday }: Props) {
   const database = useMemo(() => db ?? getDb(), [db]);
   const tasks = useTasks(database, now);
   const lists = useLists(database, now);
+  const backup = useBackup(database, now);
   const applyUpdate = useSyncExternalStore(updateSignal.subscribe, updateSignal.get);
   const [chosen, setChosen] = useState<Selection>('main');
   const [openId, setOpenId] = useState<string | null>(null);
@@ -48,6 +51,15 @@ export function App({ db, now = systemClock, today = systemToday }: Props) {
 
   return (
     <TasksScreen
+      data={{
+        snapshots: backup.snapshots.map((s) => ({ id: s.id, label: formatWhen(s.createdAt) })),
+        outcome: backup.outcome,
+        onOpen: () => void backup.refresh(),
+        onExport: () =>
+          void backup.exportJson().then((text) => downloadText(`nawy-do-${today()}.json`, text)),
+        onImport: (file) => void file.text().then(backup.importText),
+        onRestore: (id) => void backup.restore(id),
+      }}
       tasks={tasks.tasks}
       lists={lists.lists}
       today={today()}

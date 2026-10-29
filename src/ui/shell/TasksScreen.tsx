@@ -9,9 +9,10 @@ import {
   type TaskList,
   type TaskPatch,
 } from '@/core/model';
+import { BackupSheet, type Outcome, type SnapshotItem } from '../backup';
 import { DetailsSheet } from '../details';
 import { ListSheet } from '../lists';
-import { MoreIcon } from '../primitives';
+import { DataIcon, MoreIcon } from '../primitives';
 import { Composer, TaskList as Tasks, UndoToast } from '../tasks';
 import '../styles/index.css';
 import { Nav } from './Nav';
@@ -23,7 +24,19 @@ const LIST_ERRORS = {
   failed: 'مقدرتش أحفظ القائمة. جرّب تاني.',
 } as const;
 
+/** Everything the «بياناتي» sheet needs; the screen only shows it. */
+export interface DataProps {
+  snapshots: SnapshotItem[];
+  outcome: Outcome | null;
+  /** Called when the sheet opens (loads the safety copies, clears the last result). */
+  onOpen: () => void;
+  onExport: () => void;
+  onImport: (file: File) => void;
+  onRestore: (id: number) => void;
+}
+
 export interface TasksScreenProps {
+  data: DataProps;
   tasks: Task[];
   lists: TaskList[];
   today: string;
@@ -58,6 +71,7 @@ type Sheet = { mode: 'create' } | { mode: 'edit'; id: string } | null;
 export function TasksScreen(p: TasksScreenProps) {
   const [sheet, setSheet] = useState<Sheet>(null);
   const [sheetError, setSheetError] = useState<string | undefined>();
+  const [dataOpen, setDataOpen] = useState(false);
 
   // A list deleted elsewhere while it is open: fall back to the main list.
   const listId = selectedListId(p.selection);
@@ -98,16 +112,29 @@ export function TasksScreen(p: TasksScreenProps) {
         )}
         <div className="title-row">
           <h1>{title}</h1>
-          {list && (
+          <span className="title-actions">
             <button
               type="button"
               className="icon"
-              aria-label="خيارات القائمة"
-              onClick={() => setSheet({ mode: 'edit', id: list.id })}
+              aria-label="بياناتي"
+              onClick={() => {
+                p.data.onOpen();
+                setDataOpen(true);
+              }}
             >
-              <MoreIcon />
+              <DataIcon />
             </button>
-          )}
+            {list && (
+              <button
+                type="button"
+                className="icon"
+                aria-label="خيارات القائمة"
+                onClick={() => setSheet({ mode: 'edit', id: list.id })}
+              >
+                <MoreIcon />
+              </button>
+            )}
+          </span>
         </div>
         <Composer onAdd={p.onAdd} />
         {p.failed ? (
@@ -176,6 +203,16 @@ export function TasksScreen(p: TasksScreenProps) {
             p.onSelect('main');
             closeSheet();
           }}
+        />
+      )}
+      {dataOpen && (
+        <BackupSheet
+          snapshots={p.data.snapshots}
+          outcome={p.data.outcome}
+          onExport={p.data.onExport}
+          onImport={p.data.onImport}
+          onRestore={p.data.onRestore}
+          onClose={() => setDataOpen(false)}
         />
       )}
       {p.removed && (
