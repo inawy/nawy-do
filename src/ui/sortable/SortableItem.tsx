@@ -19,8 +19,15 @@ export function SortableItem({
   id: string;
   children: (sort: SortState) => ReactNode;
 }) {
-  const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } =
-    useSortable({ id });
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    setActivatorNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
   return children({
     rowRef: setNodeRef,
     style: { transform: CSS.Transform.toString(transform), transition },

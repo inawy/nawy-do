@@ -62,9 +62,12 @@ export function SortableList({ ids, onMove, describe, ariaLabel, children }: Pro
     `المكان ${list.indexOf(id) + 1} من ${list.length}`;
 
   const announcements: Announcements = {
-    onDragStart: ({ active }) => `التقطت «${describe(String(active.id))}». ${position(String(active.id), ids)}.`,
+    onDragStart: ({ active }) =>
+      `التقطت «${describe(String(active.id))}». ${position(String(active.id), ids)}.`,
     onDragOver: ({ active, over }) =>
-      over ? `«${describe(String(active.id))}» فوق «${describe(String(over.id))}». ${position(String(over.id), ids)}.` : undefined,
+      over
+        ? `«${describe(String(active.id))}» فوق «${describe(String(over.id))}». ${position(String(over.id), ids)}.`
+        : undefined,
     onDragEnd: ({ active, over }) =>
       over
         ? `أفلتّ «${describe(String(active.id))}» في ${position(String(over.id), ids)}.`

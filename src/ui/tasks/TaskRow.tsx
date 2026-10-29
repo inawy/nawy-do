@@ -66,12 +66,7 @@ export function TaskRow({ task, today, onToggle, onStar, onOpen, sort }: Props) 
         <StarIcon on={task.starred} />
       </button>
       {sort && (
-        <button
-          type="button"
-          className="grip"
-          aria-label={`تحريك: ${task.title}`}
-          {...sort.handle}
-        >
+        <button type="button" className="grip" aria-label={`تحريك: ${task.title}`} {...sort.handle}>
           <GripIcon />
         </button>
       )}
