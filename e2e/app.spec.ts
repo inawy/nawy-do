@@ -84,7 +84,14 @@ test('moves an intention with the keyboard (Space, arrow, Space on its handle)',
   expect(await titles(page)).toEqual(['ب', 'أ']);
   await page.getByRole('button', { name: 'تحريك: ب' }).focus();
   await page.keyboard.press('Space');
+  // dnd-kit attaches its key listeners just after the pick-up, so wait for it before moving.
+  await expect(page.getByRole('button', { name: 'تحريك: ب' })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await page.waitForTimeout(150);
   await page.keyboard.press('ArrowDown');
+  await page.waitForTimeout(250);
   await page.keyboard.press('Space');
   await expect.poll(() => stored(page)).toEqual(['أ', 'ب']);
   await page.reload();
