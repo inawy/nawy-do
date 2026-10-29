@@ -10,10 +10,12 @@ interface Props {
   onOpen: (task: Task) => void;
   /** Present only when the row can be re-ordered. */
   sort?: SortState;
+  /** Selection mode: the row is picked instead of completed, starred or opened. */
+  pick?: { on: boolean; onToggle: () => void };
 }
 
 /** One intention: circle to complete, the text opens the details, the star marks it. */
-export function TaskRow({ task, today, onToggle, onStar, onOpen, sort }: Props) {
+export function TaskRow({ task, today, onToggle, onStar, onOpen, sort, pick }: Props) {
   const done = task.status === 'done';
   const state = task.due ? dueState(task.due, today) : undefined;
   const progress = stepProgress(task);
@@ -24,20 +26,32 @@ export function TaskRow({ task, today, onToggle, onStar, onOpen, sort }: Props) 
       style={sort?.style}
       className={['row', done && 'done', sort?.dragging && 'dragging'].filter(Boolean).join(' ')}
     >
-      <label className="hit">
-        <input
-          type="checkbox"
-          className="circle"
-          checked={done}
-          onChange={() => onToggle(task)}
-          aria-label={`${done ? 'إلغاء إنجاز' : 'إنجاز'}: ${task.title}`}
-        />
-      </label>
+      {pick ? (
+        <label className="hit">
+          <input
+            type="checkbox"
+            className="circle pick"
+            checked={pick.on}
+            onChange={pick.onToggle}
+            aria-label={`تحديد: ${task.title}`}
+          />
+        </label>
+      ) : (
+        <label className="hit">
+          <input
+            type="checkbox"
+            className="circle"
+            checked={done}
+            onChange={() => onToggle(task)}
+            aria-label={`${done ? 'إلغاء إنجاز' : 'إنجاز'}: ${task.title}`}
+          />
+        </label>
+      )}
       <button
         type="button"
         className="body"
         aria-label={`تفاصيل: ${task.title}`}
-        onClick={() => onOpen(task)}
+        onClick={() => (pick ? pick.onToggle() : onOpen(task))}
       >
         <span className="title">{task.title}</span>
         {task.notes && <span className="snippet">{task.notes}</span>}
@@ -56,16 +70,18 @@ export function TaskRow({ task, today, onToggle, onStar, onOpen, sort }: Props) 
           </span>
         )}
       </button>
-      <button
-        type="button"
-        className={task.starred ? 'star on' : 'star'}
-        aria-label={`تمييز: ${task.title}`}
-        aria-pressed={task.starred}
-        onClick={() => onStar(task)}
-      >
-        <StarIcon on={task.starred} />
-      </button>
-      {sort && (
+      {!pick && (
+        <button
+          type="button"
+          className={task.starred ? 'star on' : 'star'}
+          aria-label={`تمييز: ${task.title}`}
+          aria-pressed={task.starred}
+          onClick={() => onStar(task)}
+        >
+          <StarIcon on={task.starred} />
+        </button>
+      )}
+      {sort && !pick && (
         <button type="button" className="grip" aria-label={`تحريك: ${task.title}`} {...sort.handle}>
           <GripIcon />
         </button>

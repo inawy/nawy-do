@@ -16,6 +16,7 @@ import { DataIcon, MoreIcon } from '../primitives';
 import { Composer, TaskList as Tasks, UndoToast } from '../tasks';
 import '../styles/index.css';
 import { Nav } from './Nav';
+import { SelectBar } from './SelectBar';
 
 const TITLES = { main: 'نواياي', starred: 'المفضلة', scheduled: 'مجدولة' } as const;
 
@@ -54,6 +55,9 @@ export interface TasksScreenProps {
   onStar: (t: Task) => void;
   onOpen: (t: Task) => void;
   onMove: (id: string, toIndex: number) => void;
+  /** Moves the selected tasks to a list (`undefined`: the main list). */
+  onMoveMany: (ids: string[], listId: string | undefined) => void;
+  onCompleteMany: (ids: string[]) => void;
   onClose: () => void;
   onSave: (t: Task, patch: TaskPatch) => void;
   onRemove: (t: Task) => void;
@@ -72,6 +76,8 @@ export function TasksScreen(p: TasksScreenProps) {
   const [sheet, setSheet] = useState<Sheet>(null);
   const [sheetError, setSheetError] = useState<string | undefined>();
   const [dataOpen, setDataOpen] = useState(false);
+  // Selection mode: `null` is off. Cleared whenever the view changes (a pick never crosses views).
+  const [picked, setPicked] = useState<ReadonlySet<string> | null>(null);
 
   // A list deleted elsewhere while it is open: fall back to the main list.
   const listId = selectedListId(p.selection);
@@ -98,7 +104,10 @@ export function TasksScreen(p: TasksScreenProps) {
         selection={selection}
         counts={counts}
         lists={p.lists}
-        onSelect={p.onSelect}
+        onSelect={(s) => {
+          setPicked(null);
+          p.onSelect(s);
+        }}
         onNewList={() => setSheet({ mode: 'create' })}
       />
       <main className="main">
@@ -113,6 +122,9 @@ export function TasksScreen(p: TasksScreenProps) {
         <div className="title-row">
           <h1>{title}</h1>
           <span className="title-actions">
+            <button type="button" onClick={() => setPicked(picked ? null : new Set())}>
+              {picked ? 'تم' : 'تحديد'}
+            </button>
             <button
               type="button"
               className="icon"
@@ -136,7 +148,22 @@ export function TasksScreen(p: TasksScreenProps) {
             )}
           </span>
         </div>
-        <Composer onAdd={p.onAdd} />
+        {picked ? (
+          <SelectBar
+            count={picked.size}
+            lists={p.lists}
+            onMove={(listId) => {
+              p.onMoveMany([...picked], listId);
+              setPicked(null);
+            }}
+            onComplete={() => {
+              p.onCompleteMany([...picked]);
+              setPicked(null);
+            }}
+          />
+        ) : (
+          <Composer onAdd={p.onAdd} />
+        )}
         {p.failed ? (
           <p className="status" role="alert">
             مش قادر أفتح التخزين على الجهاز. لو فاتح تصفح خاص جرّب نافذة عادية.
@@ -152,6 +179,14 @@ export function TasksScreen(p: TasksScreenProps) {
             onStar={p.onStar}
             onOpen={p.onOpen}
             onMove={p.onMove}
+            picked={picked ?? undefined}
+            onPick={(id) =>
+              setPicked((cur) => {
+                const next = new Set(cur);
+                if (!next.delete(id)) next.add(id);
+                return next;
+              })
+            }
           />
         )}
       </main>

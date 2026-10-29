@@ -202,6 +202,32 @@ describe('lists', () => {
     await waitFor(() => expect(at('الثانية')).toBeLessThan(at('الأولى')));
   });
 
+  it('moves several picked tasks to a list at once, and completes picked tasks', async () => {
+    render(<App db={db} now={now} today={today} />);
+    await screen.findByText(/مفيش نوايا لسه/);
+    await createListNamed('الشغل');
+    fireEvent.click(screen.getByRole('button', { name: 'نواياي' }));
+    await addIntention('ا');
+    await addIntention('ب');
+    await addIntention('ج');
+    fireEvent.click(screen.getByRole('button', { name: 'تحديد' }));
+    fireEvent.click(screen.getByRole('checkbox', { name: 'تحديد: ا' }));
+    fireEvent.click(screen.getByRole('checkbox', { name: 'تحديد: ب' }));
+    await screen.findByText('2 محدد');
+    const id = screen.getByRole('option', { name: 'الشغل' }).getAttribute('value') ?? '';
+    fireEvent.change(screen.getByLabelText('نقل المحدد إلى'), { target: { value: id } });
+    await waitFor(() => expect(screen.queryByText('ا')).toBeNull());
+    expect(screen.getByText('ج')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'الشغل' }));
+    await screen.findByText('ا');
+    await screen.findByText('ب');
+
+    fireEvent.click(screen.getByRole('button', { name: 'تحديد' }));
+    fireEvent.click(screen.getByRole('checkbox', { name: 'تحديد: ا' }));
+    fireEvent.click(screen.getByRole('button', { name: 'إنجاز المحدد' }));
+    await screen.findByText('المنجزة (1)');
+  });
+
   it('renames a list', async () => {
     render(<App db={db} now={now} today={today} />);
     await screen.findByText(/مفيش نوايا لسه/);

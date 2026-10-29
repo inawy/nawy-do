@@ -17,6 +17,9 @@ interface Props {
   onStar: (task: Task) => void;
   onOpen: (task: Task) => void;
   onMove: (id: string, toIndex: number) => void;
+  /** Selection mode when present. */
+  picked?: ReadonlySet<string>;
+  onPick?: (id: string) => void;
 }
 
 const EMPTY = {
@@ -26,12 +29,22 @@ const EMPTY = {
   scheduled: 'مفيش نوايا بتاريخ. افتح نية وحدد لها يوم.',
 } as const;
 
-export function TaskList({ tasks, today, view, onToggle, onStar, onOpen, onMove }: Props) {
+export function TaskList({
+  tasks,
+  today,
+  view,
+  onToggle,
+  onStar,
+  onOpen,
+  onMove,
+  picked,
+  onPick,
+}: Props) {
   const grouped = groupTasks(view === 'starred' ? tasks.filter((t) => t.starred) : tasks);
   // Only the main list and a single list can be re-ordered: each shows all of its open tasks, so a
   // move is unambiguous. The favourites and scheduled views are filtered or sorted by date.
   const canSort =
-    (view === 'main' || selectedListId(view) !== undefined) && grouped.open.length > 1;
+    !picked && (view === 'main' || selectedListId(view) !== undefined) && grouped.open.length > 1;
 
   const row = (t: Task, sort?: SortState) => (
     <TaskRow
@@ -42,6 +55,7 @@ export function TaskList({ tasks, today, view, onToggle, onStar, onOpen, onMove 
       onStar={onStar}
       onOpen={onOpen}
       sort={sort}
+      pick={picked && onPick ? { on: picked.has(t.id), onToggle: () => onPick(t.id) } : undefined}
     />
   );
 

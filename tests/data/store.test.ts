@@ -6,6 +6,8 @@ import {
   allRecords,
   applyRecords,
   completeTaskById,
+  completeTasksByIds,
+  moveTasksToList,
   createDb,
   editTask,
   exportBackup,
@@ -149,5 +151,28 @@ describe('saveOrder', () => {
     const records = await allRecords(db);
     expect(records.find((t) => t.id === 'a')).toMatchObject({ sortOrder: 5, updatedAt: 400 });
     expect(records.find((t) => t.id === 'b')?.deletedAt).toBe(300);
+  });
+});
+
+describe('selections', () => {
+  it('moves picked tasks to a list and back to main, skipping deleted and unknown ones', async () => {
+    await addTask(db, 'a', 'أ', 1);
+    await addTask(db, 'b', 'ب', 2);
+    await addTask(db, 'c', 'ج', 3);
+    await removeTask(db, 'c', 4);
+    expect(await moveTasksToList(db, ['a', 'b', 'c', 'zzz', 'a'], 'L1', 10)).toBe(2);
+    expect((await listTasks(db)).map((t) => t.listId)).toEqual(['L1', 'L1']);
+    expect(await moveTasksToList(db, ['a'], undefined, 20)).toBe(1);
+    const a = (await listTasks(db)).find((t) => t.id === 'a');
+    expect(a?.listId).toBeUndefined();
+    expect(a?.updatedAt).toBeGreaterThanOrEqual(20);
+  });
+
+  it('completes only open picked tasks', async () => {
+    await addTask(db, 'a', 'أ', 1);
+    await addTask(db, 'b', 'ب', 2);
+    await completeTaskById(db, 'b', 3);
+    expect(await completeTasksByIds(db, ['a', 'b'], 10)).toBe(1);
+    expect((await listTasks(db)).every((t) => t.status === 'done')).toBe(true);
   });
 });
