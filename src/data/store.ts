@@ -120,3 +120,38 @@ export async function saveOrder(
     return written;
   });
 }
+
+/**
+ * One transaction for a whole selection: every live task in `ids` is changed with `fn`. Missing or
+ * deleted ones are skipped. Returns how many were written.
+ */
+async function changeMany(
+  db: NawyDoDb,
+  ids: readonly string[],
+  fn: (task: Task) => Task,
+): Promise<number> {
+  return db.transaction('rw', db.tasks, async () => {
+    let written = 0;
+    for (const id of new Set(ids)) {
+      const current = await db.tasks.get(id);
+      if (!current || isDeleted(current)) continue;
+      const next = fn(current);
+      if (next !== current) {
+        await db.tasks.put(next);
+        written++;
+      }
+    }
+    return written;
+  });
+}
+
+/** `listId` undefined moves them to the main list. */
+export const moveTasksToList = (
+  db: NawyDoDb,
+  ids: readonly string[],
+  listId: string | undefined,
+  now: number,
+) => changeMany(db, ids, (t) => updateTask(t, { listId: listId ?? '' }, now));
+
+export const completeTasksByIds = (db: NawyDoDb, ids: readonly string[], now: number) =>
+  changeMany(db, ids, (t) => (t.status === 'open' ? completeTask(t, now) : t));

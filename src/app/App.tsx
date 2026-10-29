@@ -75,6 +75,8 @@ export function App({ db, now = systemClock, today = systemToday }: Props) {
       onStar={(t) => void tasks.edit(t, { starred: !t.starred })}
       onOpen={(t) => setOpenId(t.id)}
       onMove={(id, to) => void tasks.move(id, to)}
+      onMoveMany={(ids, listId) => void tasks.moveMany(ids, listId)}
+      onCompleteMany={(ids) => void tasks.completeMany(ids)}
       onClose={() => setOpenId(null)}
       onSave={(t, patch) => void tasks.edit(t, patch)}
       onRemove={(t) => void tasks.remove(t)}

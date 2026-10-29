@@ -273,3 +273,23 @@
   white-space: nowrap;
   border: 0;
 }
+
+.circle.pick {
+  border-radius: 6px;
+}
+.select-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+}
+.select-bar .count {
+  margin-inline-end: auto;
+  font-weight: 600;
+}
+.select-bar select:disabled,
+.select-bar button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}

@@ -4,6 +4,8 @@ import {
   addTask,
   type NewTaskOptions,
   completeTaskById,
+  completeTasksByIds,
+  moveTasksToList,
   editTask,
   removeTask,
   reopenTaskById,
@@ -26,6 +28,9 @@ export interface TasksApi {
   edit: (task: Task, patch: TaskPatch) => Promise<void>;
   /** Moves an open task to `toIndex` of the displayed (newest-first) list. */
   move: (id: string, toIndex: number) => Promise<void>;
+  /** Moves a selection to a list (`undefined`: the main list). */
+  moveMany: (ids: readonly string[], listId: string | undefined) => Promise<void>;
+  completeMany: (ids: readonly string[]) => Promise<void>;
   remove: (task: Task) => Promise<void>;
   undoRemove: () => Promise<void>;
   dismissUndo: () => void;
@@ -94,6 +99,20 @@ export function useTasks(db: NawyDoDb, now: () => number): TasksApi {
     [db, now, guard, tasks],
   );
 
+  const moveMany = useCallback(
+    async (ids: readonly string[], listId: string | undefined) => {
+      await guard(() => moveTasksToList(db, ids, listId, now()));
+    },
+    [db, now, guard],
+  );
+
+  const completeMany = useCallback(
+    async (ids: readonly string[]) => {
+      await guard(() => completeTasksByIds(db, ids, now()));
+    },
+    [db, now, guard],
+  );
+
   const remove = useCallback(
     async (task: Task) => {
       await guard(async () => {
@@ -122,6 +141,8 @@ export function useTasks(db: NawyDoDb, now: () => number): TasksApi {
     toggle,
     edit,
     move,
+    moveMany,
+    completeMany,
     remove,
     undoRemove,
     dismissUndo,
