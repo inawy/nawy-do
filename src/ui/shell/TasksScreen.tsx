@@ -47,6 +47,7 @@ export interface TasksScreenProps {
   onAddList: (name: string) => Promise<TaskList | 'empty' | 'limit' | 'failed'>;
   onRenameList: (list: TaskList, name: string) => void;
   onDeleteList: (list: TaskList) => void;
+  onMoveList: (list: TaskList, delta: -1 | 1) => void;
   onUndo: () => void;
   onDismissUndo: () => void;
 }
@@ -162,6 +163,9 @@ export function TasksScreen(p: TasksScreenProps) {
         <ListSheet
           mode="edit"
           initialName={editingList.name}
+          canMoveEarlier={p.lists.findIndex((l) => l.id === editingList.id) > 0}
+          canMoveLater={p.lists.findIndex((l) => l.id === editingList.id) < p.lists.length - 1}
+          onMove={(delta) => p.onMoveList(editingList, delta)}
           onClose={closeSheet}
           onSave={(name) => {
             p.onRenameList(editingList, name);

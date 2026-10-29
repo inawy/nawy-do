@@ -1,7 +1,7 @@
 import 'fake-indexeddb/auto';
 import Dexie from 'dexie';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { createList, MAX_LISTS, parseEnvelope, tombstoneList } from '@/core/model';
+import { createList, MAX_LISTS, parseEnvelope, planListMove, tombstoneList } from '@/core/model';
 import {
   addList,
   addTask,
@@ -15,6 +15,7 @@ import {
   listSnapshots,
   listTasks,
   purgeTombstones,
+  saveListOrder,
   removeList,
   renameListById,
   restoreRemovedList,
@@ -170,5 +171,23 @@ describe('real upgrade from schema v1', () => {
       await snapshotBeforeUpgrade(name, i, snaps);
     }
     expect((await listSnapshots(snaps)).map((s) => s.createdAt)).toEqual([5, 4, 3]);
+  });
+});
+
+describe('saveListOrder', () => {
+  it('reorders live lists and bumps their updatedAt', async () => {
+    await addList(db, 'A', 'أ', 1000);
+    await addList(db, 'B', 'ب', 2000);
+    const before = await listLists(db);
+    await saveListOrder(db, planListMove(before, 'B', -1), 3000);
+    const after = await listLists(db);
+    expect(after.map((l) => l.id)).toEqual(['B', 'A']);
+    expect(after.every((l) => l.updatedAt >= 3000)).toBe(true);
+  });
+
+  it('skips a list that was deleted meanwhile', async () => {
+    await addList(db, 'A', 'أ', 1000);
+    await removeList(db, 'A', 2000);
+    expect(await saveListOrder(db, [{ id: 'A', sortOrder: 5 }], 3000)).toBe(0);
   });
 });

@@ -69,6 +69,7 @@ export function App({ db, now = systemClock, today = systemToday }: Props) {
       onAddList={lists.add}
       onRenameList={(l, name) => void lists.rename(l, name)}
       onDeleteList={(l) => void lists.remove(l)}
+      onMoveList={(l, delta) => void lists.move(l, delta)}
       onUndo={() => void (lists.lastRemoved ? lists.undoRemove() : tasks.undoRemove())}
       onDismissUndo={() => {
         lists.dismissUndo();

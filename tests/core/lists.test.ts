@@ -10,6 +10,7 @@ import {
   listSelection,
   mergeRecord,
   mergeRecords,
+  planListMove,
   renameList,
   restoreList,
   selectedListId,
@@ -115,5 +116,38 @@ describe('selection', () => {
       scheduled: 1,
       lists: { L1: 2, L2: 1 },
     });
+  });
+});
+
+describe('planListMove', () => {
+  const A = createList('A', 'أ', 100);
+  const B = createList('B', 'ب', 200);
+  const C = createList('C', 'ج', 300);
+  const order = (lists: (typeof A)[], changes: { id: string; sortOrder: number }[]) =>
+    liveLists(
+      lists.map((l) => {
+        const c = changes.find((x) => x.id === l.id);
+        return c ? { ...l, sortOrder: c.sortOrder } : l;
+      }),
+    ).map((l) => l.id);
+
+  it('swaps two neighbours and touches only them', () => {
+    const changes = planListMove([A, B, C], 'B', -1);
+    expect(changes).toHaveLength(2);
+    expect(order([A, B, C], changes)).toEqual(['B', 'A', 'C']);
+    expect(order([A, B, C], planListMove([A, B, C], 'B', 1))).toEqual(['A', 'C', 'B']);
+  });
+
+  it('does nothing at the ends or for an unknown id', () => {
+    expect(planListMove([A, B], 'A', -1)).toEqual([]);
+    expect(planListMove([A, B], 'B', 1)).toEqual([]);
+    expect(planListMove([A, B], 'Z', 1)).toEqual([]);
+  });
+
+  it('renumbers the whole list when two share a sortOrder', () => {
+    const tie = { ...B, sortOrder: 100 };
+    const changes = planListMove([A, tie, C], 'B', -1);
+    expect(changes).toHaveLength(3);
+    expect(order([A, tie, C], changes)).toEqual(['B', 'A', 'C']);
   });
 });

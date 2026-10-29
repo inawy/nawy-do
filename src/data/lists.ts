@@ -4,6 +4,8 @@ import {
   liveLists,
   MAX_LISTS,
   mergeRecord,
+  nextUpdatedAt,
+  type ListOrderChange,
   renameList,
   restoreList,
   tombstoneList,
@@ -88,5 +90,27 @@ export async function applyLists(db: NawyDoDb, incoming: readonly TaskList[]): P
       }
     }
     return changed;
+  });
+}
+
+/** Writes new `sortOrder`s for live lists (one transaction). Returns how many were written. */
+export async function saveListOrder(
+  db: NawyDoDb,
+  changes: readonly ListOrderChange[],
+  now: number,
+): Promise<number> {
+  return db.transaction('rw', db.lists, async () => {
+    let written = 0;
+    for (const change of changes) {
+      const current = await db.lists.get(change.id);
+      if (!current || current.deletedAt !== undefined) continue;
+      await db.lists.put({
+        ...current,
+        sortOrder: change.sortOrder,
+        updatedAt: nextUpdatedAt(current.updatedAt, now),
+      });
+      written++;
+    }
+    return written;
   });
 }
