@@ -179,3 +179,34 @@
   opacity: 0.45;
   cursor: default;
 }
+
+.form-ok {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--brand);
+}
+.hint {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+.data-actions {
+  flex-wrap: wrap;
+}
+.snapshots h3 {
+  margin: 0.5rem 0 0.25rem;
+  font-size: 1rem;
+}
+.snapshots ul {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+.snapshots li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
