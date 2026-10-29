@@ -9,8 +9,8 @@ export type Outcome =
 
 export interface SnapshotItem {
   id: number;
-  createdAt: number;
-  fromVersion: number;
+  /** Already formatted for display. */
+  label: string;
 }
 
 interface Props {
@@ -48,9 +48,6 @@ export function describeOutcome(o: Outcome): string {
       return ERRORS[o.code] ?? 'الملف ده مش سليم، ومحصلش أي تغيير.';
   }
 }
-
-const formatWhen = (ms: number) =>
-  new Date(ms).toLocaleString('ar', { dateStyle: 'medium', timeStyle: 'short' });
 
 /** Backup file out and in, and the safety copies taken before an upgrade. Nothing here deletes. */
 export function BackupSheet({ snapshots, outcome, onExport, onImport, onRestore, onClose }: Props) {
@@ -118,10 +115,10 @@ export function BackupSheet({ snapshots, outcome, onExport, onImport, onRestore,
             <ul>
               {snapshots.map((s) => (
                 <li key={s.id}>
-                  <span>{formatWhen(s.createdAt)}</span>
+                  <span>{s.label}</span>
                   <button type="button" onClick={() => onRestore(s.id)}>
                     استرجاع
-                    <span className="sr-only"> نسخة {formatWhen(s.createdAt)}</span>
+                    <span className="sr-only"> نسخة {s.label}</span>
                   </button>
                 </li>
               ))}

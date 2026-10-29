@@ -5,7 +5,7 @@ import { useBackup } from '@/features/backup';
 import { useLists } from '@/features/lists';
 import { useTasks } from '@/features/tasks';
 import { TasksScreen } from '@/ui/shell';
-import { systemClock, systemToday } from './clock';
+import { formatWhen, systemClock, systemToday } from './clock';
 import { getDb } from './db';
 import { downloadText } from './files';
 import { updateSignal } from './updateSignal';
@@ -52,7 +52,7 @@ export function App({ db, now = systemClock, today = systemToday }: Props) {
   return (
     <TasksScreen
       data={{
-        snapshots: backup.snapshots,
+        snapshots: backup.snapshots.map((s) => ({ id: s.id, label: formatWhen(s.createdAt) })),
         outcome: backup.outcome,
         onOpen: () => void backup.refresh(),
         onExport: () =>
