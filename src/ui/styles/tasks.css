@@ -251,9 +251,6 @@
     opacity: 1;
   }
 }
-.list.sorting {
-  user-select: none;
-}
 .row.dragging {
   position: relative;
   z-index: 3;

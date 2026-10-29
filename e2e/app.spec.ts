@@ -76,14 +76,19 @@ test('drags an intention to a new place and the order survives a reload', async 
   expect(await titles(page)).toEqual(['الثانية', 'الأولى', 'الثالثة']);
 });
 
-test('moves an intention with the keyboard (Alt+Arrow on its handle)', async ({ page }) => {
+test('moves an intention with the keyboard (Space, arrow, Space on its handle)', async ({
+  page,
+}) => {
   await add(page, 'أ');
   await add(page, 'ب');
-  const grip = page.getByRole('button', { name: 'تحريك: ب' });
-  await grip.focus();
-  await page.keyboard.press('Alt+ArrowDown');
-  await expect.poll(() => titles(page)).toEqual(['أ', 'ب']);
-  await expect(page.getByRole('button', { name: 'تحريك: ب' })).toBeFocused();
+  expect(await titles(page)).toEqual(['ب', 'أ']);
+  await page.getByRole('button', { name: 'تحريك: ب' }).focus();
+  await page.keyboard.press('Space');
+  await page.keyboard.press('ArrowDown');
+  await page.keyboard.press('Space');
+  await expect.poll(() => stored(page)).toEqual(['أ', 'ب']);
+  await page.reload();
+  expect(await titles(page)).toEqual(['أ', 'ب']);
 });
 
 test('creates a list, adds a task to it, and it survives a reload', async ({ page }) => {

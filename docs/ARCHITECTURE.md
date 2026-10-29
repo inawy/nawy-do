@@ -25,7 +25,7 @@ src/
     primitives/        أيقونات وعناصر صغيرة بلا منطق
     tasks/             Composer · TaskRow · TaskList · UndoToast
     lists/             ListSheet
-    sortable/          useSortable
+    sortable/          SortableList, SortableItem (dnd-kit)
     details/           DetailsSheet
     shell/             TasksScreen · Nav (تركيب الشاشة)
     styles/            tokens · base · shell · tasks · details · feedback (index.css يجمعها)

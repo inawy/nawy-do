@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import {
   groupScheduled,
   groupTasks,
@@ -7,7 +6,7 @@ import {
   type Task,
 } from '@/core/model';
 import { ChevronIcon } from '../primitives';
-import { useSortable } from '../sortable';
+import { SortableItem, SortableList, type SortState } from '../sortable';
 import { TaskRow } from './TaskRow';
 
 interface Props {
@@ -29,50 +28,49 @@ const EMPTY = {
 
 export function TaskList({ tasks, today, view, onToggle, onStar, onOpen, onMove }: Props) {
   const grouped = groupTasks(view === 'starred' ? tasks.filter((t) => t.starred) : tasks);
-  const [announcement, setAnnouncement] = useState('');
   // Only the main list and a single list can be re-ordered: each shows all of its open tasks, so a
   // move is unambiguous. The favourites and scheduled views are filtered or sorted by date.
   const canSort =
     (view === 'main' || selectedListId(view) !== undefined) && grouped.open.length > 1;
-  const sortable = useSortable({
-    ids: grouped.open.map((t) => t.id),
-    enabled: canSort,
-    onMove: (id, toIndex) => {
-      const task = grouped.open.find((t) => t.id === id);
-      if (task)
-        setAnnouncement(
-          `نُقلت «${task.title}» إلى المكان ${toIndex + 1} من ${grouped.open.length}`,
-        );
-      onMove(id, toIndex);
-    },
-  });
 
-  const rows = (list: Task[], label: string, sortList = false) => {
-    const ordered = sortList
-      ? sortable.order.map((id) => list.find((t) => t.id === id)).filter((t): t is Task => !!t)
-      : list;
+  const row = (t: Task, sort?: SortState) => (
+    <TaskRow
+      key={t.id}
+      task={t}
+      today={today}
+      onToggle={onToggle}
+      onStar={onStar}
+      onOpen={onOpen}
+      sort={sort}
+    />
+  );
+
+  const rows = (list: Task[], label: string) => (
+    <ul className="list" aria-label={label}>
+      {list.map((t) => row(t))}
+    </ul>
+  );
+
+  const sortableRows = (list: Task[], label: string) => {
+    const byId = new Map(list.map((t) => [t.id, t]));
     return (
-      <ul className={sortList && sortable.dragId ? 'list sorting' : 'list'} aria-label={label}>
-        {ordered.map((t) => (
-          <TaskRow
-            key={t.id}
-            task={t}
-            today={today}
-            onToggle={onToggle}
-            onStar={onStar}
-            onOpen={onOpen}
-            sort={
-              sortList && canSort
-                ? {
-                    rowRef: sortable.registerRow(t.id),
-                    handle: sortable.handleProps(t.id),
-                    dragging: sortable.dragId === t.id,
-                  }
-                : undefined
-            }
-          />
-        ))}
-      </ul>
+      <SortableList
+        ids={list.map((t) => t.id)}
+        ariaLabel={label}
+        describe={(id) => byId.get(id)?.title ?? ''}
+        onMove={onMove}
+      >
+        {(ordered) =>
+          ordered.map((id) => {
+            const t = byId.get(id);
+            return t ? (
+              <SortableItem key={id} id={id}>
+                {(sort) => row(t, sort)}
+              </SortableItem>
+            ) : null;
+          })
+        }
+      </SortableList>
     );
   };
 
@@ -113,11 +111,8 @@ export function TaskList({ tasks, today, view, onToggle, onStar, onOpen, onMove 
           text={EMPTY[selectedListId(view) !== undefined ? 'list' : (view as 'main' | 'starred')]}
         />
       ) : (
-        open.length > 0 && rows(open, 'النوايا', true)
+        open.length > 0 && (canSort ? sortableRows(open, 'النوايا') : rows(open, 'النوايا'))
       )}
-      <p className="sr-only" role="status" aria-live="polite">
-        {announcement}
-      </p>
       {done.length > 0 && (
         <details className="done-section">
           <summary>
