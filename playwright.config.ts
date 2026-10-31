@@ -21,5 +21,9 @@ export default defineConfig({
     url: 'http://localhost:4173',
     reuseExistingServer: !process.env['CI'],
   },
-  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+  projects: [
+    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+    // Phone first (D-023): the same flows on an Android-sized touch screen.
+    { name: 'android', use: { ...devices['Pixel 7'] }, testMatch: /screens\.spec\.ts/ },
+  ],
 });
