@@ -49,7 +49,7 @@ export function useBackup(repo: BackupRepository, now: () => number): BackupApi 
     } catch {
       setSnapshots([]);
     }
-  }, []);
+  }, [repo]);
 
   const exportJson = useCallback(async () => {
     const text = await repo.export(now());
