@@ -1,4 +1,4 @@
-import { useMemo, useState, useSyncExternalStore } from 'react';
+import { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import { selectedListId, type Selection } from '@/core/model';
 import type { NawyDoDb, NewTaskOptions } from '@/data';
 import { useBackup } from '@/features/backup';
@@ -8,6 +8,7 @@ import { TasksScreen } from '@/ui/shell';
 import { formatWhen, systemClock, systemToday } from './clock';
 import { getDb } from './db';
 import { downloadText } from './files';
+import { requestPersistence, type StorageState } from './storage';
 import { updateSignal } from './updateSignal';
 
 interface Props {
@@ -24,7 +25,12 @@ export function App({ db, now = systemClock, today = systemToday }: Props) {
   const backup = useBackup(database, now);
   const applyUpdate = useSyncExternalStore(updateSignal.subscribe, updateSignal.get);
   const [chosen, setChosen] = useState<Selection>('main');
+  const [storage, setStorage] = useState<StorageState | 'unknown'>('unknown');
   const [openId, setOpenId] = useState<string | null>(null);
+
+  useEffect(() => {
+    void requestPersistence().then(setStorage);
+  }, []);
 
   // A list that no longer exists (deleted here or elsewhere) falls back to the main list.
   const chosenList = selectedListId(chosen);
@@ -52,6 +58,7 @@ export function App({ db, now = systemClock, today = systemToday }: Props) {
   return (
     <TasksScreen
       data={{
+        storage,
         snapshots: backup.snapshots.map((s) => ({ id: s.id, label: formatWhen(s.createdAt) })),
         outcome: backup.outcome,
         onOpen: () => void backup.refresh(),

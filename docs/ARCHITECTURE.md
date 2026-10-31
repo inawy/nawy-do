@@ -19,7 +19,7 @@ core  ←  data  ←  features  ←  ui  ←  app
 ```text
 src/
   core/model/          نموذج المهمة والقوائم (types · task · lists · selection · group · order · merge · validate · envelope · civil)
-  data/                schema · store · lists · live · backup · purge · migrate
+  data/                schema · store · lists · live · backup · purge · snapshot
   features/<ميزة>/     index.ts + ملفاتها (tasks/ · lists/)
   ui/
     primitives/        أيقونات وعناصر صغيرة بلا منطق

@@ -29,8 +29,12 @@ export async function importBackup(
   const parsed: Result<Envelope, EnvelopeError> = parseEnvelope(text, options);
   if (!parsed.ok) return parsed;
   const { tasks, lists } = parsed.value;
-  // Lists first, so a task never points at a list that is not there yet.
-  const listsChanged = await applyLists(db, lists);
-  const changed = await applyRecords(db, tasks);
+  // One transaction: either the whole file is merged or nothing is (a tab closing half-way must
+  // not leave lists without their tasks). Lists first, so a task never points at a missing list.
+  const { changed, listsChanged } = await db.transaction('rw', db.tasks, db.lists, async () => {
+    const listsChanged = await applyLists(db, lists);
+    const changed = await applyRecords(db, tasks);
+    return { changed, listsChanged };
+  });
   return { ok: true, value: { total: tasks.length, changed, lists: lists.length, listsChanged } };
 }

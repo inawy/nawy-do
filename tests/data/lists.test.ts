@@ -144,6 +144,31 @@ describe('real upgrade from schema v1', () => {
     upgraded.close();
   });
 
+  it('the safety copy holds every table, not only tasks', async () => {
+    const name = v1Name();
+    const old = new Dexie(name);
+    old.version(1).stores({ tasks: 'id', extra: 'id' });
+    await old.table('tasks').add({ id: 'a' });
+    await old.table('extra').add({ id: 'x' });
+    old.close();
+    const snaps = `snaps-${n++}`;
+    expect(await snapshotBeforeUpgrade(name, 10, snaps)).toBe('saved');
+    const copy = JSON.parse((await listSnapshots(snaps))[0]?.json ?? '{}');
+    expect(copy.tasks).toEqual([{ id: 'a' }]);
+    expect(copy.extra).toEqual([{ id: 'x' }]);
+    expect(copy.app).toBe('nawy-do');
+  });
+
+  it('keeps only the newest three safety copies', async () => {
+    const snaps = `snaps-${n++}`;
+    for (let i = 1; i <= 5; i++) {
+      const name = v1Name();
+      await makeV1(name);
+      await snapshotBeforeUpgrade(name, i * 10, snaps);
+    }
+    expect((await listSnapshots(snaps)).map((s) => s.createdAt)).toEqual([50, 40, 30]);
+  });
+
   it('takes a restorable safety copy first, once, and only for an older database', async () => {
     const name = v1Name();
     const snaps = `snaps-${n++}`;

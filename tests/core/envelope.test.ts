@@ -1,5 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { buildEnvelope, createList, createTask, parseEnvelope, parseTask } from '@/core/model';
+import {
+  buildEnvelope,
+  clampFuture,
+  createList,
+  createTask,
+  MAX_FUTURE_MS,
+  parseEnvelope,
+  parseTask,
+  tombstoneTask,
+} from '@/core/model';
 
 const t = createTask('a', 'x', 100);
 const text = (o: unknown) => JSON.stringify(o);
@@ -91,5 +100,36 @@ describe('envelope with lists (version 2)', () => {
     expect(ok.ok && ok.value.listId).toBe('L');
     const bad = parseTask({ ...t, listId: 5 });
     expect(!bad.ok && bad.error).toBe('listId');
+  });
+});
+
+describe('records from the future', () => {
+  const NOW = 1_700_000_000_000;
+  const limit = NOW + MAX_FUTURE_MS;
+
+  it('clampFuture leaves normal records alone and pulls future ones back', () => {
+    const normal = createTask('a', 'x', NOW);
+    expect(clampFuture(normal, limit)).toBe(normal);
+    const far = { ...normal, updatedAt: 4_102_444_800_000 }; // year 2100
+    expect(clampFuture(far, limit).updatedAt).toBe(limit);
+    const gone = tombstoneTask(createTask('b', 'x', 1), 4_102_444_800_000);
+    const fixed = clampFuture(gone, limit);
+    expect([fixed.updatedAt, fixed.deletedAt]).toEqual([limit, limit]);
+  });
+
+  it('parseEnvelope clamps tasks and lists only when it is told the time', () => {
+    const far = 4_102_444_800_000;
+    const file = text({
+      app: 'nawy-do',
+      schemaVersion: 2,
+      exportedAt: far,
+      tasks: [{ ...createTask('a', 'x', 1), updatedAt: far }],
+      lists: [{ ...createList('L', 'ق', 1), updatedAt: far }],
+    });
+    const clamped = parseEnvelope(file, { now: NOW });
+    expect(clamped.ok && clamped.value.tasks[0]?.updatedAt).toBe(limit);
+    expect(clamped.ok && clamped.value.lists[0]?.updatedAt).toBe(limit);
+    const raw = parseEnvelope(file);
+    expect(raw.ok && raw.value.tasks[0]?.updatedAt).toBe(far);
   });
 });

@@ -61,7 +61,7 @@ export function useBackup(db: NawyDoDb, now: () => number): BackupApi {
     async (text: string, restored: boolean) => {
       if (text.length > MAX_FILE_CHARS) return setOutcome({ kind: 'error', code: 'too-big' });
       try {
-        const result = await importBackup(db, text);
+        const result = await importBackup(db, text, { now: now() });
         if (!result.ok) return setOutcome({ kind: 'error', code: result.error.code });
         const changed = result.value.changed + result.value.listsChanged;
         setOutcome(
@@ -73,7 +73,7 @@ export function useBackup(db: NawyDoDb, now: () => number): BackupApi {
         setOutcome({ kind: 'error', code: 'failed' });
       }
     },
-    [db],
+    [db, now],
   );
 
   const importText = useCallback((text: string) => run(text, false), [run]);
