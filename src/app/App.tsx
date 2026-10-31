@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import { selectedListId, type Selection } from '@/core/model';
-import type { NawyDoDb, NewTaskOptions } from '@/data';
+import type { NewTaskOptions, Repositories } from '@/core/ports';
+import { createDexieRepositories, type NawyDoDb } from '@/data';
 import { useBackup } from '@/features/backup';
 import { useLists } from '@/features/lists';
 import { useTasks } from '@/features/tasks';
@@ -8,21 +9,27 @@ import { TasksScreen } from '@/ui/shell';
 import { formatWhen, systemClock, systemToday } from './clock';
 import { getDb } from './db';
 import { downloadText } from './files';
+import { newId } from './ids';
 import { requestPersistence, type StorageState } from './storage';
 import { updateSignal } from './updateSignal';
 
 interface Props {
+  /** Storage: the repositories to use, or a Dexie database to wrap, or (by default) the app's own. */
+  repositories?: Repositories;
   db?: NawyDoDb;
   now?: () => number;
   today?: () => string;
 }
 
 /** The only place that wires features to the screen. */
-export function App({ db, now = systemClock, today = systemToday }: Props) {
-  const database = useMemo(() => db ?? getDb(), [db]);
-  const tasks = useTasks(database, now);
-  const lists = useLists(database, now);
-  const backup = useBackup(database, now);
+export function App({ repositories, db, now = systemClock, today = systemToday }: Props) {
+  const repos = useMemo(
+    () => repositories ?? createDexieRepositories(db ?? getDb()),
+    [repositories, db],
+  );
+  const tasks = useTasks(repos.tasks, now, newId);
+  const lists = useLists(repos.lists, now, newId);
+  const backup = useBackup(repos.backup, now);
   const applyUpdate = useSyncExternalStore(updateSignal.subscribe, updateSignal.get);
   const [chosen, setChosen] = useState<Selection>('main');
   const [storage, setStorage] = useState<StorageState | 'unknown'>('unknown');

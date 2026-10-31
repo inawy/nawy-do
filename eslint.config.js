@@ -75,7 +75,8 @@ export default tseslint.config(
   },
   layer('core', ['data', 'features', 'ui', 'app'], ['react', 'react-dom', 'dexie']),
   layer('data', ['features', 'ui', 'app'], ['react', 'react-dom']),
-  layer('features', ['ui', 'app'], ['dexie']),
+  // Dependency inversion (D-024): features see storage only through the ports in core/ports.
+  layer('features', ['data', 'ui', 'app'], ['dexie']),
   layer('ui', ['data', 'app'], ['dexie']),
   layer('app', [], []),
 );
