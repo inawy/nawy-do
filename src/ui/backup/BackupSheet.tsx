@@ -13,7 +13,10 @@ export interface SnapshotItem {
   label: string;
 }
 
+export type StorageStatus = 'persisted' | 'best-effort' | 'unsupported' | 'unknown';
+
 interface Props {
+  storage: StorageStatus;
   snapshots: SnapshotItem[];
   outcome: Outcome | null;
   onExport: () => void;
@@ -50,7 +53,15 @@ export function describeOutcome(o: Outcome): string {
 }
 
 /** Backup file out and in, and the safety copies taken before an upgrade. Nothing here deletes. */
-export function BackupSheet({ snapshots, outcome, onExport, onImport, onRestore, onClose }: Props) {
+export function BackupSheet({
+  storage,
+  snapshots,
+  outcome,
+  onExport,
+  onImport,
+  onRestore,
+  onClose,
+}: Props) {
   const file = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -77,6 +88,14 @@ export function BackupSheet({ snapshots, outcome, onExport, onImport, onRestore,
           </button>
         </div>
         <p className="hint">كل نواياك محفوظة على جهازك بس. خُد نسخة احتياطية تحفظها عندك.</p>
+        {storage === 'persisted' ? (
+          <p className="form-ok">التخزين محمي من المسح التلقائي.</p>
+        ) : storage === 'best-effort' || storage === 'unsupported' ? (
+          <p className="form-warn">
+            المتصفح ممكن يمسح بيانات الموقع لو الجهاز ضاق. ثبّت التطبيق على الشاشة الرئيسية وخُد
+            نسخة احتياطية بانتظام.
+          </p>
+        ) : null}
         <div className="actions data-actions">
           <button type="button" className="primary" onClick={onExport}>
             تنزيل نسخة احتياطية

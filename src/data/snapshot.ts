@@ -39,16 +39,17 @@ export async function snapshotBeforeUpgrade(
       old.close();
       return 'none';
     }
-    const has = (table: string) => old.tables.some((t) => t.name === table);
-    const tasks: unknown[] = has('tasks') ? await old.table('tasks').toArray() : [];
+    // Every table, by name, so a future schema that adds one is never silently left out.
+    const tables: Record<string, unknown[]> = {};
+    for (const table of old.tables) tables[table.name] = await table.toArray();
     old.close();
 
     const store = snapshotDb(snapshotName);
     const json = JSON.stringify({
+      ...tables,
       app: 'nawy-do',
       schemaVersion: fromVersion,
       exportedAt: now,
-      tasks,
     });
     await store.snapshots.add({ createdAt: now, fromVersion, json });
     const all = await store.snapshots.orderBy('createdAt').toArray();

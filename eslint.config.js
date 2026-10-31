@@ -18,7 +18,7 @@ const noRawDate = [
 // Records are never removed directly; deleting writes a tombstone (D-006).
 const noHardDelete = {
   selector: 'CallExpression[callee.property.name=/^(delete|bulkDelete|clear)$/]',
-  message: 'Hard deletes are only allowed in src/data/purge.ts and migrate.ts (D-006).',
+  message: 'Hard deletes are only allowed in src/data/purge.ts and snapshot.ts (D-006).',
 };
 
 // A module (src/ui/tasks, src/features/tasks, ...) is used only through its index.ts. Inside a
@@ -70,7 +70,7 @@ export default tseslint.config(
   },
   {
     files: ['src/data/**/*.{ts,tsx}'],
-    ignores: ['src/data/purge.ts', 'src/data/migrate.ts'],
+    ignores: ['src/data/purge.ts', 'src/data/snapshot.ts'],
     rules: { 'no-restricted-syntax': ['error', noInnerHtml, ...noRawDate, noHardDelete] },
   },
   layer('core', ['data', 'features', 'ui', 'app'], ['react', 'react-dom', 'dexie']),

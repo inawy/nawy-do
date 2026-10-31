@@ -42,6 +42,25 @@ export interface EnvelopeOptions {
   currentVersion?: number;
   migrations?: Readonly<Record<number, Migration>>;
   maxRecords?: number;
+  /**
+   * The current time. When given, no record may claim to be modified later than a day after it: a
+   * file with an `updatedAt` in 2100 would otherwise win every future merge and freeze that record.
+   */
+  now?: number;
+}
+
+/** A day of tolerance for clocks that are a little ahead. */
+export const MAX_FUTURE_MS = 86_400_000;
+
+/** Pure: pulls a record's timestamps back to `limit` when they are later than it. */
+export function clampFuture<T extends { updatedAt: number; deletedAt?: number }>(
+  record: T,
+  limit: number,
+): T {
+  if (record.updatedAt <= limit && (record.deletedAt ?? 0) <= limit) return record;
+  const next = { ...record, updatedAt: Math.min(record.updatedAt, limit) };
+  if (record.deletedAt !== undefined) next.deletedAt = Math.min(record.deletedAt, limit);
+  return next;
 }
 
 export function buildEnvelope(
@@ -78,6 +97,8 @@ export function parseEnvelopeValue(
   const current = options.currentVersion ?? SCHEMA_VERSION;
   const migrations = options.migrations ?? MIGRATIONS;
   const maxRecords = options.maxRecords ?? MAX_RECORDS;
+  const fix = <T extends { updatedAt: number; deletedAt?: number }>(r: T): T =>
+    options.now === undefined ? r : clampFuture(r, options.now + MAX_FUTURE_MS);
 
   if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) {
     return err({ code: 'not-an-envelope' });
@@ -107,7 +128,7 @@ export function parseEnvelopeValue(
     if (!parsed.ok) return err({ code: 'invalid-record', index, reason: parsed.error });
     if (seen.has(parsed.value.id)) return err({ code: 'duplicate-id', id: parsed.value.id });
     seen.add(parsed.value.id);
-    tasks.push(parsed.value);
+    tasks.push(fix(parsed.value));
   }
   const rawLists = obj['lists'];
   if (!Array.isArray(rawLists)) return err({ code: 'not-an-envelope' });
@@ -119,7 +140,7 @@ export function parseEnvelopeValue(
     if (!parsed.ok) return err({ code: 'invalid-list', index, reason: parsed.error });
     if (seenLists.has(parsed.value.id)) return err({ code: 'duplicate-id', id: parsed.value.id });
     seenLists.add(parsed.value.id);
-    lists.push(parsed.value);
+    lists.push(fix(parsed.value));
   }
   const exportedAt = typeof obj['exportedAt'] === 'number' ? obj['exportedAt'] : 0;
   return ok({ app: APP_ID, schemaVersion: current, exportedAt, tasks, lists });

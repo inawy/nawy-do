@@ -10,7 +10,7 @@ import {
   type TaskList,
   type TaskPatch,
 } from '@/core/model';
-import { BackupSheet, type Outcome, type SnapshotItem } from '../backup';
+import { BackupSheet, type Outcome, type SnapshotItem, type StorageStatus } from '../backup';
 import { DetailsSheet } from '../details';
 import { ListSheet } from '../lists';
 import { DataIcon, MoreIcon, SearchIcon } from '../primitives';
@@ -28,6 +28,7 @@ const LIST_ERRORS = {
 
 /** Everything the «بياناتي» sheet needs; the screen only shows it. */
 export interface DataProps {
+  storage: StorageStatus;
   snapshots: SnapshotItem[];
   outcome: Outcome | null;
   /** Called when the sheet opens (loads the safety copies, clears the last result). */
@@ -274,6 +275,7 @@ export function TasksScreen(p: TasksScreenProps) {
       )}
       {dataOpen && (
         <BackupSheet
+          storage={p.data.storage}
           snapshots={p.data.snapshots}
           outcome={p.data.outcome}
           onExport={p.data.onExport}

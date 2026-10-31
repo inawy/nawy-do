@@ -1,5 +1,5 @@
 import 'fake-indexeddb/auto';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createTask, tombstoneTask } from '@/core/model';
 import {
   addTask,
@@ -12,6 +12,7 @@ import {
   editTask,
   exportBackup,
   importBackup,
+  listLists,
   listTasks,
   purgeTombstones,
   removeTask,
@@ -174,5 +175,29 @@ describe('selections', () => {
     await completeTaskById(db, 'b', 3);
     expect(await completeTasksByIds(db, ['a', 'b'], 10)).toBe(1);
     expect((await listTasks(db)).every((t) => t.status === 'done')).toBe(true);
+  });
+});
+
+describe('import safety', () => {
+  const file = (tasks: unknown[], lists: unknown[]) =>
+    JSON.stringify({ app: 'nawy-do', schemaVersion: 2, exportedAt: 1, tasks, lists });
+
+  it('is all-or-nothing: a failure while writing tasks leaves no lists behind', async () => {
+    const list = { id: 'L', name: 'ق', sortOrder: 1, createdAt: 1, updatedAt: 1 };
+    const task = { ...createTask('a', 'x', 1), listId: 'L' };
+    const put = vi.spyOn(db.tasks, 'put').mockRejectedValueOnce(new Error('disk full'));
+    await expect(importBackup(db, file([task], [list]))).rejects.toThrow();
+    put.mockRestore();
+    expect(await listLists(db)).toEqual([]);
+    expect(await listTasks(db)).toEqual([]);
+  });
+
+  it('a record dated in the far future cannot freeze itself: later edits still win', async () => {
+    const NOW = 1_700_000_000_000;
+    const far = { ...createTask('a', 'من ملف', 1), updatedAt: 4_102_444_800_000 };
+    await importBackup(db, file([far], []), { now: NOW });
+    const edited = await editTask(db, 'a', { title: 'عدّلتها' }, NOW + 1000);
+    expect(edited?.title).toBe('عدّلتها');
+    expect((await listTasks(db))[0]?.updatedAt).toBeLessThan(NOW + 2 * 86_400_000);
   });
 });

@@ -1,1 +1,7 @@
-export { BackupSheet, describeOutcome, type Outcome, type SnapshotItem } from './BackupSheet';
+export {
+  BackupSheet,
+  describeOutcome,
+  type Outcome,
+  type SnapshotItem,
+  type StorageStatus,
+} from './BackupSheet';
