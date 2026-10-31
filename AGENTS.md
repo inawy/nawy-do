@@ -31,7 +31,7 @@
 
 ## الأوامر
 
-`npm install` · `npm run dev` · `npm run build` · `npm test` · `npm run lint` · `npm run format:check`
+`pnpm install` · `pnpm dev` · `pnpm build` · `pnpm test` · `pnpm lint` · `pnpm format:check` (pnpm 12 وNode 24، كما في المرجع؛ القفل يُولَّد في CI: D-027)
 
 ## بوابات CI
 

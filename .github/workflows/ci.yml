@@ -14,23 +14,33 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4 # version comes from `packageManager` in package.json
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
-      # No lockfile yet: it could not be generated offline. Replace with `npm ci` once committed.
-      - run: npm install --no-audit --no-fund
+          node-version: 24
+      # With a committed lockfile the install is frozen (what is tested is what ships). Without one
+      # (the first run after switching to pnpm) it resolves, and the lockfile is published to the
+      # `ci-lockfile` branch for committing: it cannot be generated in the offline dev sandbox.
+      - name: Install
+        run: |
+          if [ -f pnpm-lock.yaml ]; then
+            pnpm install --frozen-lockfile
+          else
+            pnpm install --no-frozen-lockfile
+            echo "GENERATED_LOCK=1" >> "$GITHUB_ENV"
+          fi
       - name: Type check (errors as annotations)
         run: |
-          npx tsc --noEmit --pretty false | sed -E 's/^([^()]+)\(([0-9]+),([0-9]+)\): (.*)$/::error file=\1,line=\2,col=\3::\4/' ; test "${PIPESTATUS[0]}" -eq 0
-      - run: npm run lint
-      - run: npm run format:check
-      - run: npm test
-      - run: npm run build
+          pnpm exec tsc --noEmit --pretty false | sed -E 's/^([^()]+)\(([0-9]+),([0-9]+)\): (.*)$/::error file=\1,line=\2,col=\3::\4/' ; test "${PIPESTATUS[0]}" -eq 0
+      - run: pnpm run lint
+      - run: pnpm run format:check
+      - run: pnpm test
+      - run: pnpm run build
       - name: Install Playwright browser
         timeout-minutes: 5
-        run: npx playwright install --with-deps chromium
+        run: pnpm exec playwright install --with-deps chromium
       - name: End-to-end (production build in a real browser)
-        run: npm run e2e
+        run: pnpm run e2e
       - name: Upload e2e traces on failure
         if: failure()
         uses: actions/upload-artifact@v4
@@ -57,3 +67,18 @@ jobs:
           git add -A
           git commit -qm "screenshots of ${GITHUB_SHA}"
           git push -qf "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" ci-screenshots
+      - name: Publish the generated lockfile to the ci-lockfile branch
+        if: env.GENERATED_LOCK == '1' && github.event_name == 'push'
+        continue-on-error: true
+        run: |
+          mkdir /tmp/lock && cp pnpm-lock.yaml /tmp/lock/
+          pnpm list --depth 0 --json > /tmp/lock/resolved.json
+          pnpm --version > /tmp/lock/pnpm-version.txt
+          node --version > /tmp/lock/node-version.txt
+          cd /tmp/lock
+          git init -q -b ci-lockfile
+          git config user.name "github-actions"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          git commit -qm "lockfile for ${GITHUB_SHA}"
+          git push -qf "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" ci-lockfile
