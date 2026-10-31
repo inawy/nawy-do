@@ -1,4 +1,5 @@
 import {
+  canReorder,
   groupScheduled,
   groupTasks,
   selectedListId,
@@ -42,10 +43,7 @@ export function TaskList({
   onPick,
 }: Props) {
   const grouped = groupTasks(view === 'starred' ? tasks.filter((t) => t.starred) : tasks);
-  // Only the main list and a single list can be re-ordered: each shows all of its open tasks, so a
-  // move is unambiguous. The favourites and scheduled views are filtered or sorted by date.
-  const canSort =
-    !picked && (view === 'main' || selectedListId(view) !== undefined) && grouped.open.length > 1;
+  const canSort = !picked && canReorder(view, grouped.open.length);
 
   const row = (t: Task, sort?: SortState) => (
     <TaskRow

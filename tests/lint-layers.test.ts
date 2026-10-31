@@ -94,11 +94,24 @@ describe('purity and safety rules', () => {
     expect(await rules('src/app/clock.ts', 'export const t = () => Date.now();\n')).toEqual([]);
   });
 
-  it('rejects a hard delete outside data/purge.ts', async () => {
+  it('rejects a hard delete anywhere in src except data/purge.ts', async () => {
     const code =
       'export const f = (db: { tasks: { delete(id: string): void } }) => db.tasks.delete("a");\n';
-    expect(await rules('src/data/store.ts', code)).toContain('no-restricted-syntax');
+    for (const file of ['src/data/store.ts', 'src/features/tasks/x.ts', 'src/app/x.ts'])
+      expect(await rules(file, code)).toContain('no-restricted-syntax');
     expect(await rules('src/data/purge.ts', code)).toEqual([]);
+    const clear = 'export const f = (t: { clear(): void }) => t.clear();\n';
+    expect(await rules('src/features/tasks/x.ts', clear)).toContain('no-restricted-syntax');
+  });
+
+  it('does not mistake Set.delete for a hard delete', async () => {
+    const code = 'export const f = (s: Set<string>) => s.delete("a");\n';
+    expect(await rules('src/features/tasks/x.ts', code)).toEqual([]);
+  });
+
+  it('rejects a file longer than the size limit', async () => {
+    const big = Array.from({ length: 230 }, (_, i) => `export const a${i} = ${i};`).join('\n');
+    expect(await rules('src/ui/tasks/x.ts', big + '\n')).toContain('max-lines');
   });
 
   it('rejects dangerouslySetInnerHTML', async () => {

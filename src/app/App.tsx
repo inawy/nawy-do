@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
-import { selectedListId, type Selection } from '@/core/model';
-import type { NewTaskOptions, Repositories } from '@/core/ports';
+import { newTaskDefaults, resolveSelection, type Selection } from '@/core/model';
+import type { Repositories } from '@/core/ports';
 import { createDexieRepositories, type NawyDoDb } from '@/data';
 import { useBackup } from '@/features/backup';
 import { useLists } from '@/features/lists';
@@ -39,19 +39,7 @@ export function App({ repositories, db, now = systemClock, today = systemToday }
     void requestPersistence().then(setStorage);
   }, []);
 
-  // A list that no longer exists (deleted here or elsewhere) falls back to the main list.
-  const chosenList = selectedListId(chosen);
-  const selection: Selection =
-    chosenList !== undefined && !lists.lists.some((l) => l.id === chosenList) ? 'main' : chosen;
-
-  // A new intention takes on the context it is added in.
-  const optionsFor = (s: Selection): NewTaskOptions => {
-    const listId = selectedListId(s);
-    if (listId !== undefined) return { listId };
-    if (s === 'starred') return { starred: true };
-    if (s === 'scheduled') return { due: today() };
-    return {};
-  };
+  const selection = resolveSelection(chosen, lists.lists);
 
   // The sheet shows the task as it is now; if it was deleted elsewhere it simply closes.
   const editing = tasks.tasks.find((t) => t.id === openId);
@@ -84,7 +72,7 @@ export function App({ repositories, db, now = systemClock, today = systemToday }
       removed={removed}
       applyUpdate={applyUpdate}
       onSelect={setChosen}
-      onAdd={(title) => void tasks.add(title, optionsFor(selection))}
+      onAdd={(title) => void tasks.add(title, newTaskDefaults(selection, today()))}
       onToggle={(t) => void tasks.toggle(t)}
       onStar={(t) => void tasks.edit(t, { starred: !t.starred })}
       onOpen={(t) => setOpenId(t.id)}

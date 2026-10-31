@@ -1,104 +1,29 @@
-import { useState } from 'react';
-import {
-  countsFor,
-  searchTasks,
-  listSelection,
-  selectedListId,
-  tasksIn,
-  type Selection,
-  type Task,
-  type TaskList,
-  type TaskPatch,
-} from '@/core/model';
-import { BackupSheet, type Outcome, type SnapshotItem, type StorageStatus } from '../backup';
+import { countsFor, resolveSelection, searchTasks, selectedListId, tasksIn } from '@/core/model';
+import { BackupSheet } from '../backup';
 import { DetailsSheet } from '../details';
-import { ListSheet } from '../lists';
-import { DataIcon, MoreIcon, SearchIcon } from '../primitives';
-import { Composer, TaskList as Tasks, UndoToast } from '../tasks';
+import { TaskList as Tasks, UndoToast } from '../tasks';
 import '../styles/index.css';
+import { InputBar } from './InputBar';
+import { ListSheets } from './ListSheets';
 import { Nav } from './Nav';
-import { SelectBar } from './SelectBar';
+import { TitleBar } from './TitleBar';
+import type { TasksScreenProps } from './types';
+import { useScreenState } from './useScreenState';
+
+export type { DataProps, TasksScreenProps } from './types';
 
 const TITLES = { main: 'نواياي', starred: 'المفضلة', scheduled: 'مجدولة' } as const;
 
-const LIST_ERRORS = {
-  limit: 'وصلت للحد الأقصى من القوائم.',
-  failed: 'مقدرتش أحفظ القائمة. جرّب تاني.',
-} as const;
-
-/** Everything the «بياناتي» sheet needs; the screen only shows it. */
-export interface DataProps {
-  storage: StorageStatus;
-  snapshots: SnapshotItem[];
-  outcome: Outcome | null;
-  /** Called when the sheet opens (loads the safety copies, clears the last result). */
-  onOpen: () => void;
-  onExport: () => void;
-  onImport: (file: File) => void;
-  onRestore: (id: number) => void;
-}
-
-export interface TasksScreenProps {
-  data: DataProps;
-  tasks: Task[];
-  lists: TaskList[];
-  today: string;
-  selection: Selection;
-  ready: boolean;
-  failed: boolean;
-  editing: Task | undefined;
-  /** The task or list just deleted (at most one is offered for undo). */
-  removed: { kind: 'task' | 'list'; label: string } | null;
-  /** Set when a new app version is waiting. */
-  applyUpdate: (() => void) | undefined;
-  onSelect: (s: Selection) => void;
-  onAdd: (title: string) => void;
-  onToggle: (t: Task) => void;
-  onStar: (t: Task) => void;
-  onOpen: (t: Task) => void;
-  onMove: (id: string, toIndex: number) => void;
-  /** Moves the selected tasks to a list (`undefined`: the main list). */
-  onMoveMany: (ids: string[], listId: string | undefined) => void;
-  onCompleteMany: (ids: string[]) => void;
-  onClose: () => void;
-  onSave: (t: Task, patch: TaskPatch) => void;
-  onRemove: (t: Task) => void;
-  onAddList: (name: string) => Promise<TaskList | 'empty' | 'limit' | 'failed'>;
-  onRenameList: (list: TaskList, name: string) => void;
-  onDeleteList: (list: TaskList) => void;
-  onMoveList: (list: TaskList, delta: -1 | 1) => void;
-  onUndo: () => void;
-  onDismissUndo: () => void;
-}
-
-type Sheet = { mode: 'create' } | { mode: 'edit'; id: string } | null;
-
 /** The whole screen as a function of its props: easy to test and to preview without a database. */
 export function TasksScreen(p: TasksScreenProps) {
-  const [sheet, setSheet] = useState<Sheet>(null);
-  const [sheetError, setSheetError] = useState<string | undefined>();
-  const [dataOpen, setDataOpen] = useState(false);
-  // Selection mode: `null` is off. Cleared whenever the view changes (a pick never crosses views).
-  // Search: `null` is off; while on, results come from ALL tasks, not just the current view.
-  const [query, setQuery] = useState<string | null>(null);
-  const searching = query !== null && query.trim() !== '';
-  const [picked, setPicked] = useState<ReadonlySet<string> | null>(null);
-
-  // A list deleted elsewhere while it is open: fall back to the main list.
-  const listId = selectedListId(p.selection);
-  const list = listId === undefined ? undefined : p.lists.find((l) => l.id === listId);
-  const selection: Selection = listId !== undefined && !list ? 'main' : p.selection;
-
-  const counts = countsFor(p.tasks, p.lists);
-  const visible = searching ? searchTasks(p.tasks, query) : tasksIn(p.tasks, p.lists, selection);
-  const title = list ? list.name : TITLES[selection as keyof typeof TITLES];
-  const editingList = sheet?.mode === 'edit' ? p.lists.find((l) => l.id === sheet.id) : undefined;
+  const ui = useScreenState();
+  const selection = resolveSelection(p.selection, p.lists);
+  const list = p.lists.find((l) => l.id === selectedListId(selection));
+  const visible =
+    ui.searching && ui.query !== null
+      ? searchTasks(p.tasks, ui.query)
+      : tasksIn(p.tasks, p.lists, selection);
   const { editing } = p;
-
-  const closeSheet = () => {
-    setSheet(null);
-    setSheetError(undefined);
-  };
 
   return (
     <div className="shell">
@@ -107,14 +32,13 @@ export function TasksScreen(p: TasksScreenProps) {
       </header>
       <Nav
         selection={selection}
-        counts={counts}
+        counts={countsFor(p.tasks, p.lists)}
         lists={p.lists}
         onSelect={(s) => {
-          setPicked(null);
-          setQuery(null);
+          ui.reset();
           p.onSelect(s);
         }}
-        onNewList={() => setSheet({ mode: 'create' })}
+        onNewList={() => ui.setSheet({ mode: 'create' })}
       />
       <main className="main">
         {p.applyUpdate && (
@@ -125,78 +49,28 @@ export function TasksScreen(p: TasksScreenProps) {
             </button>
           </div>
         )}
-        <div className="title-row">
-          <h1>{title}</h1>
-          <span className="title-actions">
-            <button
-              type="button"
-              className="icon"
-              aria-label="بحث"
-              aria-pressed={query !== null}
-              onClick={() => setQuery(query === null ? '' : null)}
-            >
-              <SearchIcon />
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setQuery(null);
-                setPicked(picked ? null : new Set());
-              }}
-            >
-              {picked ? 'تم' : 'تحديد'}
-            </button>
-            <button
-              type="button"
-              className="icon"
-              aria-label="بياناتي"
-              onClick={() => {
-                p.data.onOpen();
-                setDataOpen(true);
-              }}
-            >
-              <DataIcon />
-            </button>
-            {list && (
-              <button
-                type="button"
-                className="icon"
-                aria-label="خيارات القائمة"
-                onClick={() => setSheet({ mode: 'edit', id: list.id })}
-              >
-                <MoreIcon />
-              </button>
-            )}
-          </span>
-        </div>
-        {picked ? (
-          <SelectBar
-            count={picked.size}
-            lists={p.lists}
-            onMove={(listId) => {
-              p.onMoveMany([...picked], listId);
-              setPicked(null);
-            }}
-            onComplete={() => {
-              p.onCompleteMany([...picked]);
-              setPicked(null);
-            }}
-          />
-        ) : query !== null ? (
-          <div className="search-bar">
-            <input
-              type="search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="ابحث في كل نواياك"
-              aria-label="كلمة البحث"
-              autoFocus
-              autoComplete="off"
-            />
-          </div>
-        ) : (
-          <Composer onAdd={p.onAdd} />
-        )}
+        <TitleBar
+          title={list ? list.name : TITLES[selection as keyof typeof TITLES]}
+          searchOn={ui.query !== null}
+          selecting={ui.picked !== null}
+          onSearch={ui.toggleSearch}
+          onSelect={ui.toggleSelecting}
+          onData={() => {
+            p.data.onOpen();
+            ui.setDataOpen(true);
+          }}
+          onListOptions={list ? () => ui.setSheet({ mode: 'edit', id: list.id }) : undefined}
+        />
+        <InputBar
+          lists={p.lists}
+          picked={ui.picked}
+          query={ui.query}
+          onAdd={p.onAdd}
+          onQuery={ui.setQuery}
+          onMoveMany={p.onMoveMany}
+          onCompleteMany={p.onCompleteMany}
+          onDone={ui.stopSelecting}
+        />
         {p.failed ? (
           <p className="status" role="alert">
             مش قادر أفتح التخزين على الجهاز. لو فاتح تصفح خاص جرّب نافذة عادية.
@@ -207,19 +81,13 @@ export function TasksScreen(p: TasksScreenProps) {
           <Tasks
             tasks={visible}
             today={p.today}
-            view={searching ? 'search' : selection}
+            view={ui.searching ? 'search' : selection}
             onToggle={p.onToggle}
             onStar={p.onStar}
             onOpen={p.onOpen}
             onMove={p.onMove}
-            picked={picked ?? undefined}
-            onPick={(id) =>
-              setPicked((cur) => {
-                const next = new Set(cur);
-                if (!next.delete(id)) next.add(id);
-                return next;
-              })
-            }
+            picked={ui.picked ?? undefined}
+            onPick={ui.pick}
           />
         )}
       </main>
@@ -236,44 +104,17 @@ export function TasksScreen(p: TasksScreenProps) {
           onClose={p.onClose}
         />
       )}
-      {sheet?.mode === 'create' && (
-        <ListSheet
-          mode="create"
-          initialName=""
-          error={sheetError}
-          onClose={closeSheet}
-          onSave={(name) => {
-            void p.onAddList(name).then((result) => {
-              if (typeof result === 'object') {
-                p.onSelect(listSelection(result.id));
-                closeSheet();
-              } else if (result !== 'empty') {
-                setSheetError(LIST_ERRORS[result]);
-              }
-            });
-          }}
-        />
-      )}
-      {editingList && (
-        <ListSheet
-          mode="edit"
-          initialName={editingList.name}
-          canMoveEarlier={p.lists.findIndex((l) => l.id === editingList.id) > 0}
-          canMoveLater={p.lists.findIndex((l) => l.id === editingList.id) < p.lists.length - 1}
-          onMove={(delta) => p.onMoveList(editingList, delta)}
-          onClose={closeSheet}
-          onSave={(name) => {
-            p.onRenameList(editingList, name);
-            closeSheet();
-          }}
-          onDelete={() => {
-            p.onDeleteList(editingList);
-            p.onSelect('main');
-            closeSheet();
-          }}
-        />
-      )}
-      {dataOpen && (
+      <ListSheets
+        sheet={ui.sheet}
+        lists={p.lists}
+        onClose={() => ui.setSheet(null)}
+        onSelect={p.onSelect}
+        onAdd={p.onAddList}
+        onRename={p.onRenameList}
+        onDelete={p.onDeleteList}
+        onMove={p.onMoveList}
+      />
+      {ui.dataOpen && (
         <BackupSheet
           storage={p.data.storage}
           snapshots={p.data.snapshots}
@@ -281,7 +122,7 @@ export function TasksScreen(p: TasksScreenProps) {
           onExport={p.data.onExport}
           onImport={p.data.onImport}
           onRestore={p.data.onRestore}
-          onClose={() => setDataOpen(false)}
+          onClose={() => ui.setDataOpen(false)}
         />
       )}
       {p.removed && (

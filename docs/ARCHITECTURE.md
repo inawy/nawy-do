@@ -18,8 +18,9 @@ core  ←  data  ←  features  ←  ui  ←  app
 
 ```text
 src/
-  core/model/          نموذج المهمة والقوائم (types · task · lists · selection · group · order · merge · validate · envelope · civil)
-  data/                schema · store · lists · live · backup · purge · snapshot
+  core/model/          نموذج المهمة والقوائم وقواعد العرض (types · task · lists · selection · view · search · group · order · merge · validate · envelope · civil)
+  core/ports/          واجهات التخزين: TaskRepository · ListRepository · BackupRepository (D-024)
+  data/                schema · store · lists · live · backup · purge · snapshot · repos (محوّل Dexie للمنافذ)
   features/<ميزة>/     index.ts + ملفاتها (tasks/ · lists/)
   ui/
     primitives/        أيقونات وعناصر صغيرة بلا منطق
@@ -27,10 +28,12 @@ src/
     lists/             ListSheet
     sortable/          SortableList, SortableItem (dnd-kit)
     details/           DetailsSheet
-    shell/             TasksScreen · Nav (تركيب الشاشة)
+    shell/             TasksScreen · TitleBar · InputBar · ListSheets · Nav · SelectBar · useScreenState
     styles/            tokens · base · shell · tasks · details · feedback (index.css يجمعها)
-  app/                 App · bootstrap · clock · db · updateSignal
+  app/                 App · bootstrap · clock · ids · db · storage · files · updateSignal
 ```
+
+**قلب الاعتماد (D-024):** `features` لا تستورد `data` إطلاقًا؛ تعتمد واجهات `core/ports` فقط، و`app` تركّب محوّل Dexie. **حجم الملف:** لا يتجاوز 220 سطرًا (لينت)؛ الشاشة التي تكبر تُقسَّم. **الحذف الفعلي:** ممنوع في كل `src` عدا `purge.ts` و`snapshot.ts`.
 
 **قاعدة الوحدة:** كل وحدة في `ui/` و`features/` تُستخدم **عبر `index.ts` فقط** (`@/ui/shell` نعم، `@/ui/shell/Nav` لا). داخل الوحدة تُستخدم المسارات النسبية. القاعدة مفروضة بـ lint (D-015).
 
