@@ -8,7 +8,7 @@ export type ViewId = 'main' | 'starred' | 'scheduled';
 export type Selection = ViewId | `list:${string}`;
 
 export const listSelection = (id: string): Selection => `list:${id}`;
-export const selectedListId = (s: Selection): string | undefined =>
+export const selectedListId = (s: Selection | 'search'): string | undefined =>
   s.startsWith('list:') ? s.slice('list:'.length) : undefined;
 
 /** The tasks a selection shows (before grouping into open/done or by date). */
