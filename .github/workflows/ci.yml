@@ -35,7 +35,15 @@ jobs:
       - run: pnpm run lint
       - run: pnpm run format:check
       - run: pnpm test
-      - run: pnpm run build
+      - name: Build (the log tail becomes an annotation when it fails)
+        run: |
+          set +e
+          pnpm run build 2>&1 | tee build.log
+          code=${PIPESTATUS[0]}
+          if [ "$code" -ne 0 ]; then
+            echo "::error title=build failed::$(tail -n 25 build.log | sed 's/%/%25/g' | sed ':a;N;$!ba;s/\n/%0A/g')"
+          fi
+          exit "$code"
       - name: Install Playwright browser
         timeout-minutes: 5
         run: pnpm exec playwright install --with-deps chromium
