@@ -168,3 +168,12 @@
 - **القرار:** واجهات `TaskRepository` و`ListRepository` و`BackupRepository` في `core/ports`؛ محوّل Dexie واحد `createDexieRepositories(db)` في `data/repos.ts`؛ الـ hooks تأخذ الواجهة، و**`now` و`newId` مُحقنان**. `app` وحدها تعرف Dexie وتركّب الأجزاء. ESLint يمنع `features` من استيراد `@/data` كليًا.
 - **الإثبات:** `tests/support/memory-repositories.ts` محوّل ذاكرة يعيد استخدام قواعد القلب، و`tests/features/hooks.test.tsx` يشغّل الـ hooks به بلا IndexedDB. أي استيراد جديد لـ Dexie من `features` يكسر اللينت.
 - **ما لم يتغير:** دوال `data` نفسها (ومعاملات Dexie) كما هي واختباراتها؛ المحوّل غلاف رقيق فوقها.
+
+## D-025 — قواعد العرض في القلب وتقسيم الشاشة وقيود لينت جديدة (2026-10-31) · مُعتمد
+
+من المراجعة المستقلة (الملاحظتان 4b و5 و6):
+
+- **`core/model/view.ts`:** `resolveSelection` (قائمة محذوفة ← الرئيسية، كانت مكررة في `App` وفي الشاشة)، و`canReorder` (كانت `canSort` داخل مكوّن)، و`newTaskDefaults` (كانت `optionsFor` في `app`). نقية ومختبرة.
+- **`TasksScreen` 300 ← 141 سطرًا:** `TitleBar`، `InputBar` (الكتابة/البحث/التحديد)، `ListSheets` (إنشاء/خيارات القائمة وأخطاؤها)، `useScreenState` (الحالة العابرة)، و`types.ts`. السلوك لم يتغير؛ اختبارات التكامل نفسها تمر.
+- **لينت:** `max-lines` = 220 على `src`؛ والحذف الفعلي (`.tasks/.lists/.snapshots.delete`، `bulkDelete`، `clear`، `Dexie.delete`) ممنوع في **كل** `src` (كان في `data` فقط) عدا `purge.ts` و`snapshot.ts`، بلا إنذار كاذب على `Set.delete` (اختبار).
+- **مؤجل:** تراجع بمكدّس (يُبنى مع الإيماءات في المرحلة D لأنه الذي يحتاجه) وحد تغطية (يحتاج قفل التبعيات أولًا).

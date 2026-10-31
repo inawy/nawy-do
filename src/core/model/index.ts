@@ -10,3 +10,4 @@ export * from './order';
 export * from './lists';
 export * from './selection';
 export * from './search';
+export * from './view';

@@ -15,11 +15,24 @@ const noRawDate = [
     message: 'Pass `now` in instead (D-005).',
   },
 ];
-// Records are never removed directly; deleting writes a tombstone (D-006).
-const noHardDelete = {
-  selector: 'CallExpression[callee.property.name=/^(delete|bulkDelete|clear)$/]',
-  message: 'Hard deletes are only allowed in src/data/purge.ts and snapshot.ts (D-006).',
-};
+// Records are never removed directly; deleting writes a tombstone (D-006). Applies to ALL of src
+// (a hook calling `db.tasks.clear()` must fail too), except the two files that purge on purpose.
+// `Set.delete` and friends are not matched: only Dexie-shaped calls are.
+const noHardDelete = [
+  {
+    selector: 'CallExpression[callee.property.name=/^(bulkDelete|clear)$/]',
+    message: 'Hard deletes are only allowed in src/data/purge.ts and snapshot.ts (D-006).',
+  },
+  {
+    selector:
+      "CallExpression[callee.property.name='delete'][callee.object.property.name=/^(tasks|lists|snapshots)$/]",
+    message: 'Hard deletes are only allowed in src/data/purge.ts and snapshot.ts (D-006).',
+  },
+  {
+    selector: "CallExpression[callee.object.name='Dexie'][callee.property.name='delete']",
+    message: 'Deleting a whole database is forbidden (D-006).',
+  },
+];
 
 // A module (src/ui/tasks, src/features/tasks, ...) is used only through its index.ts. Inside a
 // module, files import each other with relative paths, which this rule does not touch.
@@ -61,17 +74,21 @@ export default tseslint.config(
   },
   {
     files: ['src/**/*.{ts,tsx}'],
-    ignores: ['src/app/clock.ts'],
-    rules: { 'no-restricted-syntax': ['error', noInnerHtml, ...noRawDate] },
+    ignores: ['src/app/clock.ts', 'src/data/purge.ts', 'src/data/snapshot.ts'],
+    rules: { 'no-restricted-syntax': ['error', noInnerHtml, ...noRawDate, ...noHardDelete] },
   },
   {
     files: ['src/app/clock.ts'],
-    rules: { 'no-restricted-syntax': ['error', noInnerHtml] },
+    rules: { 'no-restricted-syntax': ['error', noInnerHtml, ...noHardDelete] },
   },
   {
-    files: ['src/data/**/*.{ts,tsx}'],
-    ignores: ['src/data/purge.ts', 'src/data/snapshot.ts'],
-    rules: { 'no-restricted-syntax': ['error', noInnerHtml, ...noRawDate, noHardDelete] },
+    files: ['src/data/purge.ts', 'src/data/snapshot.ts'],
+    rules: { 'no-restricted-syntax': ['error', noInnerHtml, ...noRawDate] },
+  },
+  // One screen or module that grows past this is doing several jobs: split it (ROADMAP §2.5).
+  {
+    files: ['src/**/*.{ts,tsx}'],
+    rules: { 'max-lines': ['error', { max: 220, skipBlankLines: true, skipComments: true }] },
   },
   layer('core', ['data', 'features', 'ui', 'app'], ['react', 'react-dom', 'dexie']),
   layer('data', ['features', 'ui', 'app'], ['react', 'react-dom']),
