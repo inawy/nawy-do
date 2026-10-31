@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import {
   countsFor,
+  searchTasks,
   listSelection,
   selectedListId,
   tasksIn,
@@ -12,7 +13,7 @@ import {
 import { BackupSheet, type Outcome, type SnapshotItem } from '../backup';
 import { DetailsSheet } from '../details';
 import { ListSheet } from '../lists';
-import { DataIcon, MoreIcon } from '../primitives';
+import { DataIcon, MoreIcon, SearchIcon } from '../primitives';
 import { Composer, TaskList as Tasks, UndoToast } from '../tasks';
 import '../styles/index.css';
 import { Nav } from './Nav';
@@ -77,6 +78,9 @@ export function TasksScreen(p: TasksScreenProps) {
   const [sheetError, setSheetError] = useState<string | undefined>();
   const [dataOpen, setDataOpen] = useState(false);
   // Selection mode: `null` is off. Cleared whenever the view changes (a pick never crosses views).
+  // Search: `null` is off; while on, results come from ALL tasks, not just the current view.
+  const [query, setQuery] = useState<string | null>(null);
+  const searching = query !== null && query.trim() !== '';
   const [picked, setPicked] = useState<ReadonlySet<string> | null>(null);
 
   // A list deleted elsewhere while it is open: fall back to the main list.
@@ -85,7 +89,7 @@ export function TasksScreen(p: TasksScreenProps) {
   const selection: Selection = listId !== undefined && !list ? 'main' : p.selection;
 
   const counts = countsFor(p.tasks, p.lists);
-  const visible = tasksIn(p.tasks, p.lists, selection);
+  const visible = searching ? searchTasks(p.tasks, query) : tasksIn(p.tasks, p.lists, selection);
   const title = list ? list.name : TITLES[selection as keyof typeof TITLES];
   const editingList = sheet?.mode === 'edit' ? p.lists.find((l) => l.id === sheet.id) : undefined;
   const { editing } = p;
@@ -106,6 +110,7 @@ export function TasksScreen(p: TasksScreenProps) {
         lists={p.lists}
         onSelect={(s) => {
           setPicked(null);
+          setQuery(null);
           p.onSelect(s);
         }}
         onNewList={() => setSheet({ mode: 'create' })}
@@ -122,7 +127,22 @@ export function TasksScreen(p: TasksScreenProps) {
         <div className="title-row">
           <h1>{title}</h1>
           <span className="title-actions">
-            <button type="button" onClick={() => setPicked(picked ? null : new Set())}>
+            <button
+              type="button"
+              className="icon"
+              aria-label="بحث"
+              aria-pressed={query !== null}
+              onClick={() => setQuery(query === null ? '' : null)}
+            >
+              <SearchIcon />
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setQuery(null);
+                setPicked(picked ? null : new Set());
+              }}
+            >
               {picked ? 'تم' : 'تحديد'}
             </button>
             <button
@@ -161,6 +181,18 @@ export function TasksScreen(p: TasksScreenProps) {
               setPicked(null);
             }}
           />
+        ) : query !== null ? (
+          <div className="search-bar">
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="ابحث في كل نواياك"
+              aria-label="كلمة البحث"
+              autoFocus
+              autoComplete="off"
+            />
+          </div>
         ) : (
           <Composer onAdd={p.onAdd} />
         )}
@@ -174,7 +206,7 @@ export function TasksScreen(p: TasksScreenProps) {
           <Tasks
             tasks={visible}
             today={p.today}
-            view={selection}
+            view={searching ? 'search' : selection}
             onToggle={p.onToggle}
             onStar={p.onStar}
             onOpen={p.onOpen}

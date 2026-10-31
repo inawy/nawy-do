@@ -228,6 +228,23 @@ describe('lists', () => {
     await screen.findByText('المنجزة (1)');
   });
 
+  it('searches every list and shows how many were found', async () => {
+    render(<App db={db} now={now} today={today} />);
+    await screen.findByText(/مفيش نوايا لسه/);
+    await createListNamed('الشغل');
+    await addIntention('تقرير المبيعات');
+    fireEvent.click(screen.getByRole('button', { name: 'نواياي' }));
+    await addIntention('اشتري لبن');
+    fireEvent.click(screen.getByRole('button', { name: 'بحث' }));
+    fireEvent.change(screen.getByLabelText('كلمة البحث'), { target: { value: 'تقرير' } });
+    await screen.findByText('تقرير المبيعات'); // from another list
+    expect(screen.queryByText('اشتري لبن')).toBeNull();
+    fireEvent.change(screen.getByLabelText('كلمة البحث'), { target: { value: 'غيرموجود' } });
+    await screen.findByText('مفيش نتايج. جرّب كلمة تانية.');
+    fireEvent.click(screen.getByRole('button', { name: 'بحث' })); // closes the search
+    await screen.findByText('اشتري لبن');
+  });
+
   it('renames a list', async () => {
     render(<App db={db} now={now} today={today} />);
     await screen.findByText(/مفيش نوايا لسه/);

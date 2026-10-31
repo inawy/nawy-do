@@ -293,3 +293,21 @@
   opacity: 0.5;
   cursor: default;
 }
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+}
+.search-bar input {
+  flex: 1;
+  min-inline-size: 0;
+  font: inherit;
+  font-size: 16px; /* 16px stops iOS from zooming the page on focus */
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--card);
+  color: inherit;
+}

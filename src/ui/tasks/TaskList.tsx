@@ -12,7 +12,7 @@ import { TaskRow } from './TaskRow';
 interface Props {
   tasks: Task[];
   today: string;
-  view: Selection;
+  view: Selection | 'search';
   onToggle: (task: Task) => void;
   onStar: (task: Task) => void;
   onOpen: (task: Task) => void;
@@ -26,6 +26,7 @@ const EMPTY = {
   main: 'مفيش نوايا لسه. اكتب أول نية فوق.',
   list: 'القائمة فاضية. اكتب أول نية فيها فوق.',
   starred: 'مفيش نوايا مميزة. دوس على النجمة جنب أي نية.',
+  search: 'مفيش نتايج. جرّب كلمة تانية.',
   scheduled: 'مفيش نوايا بتاريخ. افتح نية وحدد لها يوم.',
 } as const;
 
@@ -122,7 +123,11 @@ export function TaskList({
     <>
       {open.length === 0 && done.length === 0 ? (
         <Empty
-          text={EMPTY[selectedListId(view) !== undefined ? 'list' : (view as 'main' | 'starred')]}
+          text={
+            EMPTY[
+              selectedListId(view) !== undefined ? 'list' : (view as 'main' | 'starred' | 'search')
+            ]
+          }
         />
       ) : (
         open.length > 0 && (canSort ? sortableRows(open, 'النوايا') : rows(open, 'النوايا'))
