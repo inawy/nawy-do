@@ -26,7 +26,13 @@ describe('layering', () => {
     );
   });
 
-  it('features may not import ui or Dexie; ui may not import data or app', async () => {
+  it('features may not import ui, data or Dexie; ui may not import data or app (D-024)', async () => {
+    expect(await rules('src/features/tasks/x.ts', "import { addTask } from '@/data';\n")).toContain(
+      'no-restricted-imports',
+    );
+    expect(
+      await rules('src/features/tasks/x.ts', "import type { NawyDoDb } from '@/data';\n"),
+    ).toContain('no-restricted-imports');
     expect(await rules('src/features/tasks/x.ts', "import { App } from '@/ui/shell';\n")).toContain(
       'no-restricted-imports',
     );
@@ -54,7 +60,13 @@ describe('layering', () => {
     expect(
       await rules(
         'src/features/tasks/x.ts',
-        "import { addTask } from '@/data';\nexport const x = addTask;\n",
+        "import type { TaskRepository } from '@/core/ports';\nexport type X = TaskRepository;\n",
+      ),
+    ).toEqual([]);
+    expect(
+      await rules(
+        'src/app/x.ts',
+        "import { createDexieRepositories } from '@/data';\nexport const x = createDexieRepositories;\n",
       ),
     ).toEqual([]);
   });

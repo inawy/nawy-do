@@ -1,19 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { groupTasks, planMove, type Task, type TaskPatch } from '@/core/model';
-import {
-  addTask,
-  type NewTaskOptions,
-  completeTaskById,
-  completeTasksByIds,
-  moveTasksToList,
-  editTask,
-  removeTask,
-  reopenTaskById,
-  restoreRemoved,
-  saveOrder,
-  watchTasks,
-  type NawyDoDb,
-} from '@/data';
+import type { NewTaskOptions, TaskRepository } from '@/core/ports';
 
 export interface TasksApi {
   tasks: Task[];
@@ -36,8 +23,8 @@ export interface TasksApi {
   dismissUndo: () => void;
 }
 
-/** `now` is injected so nothing below the app reads the clock (D-005). */
-export function useTasks(db: NawyDoDb, now: () => number): TasksApi {
+/** Time and ids are injected so nothing below the app reads the clock or makes ids (D-005). */
+export function useTasks(repo: TaskRepository, now: () => number, newId: () => string): TasksApi {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -45,15 +32,14 @@ export function useTasks(db: NawyDoDb, now: () => number): TasksApi {
 
   useEffect(
     () =>
-      watchTasks(
-        db,
+      repo.watch(
         (list) => {
           setTasks(list);
           setReady(true);
         },
         () => setFailed(true),
       ),
-    [db],
+    [repo],
   );
 
   const guard = useCallback(async (run: () => Promise<unknown>) => {
@@ -67,68 +53,66 @@ export function useTasks(db: NawyDoDb, now: () => number): TasksApi {
   const add = useCallback(
     async (title: string, options?: NewTaskOptions) => {
       if (title.trim() === '') return;
-      await guard(() => addTask(db, crypto.randomUUID(), title, now(), options));
+      await guard(() => repo.add(newId(), title, now(), options));
     },
-    [db, now, guard],
+    [repo, now, newId, guard],
   );
 
   const toggle = useCallback(
     async (task: Task) => {
       await guard(() =>
-        task.status === 'open'
-          ? completeTaskById(db, task.id, now())
-          : reopenTaskById(db, task.id, now()),
+        task.status === 'open' ? repo.complete(task.id, now()) : repo.reopen(task.id, now()),
       );
     },
-    [db, now, guard],
+    [repo, now, guard],
   );
 
   const edit = useCallback(
     async (task: Task, patch: TaskPatch) => {
-      await guard(() => editTask(db, task.id, patch, now()));
+      await guard(() => repo.edit(task.id, patch, now()));
     },
-    [db, now, guard],
+    [repo, now, guard],
   );
 
   const move = useCallback(
     async (id: string, toIndex: number) => {
       const changes = planMove(groupTasks(tasks).open, id, toIndex);
       if (changes.length === 0) return;
-      await guard(() => saveOrder(db, changes, now()));
+      await guard(() => repo.saveOrder(changes, now()));
     },
-    [db, now, guard, tasks],
+    [repo, now, guard, tasks],
   );
 
   const moveMany = useCallback(
     async (ids: readonly string[], listId: string | undefined) => {
-      await guard(() => moveTasksToList(db, ids, listId, now()));
+      await guard(() => repo.moveToList(ids, listId, now()));
     },
-    [db, now, guard],
+    [repo, now, guard],
   );
 
   const completeMany = useCallback(
     async (ids: readonly string[]) => {
-      await guard(() => completeTasksByIds(db, ids, now()));
+      await guard(() => repo.completeMany(ids, now()));
     },
-    [db, now, guard],
+    [repo, now, guard],
   );
 
   const remove = useCallback(
     async (task: Task) => {
       await guard(async () => {
-        await removeTask(db, task.id, now());
+        await repo.remove(task.id, now());
         setLastRemoved(task);
       });
     },
-    [db, now, guard],
+    [repo, now, guard],
   );
 
   const undoRemove = useCallback(async () => {
     if (!lastRemoved) return;
     const task = lastRemoved;
     setLastRemoved(null);
-    await guard(() => restoreRemoved(db, task, now()));
-  }, [db, now, guard, lastRemoved]);
+    await guard(() => repo.restore(task, now()));
+  }, [repo, now, guard, lastRemoved]);
 
   const dismissUndo = useCallback(() => setLastRemoved(null), []);
 

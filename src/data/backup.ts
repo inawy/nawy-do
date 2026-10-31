@@ -6,6 +6,7 @@ import {
   type EnvelopeOptions,
   type Result,
 } from '@/core/model';
+import type { ImportResult } from '@/core/ports';
 import { allLists, applyLists } from './lists';
 import type { NawyDoDb } from './schema';
 import { allRecords, applyRecords } from './store';
@@ -14,11 +15,6 @@ export async function exportBackup(db: NawyDoDb, now: number): Promise<string> {
   const [tasks, lists] = await Promise.all([allRecords(db), allLists(db)]);
   return JSON.stringify(buildEnvelope(tasks, lists, now));
 }
-
-export type ImportResult = Result<
-  { total: number; changed: number; lists: number; listsChanged: number },
-  EnvelopeError
->;
 
 /** Parse first, write after: a bad file changes nothing. Existing data is merged, not replaced. */
 export async function importBackup(

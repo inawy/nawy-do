@@ -11,6 +11,7 @@ import {
   type Task,
   type TaskPatch,
 } from '@/core/model';
+import type { NewTaskOptions } from '@/core/ports';
 import type { NawyDoDb } from './schema';
 
 /** Live (not deleted) tasks, in display order. */
@@ -24,12 +25,6 @@ export async function listTasks(db: NawyDoDb): Promise<Task[]> {
 /** Every record including tombstones: what an export or a sync needs. */
 export function allRecords(db: NawyDoDb): Promise<Task[]> {
   return db.tasks.toArray();
-}
-
-export interface NewTaskOptions {
-  listId?: string;
-  starred?: boolean;
-  due?: string;
 }
 
 export async function addTask(

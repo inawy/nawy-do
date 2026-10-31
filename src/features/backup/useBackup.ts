@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { type EnvelopeError } from '@/core/model';
-import { exportBackup, importBackup, listSnapshots, type NawyDoDb, type Snapshot } from '@/data';
+import type { BackupRepository, SafetyCopy } from '@/core/ports';
 
 /** What the last data action did; the UI turns it into words. */
 export type BackupOutcome =
@@ -28,22 +28,22 @@ export interface BackupApi {
 }
 
 const MAX_FILE_CHARS = 20_000_000;
-const info = (s: Snapshot): SnapshotInfo => ({
+const info = (s: SafetyCopy): SnapshotInfo => ({
   id: s.id as number,
   createdAt: s.createdAt,
   fromVersion: s.fromVersion,
 });
 
 /** Export, import and the pre-upgrade safety copies. `now` is injected (D-005). */
-export function useBackup(db: NawyDoDb, now: () => number): BackupApi {
+export function useBackup(repo: BackupRepository, now: () => number): BackupApi {
   const [snapshots, setSnapshots] = useState<SnapshotInfo[]>([]);
-  const [copies, setCopies] = useState<Snapshot[]>([]);
+  const [copies, setCopies] = useState<SafetyCopy[]>([]);
   const [outcome, setOutcome] = useState<BackupOutcome | null>(null);
 
   const refresh = useCallback(async () => {
     setOutcome(null);
     try {
-      const all = await listSnapshots();
+      const all = await repo.safetyCopies();
       setCopies(all);
       setSnapshots(all.map(info));
     } catch {
@@ -52,16 +52,16 @@ export function useBackup(db: NawyDoDb, now: () => number): BackupApi {
   }, []);
 
   const exportJson = useCallback(async () => {
-    const text = await exportBackup(db, now());
+    const text = await repo.export(now());
     setOutcome({ kind: 'exported' });
     return text;
-  }, [db, now]);
+  }, [repo, now]);
 
   const run = useCallback(
     async (text: string, restored: boolean) => {
       if (text.length > MAX_FILE_CHARS) return setOutcome({ kind: 'error', code: 'too-big' });
       try {
-        const result = await importBackup(db, text, { now: now() });
+        const result = await repo.import(text, { now: now() });
         if (!result.ok) return setOutcome({ kind: 'error', code: result.error.code });
         const changed = result.value.changed + result.value.listsChanged;
         setOutcome(
@@ -73,7 +73,7 @@ export function useBackup(db: NawyDoDb, now: () => number): BackupApi {
         setOutcome({ kind: 'error', code: 'failed' });
       }
     },
-    [db, now],
+    [repo, now],
   );
 
   const importText = useCallback((text: string) => run(text, false), [run]);

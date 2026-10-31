@@ -11,6 +11,7 @@ import {
   tombstoneList,
   type TaskList,
 } from '@/core/model';
+import type { AddListResult } from '@/core/ports';
 import type { NawyDoDb } from './schema';
 
 /** Live lists in display order. */
@@ -20,8 +21,6 @@ export async function listLists(db: NawyDoDb): Promise<TaskList[]> {
 
 /** Every list record including tombstones (export, sync). */
 export const allLists = (db: NawyDoDb): Promise<TaskList[]> => db.lists.toArray();
-
-export type AddListResult = { ok: true; list: TaskList } | { ok: false; reason: 'empty' | 'limit' };
 
 export async function addList(
   db: NawyDoDb,
