@@ -1,3 +1,4 @@
+import { chooseFromMenu } from './support/menu';
 import 'fake-indexeddb/auto';
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
@@ -170,7 +171,7 @@ describe('lists', () => {
     await screen.findByText(/مفيش نوايا لسه/);
     await createListNamed('مؤقتة');
     await addIntention('بداخلها');
-    fireEvent.click(screen.getByRole('button', { name: 'خيارات القائمة' }));
+    chooseFromMenu('خيارات القائمة');
     fireEvent.click(screen.getByRole('button', { name: 'حذف القائمة' }));
     expect(screen.getByText(/ونواياها هترجع/)).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: 'تأكيد الحذف' }));
@@ -194,7 +195,7 @@ describe('lists', () => {
         .map((b) => b.textContent ?? '');
     const at = (label: string) => names().findIndex((t) => t.includes(label));
     expect(at('الأولى')).toBeLessThan(at('الثانية'));
-    fireEvent.click(screen.getByRole('button', { name: 'خيارات القائمة' })); // on «الثانية»
+    chooseFromMenu('خيارات القائمة'); // on «الثانية»
     expect(
       (screen.getByRole('button', { name: 'أخّر القائمة' }) as HTMLButtonElement).disabled,
     ).toBe(true);
@@ -210,7 +211,7 @@ describe('lists', () => {
     await addIntention('ا');
     await addIntention('ب');
     await addIntention('ج');
-    fireEvent.click(screen.getByRole('button', { name: 'تحديد' }));
+    chooseFromMenu('تحديد');
     fireEvent.click(screen.getByRole('checkbox', { name: 'تحديد: ا' }));
     fireEvent.click(screen.getByRole('checkbox', { name: 'تحديد: ب' }));
     await screen.findByText('2 محدد');
@@ -222,7 +223,7 @@ describe('lists', () => {
     await screen.findByText('ا');
     await screen.findByText('ب');
 
-    fireEvent.click(screen.getByRole('button', { name: 'تحديد' }));
+    chooseFromMenu('تحديد');
     fireEvent.click(screen.getByRole('checkbox', { name: 'تحديد: ا' }));
     fireEvent.click(screen.getByRole('button', { name: 'إنجاز المحدد' }));
     await screen.findByText('المنجزة (1)');
@@ -249,7 +250,7 @@ describe('lists', () => {
     render(<App db={db} now={now} today={today} />);
     await screen.findByText(/مفيش نوايا لسه/);
     await createListNamed('قديم');
-    fireEvent.click(screen.getByRole('button', { name: 'خيارات القائمة' }));
+    chooseFromMenu('خيارات القائمة');
     fireEvent.change(screen.getByLabelText('اسم القائمة'), { target: { value: 'جديد' } });
     fireEvent.click(screen.getByRole('button', { name: 'حفظ' }));
     await screen.findByRole('heading', { name: 'جديد' });

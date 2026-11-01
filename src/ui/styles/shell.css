@@ -175,3 +175,64 @@ h2 {
   align-items: center;
   flex: none;
 }
+
+/* ---------- «more» menu ---------- */
+.more {
+  position: relative;
+}
+.more-menu {
+  position: absolute;
+  inset-block-start: 100%;
+  inset-inline-end: 0;
+  z-index: 8;
+  min-inline-size: 11rem;
+  display: flex;
+  flex-direction: column;
+  padding: 0.25rem;
+  background: var(--nawy-color-surface-elevated);
+  border: 1px solid var(--line);
+  border-radius: var(--nawy-radius-md);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.16);
+}
+.more-menu button {
+  min-block-size: 48px;
+  padding-inline: 1rem;
+  border: 0;
+  border-radius: var(--nawy-radius-sm);
+  background: none;
+  text-align: start;
+  font-size: var(--nawy-font-size-md);
+}
+.more-menu button:hover {
+  background: var(--hover);
+}
+.text-action {
+  min-block-size: 48px;
+  padding-inline: 1rem;
+  border: 0;
+  background: none;
+  color: var(--brand);
+  font-weight: 600;
+}
+
+/* ---------- phone: input dock above the nav, no pull-to-refresh bounce ---------- */
+html {
+  overscroll-behavior-y: contain;
+}
+@media (max-width: 879.98px) {
+  .input-dock {
+    position: fixed;
+    inset-inline: 0;
+    inset-block-end: calc(var(--nav-h) + env(safe-area-inset-bottom));
+    z-index: 4;
+    padding: 0.5rem 1rem;
+    background: var(--page);
+    border-block-start: 1px solid var(--line);
+  }
+  .input-dock .composer,
+  .input-dock .search-bar {
+    max-inline-size: 44rem;
+    margin-inline: auto;
+    margin-block-end: 0;
+  }
+}

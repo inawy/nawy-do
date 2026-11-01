@@ -152,8 +152,8 @@
 .icon {
   display: grid;
   place-items: center;
-  inline-size: 44px;
-  block-size: 44px;
+  inline-size: 48px;
+  block-size: 48px;
   border: 0;
   background: none;
   color: var(--muted);

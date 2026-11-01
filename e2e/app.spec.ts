@@ -1,3 +1,4 @@
+import { chooseFromMenu } from './menu';
 import { expect, test, type Page } from '@playwright/test';
 
 const prompt = 'ناوي تعمل إيه؟';
@@ -116,7 +117,7 @@ test('deleting a list returns its tasks to main; undo restores the list', async 
   await page.getByLabel('اسم القائمة').fill('مؤقتة');
   await page.getByRole('button', { name: 'حفظ' }).click();
   await add(page, 'بداخلها');
-  await page.getByRole('button', { name: 'خيارات القائمة' }).click();
+  await chooseFromMenu(page, 'خيارات القائمة');
   await page.getByRole('button', { name: 'حذف القائمة' }).click();
   await page.getByRole('button', { name: 'تأكيد الحذف' }).click();
   await expect(page.getByText('بداخلها', { exact: true })).toBeVisible(); // main now
