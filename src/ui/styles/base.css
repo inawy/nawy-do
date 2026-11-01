@@ -12,12 +12,15 @@ body {
   font-family: var(--nawy-font-family);
   line-height: 1.5;
 }
-button,
-input,
-textarea {
-  font: inherit;
-  color: inherit;
-}
-button {
-  cursor: pointer;
+/* In the `base` layer so Tailwind utilities (a later layer) can override them. */
+@layer base {
+  button,
+  input,
+  textarea {
+    font: inherit;
+    color: inherit;
+  }
+  button {
+    cursor: pointer;
+  }
 }
