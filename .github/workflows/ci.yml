@@ -18,7 +18,25 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-      - run: pnpm install --frozen-lockfile
+      # Frozen: what is tested is what ships. If package.json changed without the lockfile, the
+      # install resolves anyway, publishes the new lockfile to the `ci-lockfile` branch and FAILS
+      # on purpose: commit that file (the dev sandbox cannot run pnpm; CI is the only resolver).
+      - name: Install
+        run: |
+          if ! pnpm install --frozen-lockfile; then
+            pnpm install --no-frozen-lockfile
+            mkdir /tmp/lock && cp pnpm-lock.yaml /tmp/lock/
+            pnpm list --depth 0 --json > /tmp/lock/resolved.json
+            cd /tmp/lock
+            git init -q -b ci-lockfile
+            git config user.name "github-actions"
+            git config user.email "actions@users.noreply.github.com"
+            git add -A
+            git commit -qm "lockfile for ${GITHUB_SHA}"
+            git push -qf "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" ci-lockfile
+            echo "::error title=lockfile outdated::package.json changed without pnpm-lock.yaml. The regenerated lockfile is on the ci-lockfile branch."
+            exit 1
+          fi
       - name: Type check (errors as annotations)
         run: |
           pnpm exec tsc --noEmit --pretty false | sed -E 's/^([^()]+)\(([0-9]+),([0-9]+)\): (.*)$/::error file=\1,line=\2,col=\3::\4/' ; test "${PIPESTATUS[0]}" -eq 0
