@@ -1,0 +1,105 @@
+/* Nawy Design Tokens v0.1.0
+   Nawy Blue and Cairo are recorded brand decisions.
+   Neutral colors, type scale, spacing and radii are proposed starter values.
+*/
+:root {
+  color-scheme: light dark;
+
+  /* Brand */
+  --nawy-color-brand: #3D7BFF;
+  --nawy-color-brand-hover: #2F6CEB;
+  --nawy-color-brand-pressed: #2459CC;
+
+  /* Typography */
+  --nawy-font-family: "Cairo", "Segoe UI", Tahoma, Arial, sans-serif;
+  --nawy-font-size-xs: 0.75rem;
+  --nawy-font-size-sm: 0.875rem;
+  --nawy-font-size-md: 1rem;
+  --nawy-font-size-lg: 1.125rem;
+  --nawy-font-size-xl: 1.25rem;
+  --nawy-font-size-2xl: 1.5rem;
+  --nawy-font-size-3xl: 2rem;
+  --nawy-line-height-body: 1.65;
+  --nawy-line-height-heading: 1.3;
+
+  /* Spacing: proposed 4px base */
+  --nawy-space-1: 0.25rem;
+  --nawy-space-2: 0.5rem;
+  --nawy-space-3: 0.75rem;
+  --nawy-space-4: 1rem;
+  --nawy-space-5: 1.25rem;
+  --nawy-space-6: 1.5rem;
+  --nawy-space-8: 2rem;
+  --nawy-space-10: 2.5rem;
+  --nawy-space-12: 3rem;
+  --nawy-space-16: 4rem;
+
+  /* Shape */
+  --nawy-radius-sm: 0.5rem;
+  --nawy-radius-md: 0.75rem;
+  --nawy-radius-lg: 1rem;
+  --nawy-radius-pill: 999px;
+
+  /* Motion */
+  --nawy-duration-fast: 120ms;
+  --nawy-duration-normal: 180ms;
+  --nawy-duration-slow: 240ms;
+  --nawy-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+
+  /* Focus */
+  --nawy-focus-width: 2px;
+  --nawy-focus-offset: 2px;
+}
+
+/* Proposed light neutral palette */
+:root,
+[data-theme="light"] {
+  color-scheme: light;
+  --nawy-color-bg: #F7F8FA;
+  --nawy-color-surface: #FFFFFF;
+  --nawy-color-surface-elevated: #FFFFFF;
+  --nawy-color-text: #17202B;
+  --nawy-color-text-muted: #667085;
+  --nawy-color-border: #E4E7EC;
+  --nawy-color-overlay: rgb(16 24 40 / 48%);
+}
+
+/* Proposed dark neutral palette */
+[data-theme="dark"] {
+  color-scheme: dark;
+  --nawy-color-bg: #0D1117;
+  --nawy-color-surface: #151B23;
+  --nawy-color-surface-elevated: #1C2430;
+  --nawy-color-text: #F2F4F7;
+  --nawy-color-text-muted: #A0A8B5;
+  --nawy-color-border: #303A48;
+  --nawy-color-overlay: rgb(0 0 0 / 64%);
+}
+
+/* Proposed semantic colors; validate contrast in each product */
+:root {
+  --nawy-color-success: #16A36A;
+  --nawy-color-warning: #D99017;
+  --nawy-color-danger: #D64545;
+  --nawy-color-info: #3284D6;
+}
+
+html {
+  font-family: var(--nawy-font-family);
+}
+
+:focus-visible {
+  outline: var(--nawy-focus-width) solid var(--nawy-color-brand);
+  outline-offset: var(--nawy-focus-offset);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,4 +1,6 @@
 /* Nawy To Do — a quiet, Google-Tasks-like surface. Logical properties only (RTL-first). */
+@import './nawy-tokens.css';
+@import './fonts.css';
 @import './tokens.css';
 @import './base.css';
 @import './shell.css';
