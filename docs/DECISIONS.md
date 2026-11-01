@@ -196,3 +196,7 @@
 
 - **المرحلة 2 (نُفذت):** القفل `pnpm-lock.yaml` مولَّد من CI فعليًا (pnpm 12.7.0 وNode 24.22.1 وقت التوليد) ومُودَع في المستودع؛ كل التبعيات **مثبّتة بالضبط** من القائمة المحلولة (بلا `^`/`~`)؛ CI وpages بـ `--frozen-lockfile`؛ Dependabot أسبوعي مجمّع. أُزيلت خطوة نشر القفل.
 - **المحلول فعليًا:** React 19.3.1 · Vite 8.3.5 · Vitest 5.0.5 · Dexie 4.4.7 · Playwright 1.64.1 · TypeScript 6.0.3 (المرجع يوصي بـ 7.0.2: انحراف مؤقت معلن في `DESIGN-SYSTEM-CONFORMANCE.md`).
+
+## D-028 — Design-system tokens and self-hosted Cairo
+
+`nawy-tokens.css` is a verbatim copy of `inawy/design-system` `tokens/tokens.css` (excluded from Prettier). Product tokens (`--page`, `--ink`, …) in `tokens.css` alias `--nawy-*`; dark mode follows the OS via `prefers-color-scheme` (the design system itself uses `[data-theme="dark"]`), with brand/danger lightened in dark for contrast. Cairo is self-hosted as a subset variable WOFF (Arabic + Latin, OFL) and precached by the PWA; no CDN. WOFF2 deferred (no brotli locally).

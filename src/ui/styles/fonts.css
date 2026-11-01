@@ -1,0 +1,8 @@
+/* Cairo, self-hosted (no CDN). Variable weight; Arabic + Latin subset. */
+@font-face {
+  font-family: 'Cairo';
+  src: url('../../assets/fonts/cairo-arabic-latin.woff') format('woff');
+  font-weight: 200 1000;
+  font-style: normal;
+  font-display: swap;
+}

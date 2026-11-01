@@ -41,7 +41,11 @@ export default defineConfig({
           },
         ],
       },
-      workbox: { navigateFallback: 'index.html', cleanupOutdatedCaches: true },
+      workbox: {
+        navigateFallback: 'index.html',
+        cleanupOutdatedCaches: true,
+        globPatterns: ['**/*.{js,css,html,svg,woff,woff2,png,ico,webmanifest}'],
+      },
     }),
   ],
   resolve: { alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) } },

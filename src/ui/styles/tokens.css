@@ -1,30 +1,34 @@
-/* Design tokens: the only place colours, radii and sizes are defined. */
+/* Product tokens, derived from the shared design system (nawy-tokens.css).
+   Components use these names; values come from --nawy-*. */
 :root {
-  color-scheme: light dark;
-  --page: #f8fafc;
-  --card: #ffffff;
+  --page: var(--nawy-color-bg);
+  --card: var(--nawy-color-surface);
+  --ink: var(--nawy-color-text);
+  --muted: var(--nawy-color-text-muted);
+  --line: var(--nawy-color-border);
+  --brand: var(--nawy-color-brand);
+  --danger: var(--nawy-color-danger);
   --hover: #eef2f8;
-  --ink: #0f172a;
-  --muted: #5b6b82;
-  --line: #e3e8ef;
-  --brand: #3d7bff;
   --brand-soft: #e4edff;
   --on-brand: #ffffff;
-  --danger: #d93025;
-  --radius: 16px;
+  --radius: var(--nawy-radius-lg);
   --nav-h: 64px;
 }
+/* The design system switches dark via [data-theme="dark"]; the product also follows the OS. */
 @media (prefers-color-scheme: dark) {
-  :root {
-    --page: #121212;
-    --card: #1c1c1e;
-    --hover: #26262a;
-    --ink: #f1f5f9;
-    --muted: #9aa8bd;
-    --line: #2c2c31;
-    --brand: #6b9bff;
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --nawy-color-bg: #0d1117;
+    --nawy-color-surface: #151b23;
+    --nawy-color-surface-elevated: #1c2430;
+    --nawy-color-text: #f2f4f7;
+    --nawy-color-text-muted: #a0a8b5;
+    --nawy-color-border: #303a48;
+    --nawy-color-overlay: rgb(0 0 0 / 64%);
+    --hover: #1c2430;
     --brand-soft: #1d2a47;
     --on-brand: #0b1020;
+    --brand: #6b9bff;
     --danger: #ff8a80;
   }
 }
