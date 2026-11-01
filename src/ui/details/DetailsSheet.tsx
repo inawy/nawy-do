@@ -9,7 +9,7 @@ import {
   type TaskList,
   type TaskPatch,
 } from '@/core/model';
-import { CloseIcon, StarIcon, TrashIcon } from '../primitives';
+import { Chip, CloseIcon, StarIcon, TrashIcon } from '../primitives';
 
 interface Props {
   task: Task;
@@ -122,19 +122,13 @@ export function DetailsSheet({ task, lists, today, onSave, onRemove, onClose }: 
           <input type="date" value={due} onChange={(e) => setDue(e.target.value)} />
           <span className="chips" role="group" aria-label="اختيارات سريعة للتاريخ">
             {quickDueOptions(today).map((o) => (
-              <button
-                key={o.value}
-                type="button"
-                className="chip"
-                aria-pressed={due === o.value}
-                onClick={() => setDue(o.value)}
-              >
+              <Chip key={o.value} pressed={due === o.value} onClick={() => setDue(o.value)}>
                 {o.label}
-              </button>
+              </Chip>
             ))}
-            <button type="button" className="chip" disabled={due === ''} onClick={() => setDue('')}>
+            <Chip disabled={due === ''} onClick={() => setDue('')}>
               بدون تاريخ
-            </button>
+            </Chip>
           </span>
         </label>
 

@@ -200,3 +200,7 @@
 ## D-028 — Design-system tokens and self-hosted Cairo
 
 `nawy-tokens.css` is a verbatim copy of `inawy/design-system` `tokens/tokens.css` (excluded from Prettier). Product tokens (`--page`, `--ink`, …) in `tokens.css` alias `--nawy-*`; dark mode follows the OS via `prefers-color-scheme` (the design system itself uses `[data-theme="dark"]`), with brand/danger lightened in dark for contrast. Cairo is self-hosted as a subset variable WOFF (Arabic + Latin, OFL) and precached by the PWA; no CDN. WOFF2 deferred (no brotli locally).
+
+## D-029 — Tailwind v4 (utilities only), module by module
+
+Tailwind 4.3.3 via `@tailwindcss/vite`, as the design system prescribes. Only `theme` and `utilities` are imported (no preflight) so unmigrated screens are untouched; `@theme inline` maps utilities to the design-system tokens, so no raw colours in classes. Utilities live in a CSS layer and lose to unlayered legacy CSS, therefore a module's old rules are deleted in the same PR that migrates it. First module: `Chip`. Next: `Button`, `IconButton`, `Field`, then rows, nav, sheets.

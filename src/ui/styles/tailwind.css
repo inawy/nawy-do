@@ -1,0 +1,16 @@
+/* Tailwind v4, utilities only: no preflight, so existing screens keep their look while modules
+   migrate one by one. Colours and shapes come from the design-system tokens (D-029). */
+@layer theme, base, components, utilities;
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);
+
+@theme inline {
+  --color-brand: var(--nawy-color-brand);
+  --color-soft: var(--brand-soft);
+  --color-surface: var(--nawy-color-surface);
+  --color-line: var(--nawy-color-border);
+  --color-ink: var(--nawy-color-text);
+  --color-muted: var(--nawy-color-text-muted);
+  --radius-pill: var(--nawy-radius-pill);
+  --radius-md: var(--nawy-radius-md);
+}
