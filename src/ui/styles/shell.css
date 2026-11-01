@@ -206,14 +206,6 @@ h2 {
 .more-menu button:hover {
   background: var(--hover);
 }
-.text-action {
-  min-block-size: 48px;
-  padding-inline: 1rem;
-  border: 0;
-  background: none;
-  color: var(--brand);
-  font-weight: 600;
-}
 
 /* ---------- phone: input dock above the nav, no pull-to-refresh bounce ---------- */
 html {

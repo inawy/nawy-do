@@ -1,4 +1,4 @@
-import { SearchIcon } from '../primitives';
+import { Button, IconButton, SearchIcon } from '../primitives';
 import { MoreMenu, type MenuAction } from './MoreMenu';
 
 interface Props {
@@ -23,19 +23,13 @@ export function TitleBar(p: Props) {
     <div className="title-row">
       <h1>{p.title}</h1>
       <span className="title-actions">
-        <button
-          type="button"
-          className="icon"
-          aria-label="بحث"
-          aria-pressed={p.searchOn}
-          onClick={p.onSearch}
-        >
+        <IconButton label="بحث" aria-pressed={p.searchOn} onClick={p.onSearch}>
           <SearchIcon />
-        </button>
+        </IconButton>
         {p.selecting ? (
-          <button type="button" className="text-action" onClick={p.onSelect}>
+          <Button variant="text" onClick={p.onSelect}>
             تم
-          </button>
+          </Button>
         ) : (
           <MoreMenu actions={actions} />
         )}

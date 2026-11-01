@@ -89,21 +89,6 @@
   flex: 1;
   min-inline-size: 0;
 }
-.add-step button,
-.actions button {
-  min-block-size: 44px;
-  border-radius: 999px;
-  border: 1px solid var(--line);
-  background: transparent;
-  padding-inline: 1rem;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-}
-.add-step button:disabled {
-  opacity: 0.5;
-  cursor: default;
-}
 .actions {
   display: flex;
   align-items: center;
@@ -112,17 +97,6 @@
 }
 .spacer {
   flex: 1;
-}
-.actions .primary {
-  background: var(--brand);
-  color: var(--on-brand);
-  border-color: var(--brand);
-  font-weight: 600;
-  padding-inline: 1.5rem;
-}
-.actions .danger {
-  color: var(--danger);
-  border-color: transparent;
 }
 
 @media (min-width: 880px) {
@@ -160,24 +134,11 @@
   font-size: 0.875rem;
   color: var(--muted);
 }
-.actions .danger.solid {
-  background: var(--danger);
-  color: var(--on-brand);
-  border-color: var(--danger);
-}
-.actions .primary:disabled {
-  opacity: 0.5;
-  cursor: default;
-}
 
 .move-row {
   display: flex;
   gap: 0.5rem;
   flex-wrap: wrap;
-}
-.move-row button:disabled {
-  opacity: 0.45;
-  cursor: default;
 }
 
 .form-ok {

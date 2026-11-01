@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { MAX_LIST_NAME } from '@/core/model';
-import { CloseIcon, TrashIcon } from '../primitives';
+import { Button, CloseIcon, IconButton, TrashIcon } from '../primitives';
 
 interface Props {
   mode: 'create' | 'edit';
@@ -56,9 +56,9 @@ export function ListSheet({
       >
         <div className="sheet-head">
           <h2 className="sheet-heading">{mode === 'create' ? 'قائمة جديدة' : 'خيارات القائمة'}</h2>
-          <button type="button" className="icon" aria-label="إغلاق" onClick={onClose}>
+          <IconButton label="إغلاق" onClick={onClose}>
             <CloseIcon />
-          </button>
+          </IconButton>
         </div>
         <label className="field">
           <span>اسم القائمة</span>
@@ -72,12 +72,12 @@ export function ListSheet({
         </label>
         {mode === 'edit' && onMove && (
           <div className="move-row" role="group" aria-label="ترتيب القائمة">
-            <button type="button" disabled={!canMoveEarlier} onClick={() => onMove(-1)}>
+            <Button disabled={!canMoveEarlier} onClick={() => onMove(-1)}>
               قدّم القائمة
-            </button>
-            <button type="button" disabled={!canMoveLater} onClick={() => onMove(1)}>
+            </Button>
+            <Button disabled={!canMoveLater} onClick={() => onMove(1)}>
               أخّر القائمة
-            </button>
+            </Button>
           </div>
         )}
         {error && (
@@ -92,23 +92,21 @@ export function ListSheet({
         )}
         <div className="actions">
           {mode === 'edit' && onDelete && !confirming && (
-            <button type="button" className="danger" onClick={() => setConfirming(true)}>
+            <Button variant="danger" onClick={() => setConfirming(true)}>
               <TrashIcon />
               حذف القائمة
-            </button>
+            </Button>
           )}
           {confirming && onDelete && (
-            <button type="button" className="danger solid" onClick={onDelete}>
+            <Button variant="dangerSolid" onClick={onDelete}>
               تأكيد الحذف
-            </button>
+            </Button>
           )}
           <span className="spacer" />
-          <button type="button" onClick={onClose}>
-            إلغاء
-          </button>
-          <button type="submit" className="primary" disabled={empty}>
+          <Button onClick={onClose}>إلغاء</Button>
+          <Button type="submit" variant="primary" disabled={empty}>
             حفظ
-          </button>
+          </Button>
         </div>
       </form>
     </div>
