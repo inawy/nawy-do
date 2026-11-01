@@ -37,23 +37,6 @@
 .sheet-title:focus {
   border-block-end-color: var(--brand);
 }
-.field {
-  display: grid;
-  gap: 0.25rem;
-  color: var(--muted);
-  font-size: 0.875rem;
-}
-.field textarea,
-.field input,
-.add-step input {
-  font-size: 16px;
-  min-block-size: 44px;
-  padding: 0.5rem 0.75rem;
-  color: var(--ink);
-  background: var(--page);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-}
 .steps {
   border: 0;
   padding: 0;
@@ -85,10 +68,6 @@
   gap: 0.5rem;
   margin-block-start: 0.25rem;
 }
-.add-step input {
-  flex: 1;
-  min-inline-size: 0;
-}
 .actions {
   display: flex;
   align-items: center;
@@ -114,15 +93,6 @@
   margin: 0;
   font-size: 1.125rem;
   font-weight: 600;
-}
-.field select {
-  font-size: 16px;
-  min-block-size: 44px;
-  padding: 0.5rem 0.75rem;
-  color: var(--ink);
-  background: var(--page);
-  border: 1px solid var(--line);
-  border-radius: 12px;
 }
 .form-error {
   margin: 0;

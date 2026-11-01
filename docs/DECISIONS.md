@@ -203,4 +203,4 @@
 
 ## D-029 — Tailwind v4 (utilities only), module by module
 
-Tailwind 4.3.3 via `@tailwindcss/vite`, as the design system prescribes. Only `theme` and `utilities` are imported (no preflight) so unmigrated screens are untouched; `@theme inline` maps utilities to the design-system tokens, so no raw colours in classes. Utilities live in a CSS layer and lose to unlayered legacy CSS, therefore a module's old rules are deleted in the same PR that migrates it. Migrated: `Chip`, `Button`, `IconButton` (sheets, title bar, more menu; their legacy rules deleted). Next: `Field`, then rows, nav, sheets.
+Tailwind 4.3.3 via `@tailwindcss/vite`, as the design system prescribes. Only `theme` and `utilities` are imported (no preflight) so unmigrated screens are untouched; `@theme inline` maps utilities to the design-system tokens, so no raw colours in classes. Utilities live in a CSS layer and lose to unlayered legacy CSS, therefore a module's old rules are deleted in the same PR that migrates it. Migrated: `Chip`, `Button`, `IconButton` (sheets, title bar, more menu; their legacy rules deleted), `Field`, `TextInput`, `TextArea`, `Select`. Next: rows, nav, sheet frame.

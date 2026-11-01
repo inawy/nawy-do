@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { MAX_LIST_NAME } from '@/core/model';
-import { Button, CloseIcon, IconButton, TrashIcon } from '../primitives';
+import { Button, CloseIcon, Field, IconButton, TextInput, TrashIcon } from '../primitives';
 
 interface Props {
   mode: 'create' | 'edit';
@@ -60,16 +60,15 @@ export function ListSheet({
             <CloseIcon />
           </IconButton>
         </div>
-        <label className="field">
-          <span>اسم القائمة</span>
-          <input
+        <Field label="اسم القائمة">
+          <TextInput
             value={name}
             onChange={(e) => setName(e.target.value)}
             maxLength={MAX_LIST_NAME}
             autoFocus
             autoComplete="off"
           />
-        </label>
+        </Field>
         {mode === 'edit' && onMove && (
           <div className="move-row" role="group" aria-label="ترتيب القائمة">
             <Button disabled={!canMoveEarlier} onClick={() => onMove(-1)}>
