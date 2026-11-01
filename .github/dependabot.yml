@@ -1,0 +1,16 @@
+version: 2
+updates:
+  # pnpm projects are updated through the `npm` ecosystem. One grouped PR a week: the changelog and
+  # the CI run are reviewed together (the reference stack asks for deliberate upgrades, not "latest").
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 3
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly

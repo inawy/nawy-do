@@ -193,3 +193,6 @@
 - **غير مثبت:** وجود pnpm 12.7.0 فعليًا (مصدره وثيقة المرجع). إن فشل CI بسببه نعدّل الإصدار ونسجّل ذلك.
 
 - **اكتشاف أثناء التنفيذ:** مع pnpm (تخطيط صارم) فشل البناء: `virtual:pwa-register` يستورد `workbox-window` وهو peer لـ `vite-plugin-pwa` لم نعلنه (npm كان «يرفعه» ضمنيًا — phantom dependency). أُضيف صراحة `workbox-window` (مطلوب لتسجيل الـ service worker، ترخيص MIT)، و`@types/node` ← 24 ليطابق Node 24.
+
+- **المرحلة 2 (نُفذت):** القفل `pnpm-lock.yaml` مولَّد من CI فعليًا (pnpm 12.7.0 وNode 24.22.1 وقت التوليد) ومُودَع في المستودع؛ كل التبعيات **مثبّتة بالضبط** من القائمة المحلولة (بلا `^`/`~`)؛ CI وpages بـ `--frozen-lockfile`؛ Dependabot أسبوعي مجمّع. أُزيلت خطوة نشر القفل.
+- **المحلول فعليًا:** React 19.3.1 · Vite 8.3.5 · Vitest 5.0.5 · Dexie 4.4.7 · Playwright 1.64.1 · TypeScript 6.0.3 (المرجع يوصي بـ 7.0.2: انحراف مؤقت معلن في `DESIGN-SYSTEM-CONFORMANCE.md`).

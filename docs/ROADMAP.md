@@ -67,7 +67,7 @@
 - `package-lock.json` و`npm ci` وDependabot وحد حجم الحزمة وحد تغطية (يحتاج منك رفع القفل).
 - **قبول:** لا استيراد لـ Dexie خارج `data`؛ اختبارات hooks تعمل بمحوّل الذاكرة (دليل أن المنفذ حقيقي).
 
-### A3 — مواءمة الأدوات مع المرجع (قبل ميزات الشكل)
+### A3 — مواءمة الأدوات مع المرجع ✅ (D-027؛ يبقى TypeScript 7)
 
 - Node 24 LTS؛ pnpm 12.x و`packageManager`؛ إصدارات **مثبّتة بالضبط**؛ `pnpm-lock.yaml` **يُولَّد في CI** (فرع `ci-lockfile`) فيُرفَع للمستودع بلا حاجة لتشغيل npm عندك؛ ثم CI بتثبيت مقفل (`--frozen-lockfile`) وDependabot وحد حجم الحزمة.
 - TypeScript 7 يُجرَّب في PR منفصل (توافق `typescript-eslint` غير مثبت).
