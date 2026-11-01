@@ -9,7 +9,7 @@ import {
   type TaskList,
   type TaskPatch,
 } from '@/core/model';
-import { Chip, CloseIcon, StarIcon, TrashIcon } from '../primitives';
+import { Button, Chip, CloseIcon, IconButton, StarIcon, TrashIcon } from '../primitives';
 
 interface Props {
   task: Task;
@@ -70,9 +70,9 @@ export function DetailsSheet({ task, lists, today, onSave, onRemove, onClose }: 
         }}
       >
         <div className="sheet-head">
-          <button type="button" className="icon" aria-label="إغلاق" onClick={onClose}>
+          <IconButton label="إغلاق" onClick={onClose}>
             <CloseIcon />
-          </button>
+          </IconButton>
           <button
             type="button"
             className={starred ? 'star on' : 'star'}
@@ -149,14 +149,12 @@ export function DetailsSheet({ task, lists, today, onSave, onRemove, onClose }: 
                   />
                 </label>
                 <span className={st.done ? 'step-title done-title' : 'step-title'}>{st.title}</span>
-                <button
-                  type="button"
-                  className="icon"
-                  aria-label={`حذف الخطوة: ${st.title}`}
+                <IconButton
+                  label={`حذف الخطوة: ${st.title}`}
                   onClick={() => setSteps(steps.filter((x) => x.id !== st.id))}
                 >
                   <CloseIcon />
-                </button>
+                </IconButton>
               </li>
             ))}
           </ul>
@@ -175,24 +173,22 @@ export function DetailsSheet({ task, lists, today, onSave, onRemove, onClose }: 
               maxLength={MAX_STEP_TITLE}
               disabled={steps.length >= MAX_STEPS}
             />
-            <button type="button" onClick={addStep} disabled={newStep.trim() === ''}>
+            <Button onClick={addStep} disabled={newStep.trim() === ''}>
               أضف خطوة
-            </button>
+            </Button>
           </div>
         </fieldset>
 
         <div className="actions">
-          <button type="button" className="danger" onClick={onRemove}>
+          <Button variant="danger" onClick={onRemove}>
             <TrashIcon />
             حذف النية
-          </button>
+          </Button>
           <span className="spacer" />
-          <button type="button" onClick={onClose}>
-            إلغاء
-          </button>
-          <button type="submit" className="primary">
+          <Button onClick={onClose}>إلغاء</Button>
+          <Button type="submit" variant="primary">
             حفظ
-          </button>
+          </Button>
         </div>
       </form>
     </div>

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { MoreIcon } from '../primitives';
+import { IconButton, MoreIcon } from '../primitives';
 
 export interface MenuAction {
   label: string;
@@ -27,16 +27,14 @@ export function MoreMenu({ actions }: { actions: MenuAction[] }) {
 
   return (
     <span className="more" ref={root}>
-      <button
-        type="button"
-        className="icon"
-        aria-label="المزيد"
+      <IconButton
+        label="المزيد"
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
       >
         <MoreIcon />
-      </button>
+      </IconButton>
       {open && (
         <div className="more-menu" role="menu">
           {actions.map((a) => (

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { CloseIcon } from '../primitives';
+import { Button, CloseIcon, IconButton } from '../primitives';
 
 export type Outcome =
   | { kind: 'exported' }
@@ -83,9 +83,9 @@ export function BackupSheet({
       >
         <div className="sheet-head">
           <h2 className="sheet-heading">بياناتي</h2>
-          <button type="button" className="icon" aria-label="إغلاق" onClick={onClose}>
+          <IconButton label="إغلاق" onClick={onClose}>
             <CloseIcon />
-          </button>
+          </IconButton>
         </div>
         <p className="hint">كل نواياك محفوظة على جهازك بس. خُد نسخة احتياطية تحفظها عندك.</p>
         {storage === 'persisted' ? (
@@ -97,12 +97,10 @@ export function BackupSheet({
           </p>
         ) : null}
         <div className="actions data-actions">
-          <button type="button" className="primary" onClick={onExport}>
+          <Button variant="primary" onClick={onExport}>
             تنزيل نسخة احتياطية
-          </button>
-          <button type="button" onClick={() => file.current?.click()}>
-            استيراد من ملف
-          </button>
+          </Button>
+          <Button onClick={() => file.current?.click()}>استيراد من ملف</Button>
           <input
             ref={file}
             type="file"
@@ -135,10 +133,10 @@ export function BackupSheet({
               {snapshots.map((s) => (
                 <li key={s.id}>
                   <span>{s.label}</span>
-                  <button type="button" onClick={() => onRestore(s.id)}>
+                  <Button onClick={() => onRestore(s.id)}>
                     استرجاع
                     <span className="sr-only"> نسخة {s.label}</span>
-                  </button>
+                  </Button>
                 </li>
               ))}
             </ul>

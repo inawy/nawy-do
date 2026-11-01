@@ -148,8 +148,7 @@
   text-decoration: line-through;
   color: var(--muted);
 }
-.star,
-.icon {
+.star {
   display: grid;
   place-items: center;
   inline-size: 48px;
@@ -160,8 +159,7 @@
   border-radius: 50%;
   flex: none;
 }
-.star:hover,
-.icon:hover {
+.star:hover {
   background: var(--hover);
 }
 .star.on {
