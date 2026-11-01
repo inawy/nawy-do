@@ -218,20 +218,3 @@
   gap: 0.5rem;
   margin-block-start: 0.5rem;
 }
-.chip {
-  min-block-size: 48px;
-  padding-inline: 1rem;
-  border: 1px solid var(--line);
-  border-radius: var(--nawy-radius-pill);
-  background: var(--card);
-}
-.chip[aria-pressed='true'] {
-  background: var(--brand-soft);
-  border-color: var(--brand);
-  color: var(--brand);
-  font-weight: 600;
-}
-.chip:disabled {
-  color: var(--muted);
-  cursor: default;
-}
