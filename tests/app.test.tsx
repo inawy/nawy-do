@@ -59,6 +59,20 @@ describe('App', () => {
     expect((await allRecords(db))[0]?.deletedAt).toBeUndefined();
   });
 
+  it('quick due choices set and clear the date', async () => {
+    render(<App db={db} now={now} today={today} />);
+    await addIntention('كلّم أحمد');
+    fireEvent.click(screen.getByRole('button', { name: 'تفاصيل: كلّم أحمد' }));
+    const input = screen.getByLabelText('تاريخ الاستحقاق') as HTMLInputElement;
+    fireEvent.click(screen.getByRole('button', { name: 'بكرة' }));
+    expect(input.value).toBe('2026-10-28');
+    expect(screen.getByRole('button', { name: 'بكرة' }).getAttribute('aria-pressed')).toBe('true');
+    fireEvent.click(screen.getByRole('button', { name: 'الأسبوع الجاي' }));
+    expect(input.value).toBe('2026-11-03');
+    fireEvent.click(screen.getByRole('button', { name: 'بدون تاريخ' }));
+    expect(input.value).toBe('');
+  });
+
   it('edits details and shows the task in the scheduled view', async () => {
     render(<App db={db} now={now} today={today} />);
     await addIntention('ادفع الفاتورة');

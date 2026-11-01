@@ -66,3 +66,39 @@ export function formatDue(due: string, today: string): string {
   const sameYear = parseCivil(today)?.y === c.y;
   return sameYear ? `${c.d} ${month}` : `${c.d} ${month} ${c.y}`;
 }
+
+/** Inverse of `daysFromCivil` (Hinnant's algorithm). */
+function civilFromDays(z0: number): string {
+  const z = z0 + 719468;
+  const era = Math.floor(z / 146097);
+  const doe = z - era * 146097;
+  const yoe = Math.floor(
+    (doe - Math.floor(doe / 1460) + Math.floor(doe / 36524) - Math.floor(doe / 146096)) / 365,
+  );
+  const doy = doe - (365 * yoe + Math.floor(yoe / 4) - Math.floor(yoe / 100));
+  const mp = Math.floor((5 * doy + 2) / 153);
+  const d = doy - Math.floor((153 * mp + 2) / 5) + 1;
+  const m = mp < 10 ? mp + 3 : mp - 9;
+  const y = yoe + era * 400 + (m <= 2 ? 1 : 0);
+  return `${String(y).padStart(4, '0')}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+}
+
+/** `date` plus `n` days (negative allowed); returns `date` unchanged if it is not a valid civil date. */
+export function addDays(date: string, n: number): string {
+  const base = daysFromCivil(date);
+  return base === undefined ? date : civilFromDays(base + n);
+}
+
+export interface QuickDue {
+  label: string;
+  value: string;
+}
+
+/** The one-tap choices of the due-date picker. */
+export function quickDueOptions(today: string): QuickDue[] {
+  return [
+    { label: 'النهارده', value: today },
+    { label: 'بكرة', value: addDays(today, 1) },
+    { label: 'الأسبوع الجاي', value: addDays(today, 7) },
+  ];
+}
