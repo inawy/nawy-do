@@ -6,6 +6,7 @@
 
 @theme inline {
   --color-brand: var(--nawy-color-brand);
+  --color-page: var(--page);
   --color-soft: var(--brand-soft);
   --color-surface: var(--nawy-color-surface);
   --color-line: var(--nawy-color-border);

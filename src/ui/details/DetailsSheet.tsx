@@ -9,7 +9,18 @@ import {
   type TaskList,
   type TaskPatch,
 } from '@/core/model';
-import { Button, Chip, CloseIcon, IconButton, StarIcon, TrashIcon } from '../primitives';
+import {
+  Button,
+  Chip,
+  CloseIcon,
+  Field,
+  IconButton,
+  Select,
+  StarIcon,
+  TextArea,
+  TextInput,
+  TrashIcon,
+} from '../primitives';
 
 interface Props {
   task: Task;
@@ -93,33 +104,30 @@ export function DetailsSheet({ task, lists, today, onSave, onRemove, onClose }: 
           autoFocus
         />
 
-        <label className="field">
-          <span>ملاحظات</span>
-          <textarea
+        <Field label="ملاحظات">
+          <TextArea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             rows={3}
             maxLength={20000}
           />
-        </label>
+        </Field>
 
         {lists.length > 0 && (
-          <label className="field">
-            <span>القائمة</span>
-            <select aria-label="القائمة" value={listId} onChange={(e) => setListId(e.target.value)}>
+          <Field label="القائمة">
+            <Select aria-label="القائمة" value={listId} onChange={(e) => setListId(e.target.value)}>
               <option value="">نواياي</option>
               {lists.map((l) => (
                 <option key={l.id} value={l.id}>
                   {l.name}
                 </option>
               ))}
-            </select>
-          </label>
+            </Select>
+          </Field>
         )}
 
-        <label className="field">
-          <span>تاريخ الاستحقاق</span>
-          <input type="date" value={due} onChange={(e) => setDue(e.target.value)} />
+        <Field label="تاريخ الاستحقاق">
+          <TextInput type="date" value={due} onChange={(e) => setDue(e.target.value)} />
           <span className="chips" role="group" aria-label="اختيارات سريعة للتاريخ">
             {quickDueOptions(today).map((o) => (
               <Chip key={o.value} pressed={due === o.value} onClick={() => setDue(o.value)}>
@@ -130,7 +138,7 @@ export function DetailsSheet({ task, lists, today, onSave, onRemove, onClose }: 
               بدون تاريخ
             </Chip>
           </span>
-        </label>
+        </Field>
 
         <fieldset className="steps">
           <legend>الخطوات</legend>
@@ -159,7 +167,8 @@ export function DetailsSheet({ task, lists, today, onSave, onRemove, onClose }: 
             ))}
           </ul>
           <div className="add-step">
-            <input
+            <TextInput
+              className="min-w-0 flex-1"
               value={newStep}
               onChange={(e) => setNewStep(e.target.value)}
               onKeyDown={(e) => {
