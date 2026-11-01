@@ -1,6 +1,7 @@
 import { fileURLToPath, URL } from 'node:url';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
+import svgr from 'vite-plugin-svgr';
 import { defineConfig } from 'vitest/config';
 
 // base './' lets the build run under a sub-path (GitHub Pages, nawy.to/do).
@@ -8,6 +9,12 @@ export default defineConfig({
   base: './',
   plugins: [
     react(),
+    // Material Symbols files become components (`?react`): colour from the text, hidden from AT.
+    svgr({
+      svgrOptions: {
+        svgProps: { fill: 'currentColor', 'aria-hidden': 'true', focusable: 'false' },
+      },
+    }),
     VitePWA({
       // `prompt`: a new version never reloads the page under an open edit sheet (D-012).
       registerType: 'prompt',
