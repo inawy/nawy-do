@@ -27,7 +27,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-      - run: pnpm install --no-frozen-lockfile # becomes --frozen-lockfile once pnpm-lock.yaml is committed (D-027)
+      - run: pnpm install --frozen-lockfile
       - run: pnpm test
       - run: pnpm run build
       - uses: actions/upload-pages-artifact@v3
