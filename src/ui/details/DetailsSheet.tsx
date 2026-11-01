@@ -3,6 +3,7 @@ import {
   listOf,
   MAX_STEPS,
   MAX_STEP_TITLE,
+  quickDueOptions,
   type Step,
   type Task,
   type TaskList,
@@ -13,6 +14,7 @@ import { CloseIcon, StarIcon, TrashIcon } from '../primitives';
 interface Props {
   task: Task;
   lists: TaskList[];
+  today: string;
   onSave: (patch: TaskPatch) => void;
   onRemove: () => void;
   onClose: () => void;
@@ -22,7 +24,7 @@ interface Props {
  * Details of one intention: a bottom sheet on phones, a centred card on wide screens. Saving an
  * empty title keeps the old one; clearing the date or notes removes them.
  */
-export function DetailsSheet({ task, lists, onSave, onRemove, onClose }: Props) {
+export function DetailsSheet({ task, lists, today, onSave, onRemove, onClose }: Props) {
   const [title, setTitle] = useState(task.title);
   const [notes, setNotes] = useState(task.notes ?? '');
   const [due, setDue] = useState(task.due ?? '');
@@ -118,6 +120,22 @@ export function DetailsSheet({ task, lists, onSave, onRemove, onClose }: Props) 
         <label className="field">
           <span>تاريخ الاستحقاق</span>
           <input type="date" value={due} onChange={(e) => setDue(e.target.value)} />
+          <span className="chips" role="group" aria-label="اختيارات سريعة للتاريخ">
+            {quickDueOptions(today).map((o) => (
+              <button
+                key={o.value}
+                type="button"
+                className="chip"
+                aria-pressed={due === o.value}
+                onClick={() => setDue(o.value)}
+              >
+                {o.label}
+              </button>
+            ))}
+            <button type="button" className="chip" disabled={due === ''} onClick={() => setDue('')}>
+              بدون تاريخ
+            </button>
+          </span>
         </label>
 
         <fieldset className="steps">
