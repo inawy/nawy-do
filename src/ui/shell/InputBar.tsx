@@ -16,7 +16,7 @@ interface Props {
 }
 
 /** The one input area: the composer, or the search field, or the selection actions. */
-export function InputBar(p: Props) {
+function Bar(p: Props) {
   if (p.picked) {
     const ids = [...p.picked];
     return (
@@ -50,4 +50,13 @@ export function InputBar(p: Props) {
     );
   }
   return <Composer onAdd={p.onAdd} />;
+}
+
+/** Docked at the bottom on phones (thumb reach), inline on wide screens. */
+export function InputBar(p: Props) {
+  return (
+    <div className="input-dock">
+      <Bar {...p} />
+    </div>
+  );
 }
