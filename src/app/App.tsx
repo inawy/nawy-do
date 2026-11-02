@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { newTaskDefaults, resolveSelection, type Selection } from '@/core/model';
 import type { Repositories } from '@/core/ports';
 import { createDexieRepositories, type NawyDoDb } from '@/data';
@@ -9,7 +9,9 @@ import { TasksScreen } from '@/ui/shell';
 import { formatWhen, systemClock, systemToday } from './clock';
 import { getDb } from './db';
 import { downloadText } from './files';
+import { installSignal } from './install';
 import { newId } from './ids';
+import { takeLaunch } from './launch';
 import { requestPersistence, type StorageState } from './storage';
 import { updateSignal } from './updateSignal';
 
@@ -31,6 +33,9 @@ export function App({ repositories, db, now = systemClock, today = systemToday }
   const lists = useLists(repos.lists, now, newId);
   const backup = useBackup(repos.backup, now);
   const applyUpdate = useSyncExternalStore(updateSignal.subscribe, updateSignal.get);
+  const onInstall = useSyncExternalStore(installSignal.subscribe, installSignal.get);
+  const [launch] = useState(takeLaunch);
+  const shareDone = useRef(false);
   const [chosen, setChosen] = useState<Selection>('main');
   const [storage, setStorage] = useState<StorageState | 'unknown'>('unknown');
   const [openId, setOpenId] = useState<string | null>(null);
@@ -40,6 +45,14 @@ export function App({ repositories, db, now = systemClock, today = systemToday }
   }, []);
 
   const selection = resolveSelection(chosen, lists.lists);
+
+  // Text shared from another app becomes a new intention (once per launch).
+  const { add } = tasks;
+  useEffect(() => {
+    if (shareDone.current || launch.shared === undefined) return;
+    shareDone.current = true;
+    void add(launch.shared);
+  }, [launch, add]);
 
   // The sheet shows the task as it is now; if it was deleted elsewhere it simply closes.
   const editing = tasks.tasks.find((t) => t.id === openId);
@@ -72,6 +85,8 @@ export function App({ repositories, db, now = systemClock, today = systemToday }
       editing={editing}
       removed={removed}
       applyUpdate={applyUpdate}
+      onInstall={onInstall}
+      focusAdd={launch.newTask}
       onSelect={setChosen}
       onAdd={(title) => void tasks.add(title, newTaskDefaults(selection, today()))}
       onToggle={(t) => void tasks.toggle(t)}

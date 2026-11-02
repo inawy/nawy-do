@@ -4,6 +4,8 @@ import { SelectBar } from './SelectBar';
 
 interface Props {
   lists: TaskList[];
+  /** Focus the add field on mount (the «new intention» shortcut). */
+  focusAdd?: boolean;
   /** `null` when not selecting. */
   picked: ReadonlySet<string> | null;
   /** `null` when not searching. */
@@ -49,7 +51,7 @@ function Bar(p: Props) {
       </div>
     );
   }
-  return <Composer onAdd={p.onAdd} />;
+  return <Composer onAdd={p.onAdd} autoFocus={p.focusAdd === true} />;
 }
 
 /** Docked at the bottom on phones (thumb reach), inline on wide screens. */

@@ -55,6 +55,7 @@ export function TasksScreen(p: TasksScreenProps) {
           selecting={ui.picked !== null}
           onSearch={ui.toggleSearch}
           onSelect={ui.toggleSelecting}
+          onInstall={p.onInstall}
           onData={() => {
             p.data.onOpen();
             ui.setDataOpen(true);
@@ -63,6 +64,7 @@ export function TasksScreen(p: TasksScreenProps) {
         />
         <InputBar
           lists={p.lists}
+          focusAdd={p.focusAdd}
           picked={ui.picked}
           query={ui.query}
           onAdd={p.onAdd}

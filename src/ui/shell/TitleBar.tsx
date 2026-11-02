@@ -10,6 +10,8 @@ interface Props {
   onSearch: () => void;
   onSelect: () => void;
   onData: () => void;
+  /** Present while the browser offers to install the app. */
+  onInstall?: (() => void) | undefined;
 }
 
 /** The heading, search, and the «more» menu (select, data, list options). */
@@ -18,6 +20,7 @@ export function TitleBar(p: Props) {
     { label: 'تحديد', onPick: p.onSelect },
     { label: 'بياناتي', onPick: p.onData },
   ];
+  if (p.onInstall) actions.push({ label: 'تثبيت التطبيق', onPick: p.onInstall });
   if (p.onListOptions) actions.push({ label: 'خيارات القائمة', onPick: p.onListOptions });
   return (
     <div className="title-row">

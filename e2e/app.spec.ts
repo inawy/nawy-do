@@ -262,3 +262,34 @@ test('two deletions in a row can be undone one after the other', async ({ page }
   await page.getByRole('button', { name: 'تراجع' }).click();
   await expect(page.getByText('التانية', { exact: true })).toBeVisible();
 });
+
+test('text shared from another app becomes an intention, once', async ({ page }) => {
+  await page.goto('/?share_text=' + encodeURIComponent('اتصل بالسباك'));
+  await expect(page.getByText('اتصل بالسباك', { exact: true })).toBeVisible();
+  await expect(page).toHaveURL(/\/$/); // the share parameters are gone
+  await page.reload();
+  await expect(page.getByText('اتصل بالسباك', { exact: true })).toHaveCount(1);
+});
+
+test('the «new intention» shortcut focuses the add field', async ({ page }) => {
+  await page.goto('/?new=1');
+  await expect(page.getByLabel(prompt)).toBeFocused();
+});
+
+test('the web manifest declares shortcuts and a share target', async ({ page, request }) => {
+  const link = await page.locator('link[rel="manifest"]').getAttribute('href');
+  const res = await request.get(new URL(link ?? '/manifest.webmanifest', page.url()).href);
+  const m = (await res.json()) as {
+    share_target?: { method: string; params: Record<string, string> };
+    shortcuts?: { url: string }[];
+    display_override?: string[];
+  };
+  expect(m.share_target?.method).toBe('GET');
+  expect(m.share_target?.params).toEqual({
+    title: 'share_title',
+    text: 'share_text',
+    url: 'share_url',
+  });
+  expect(m.shortcuts?.[0]?.url).toContain('new=1');
+  expect(m.display_override).toContain('standalone');
+});

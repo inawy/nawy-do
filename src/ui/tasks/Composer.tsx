@@ -2,7 +2,13 @@ import { useState, type FormEvent } from 'react';
 import { PlusIcon } from '../primitives';
 
 /** The "add" row at the top of the list: one line, Enter or the plus button adds. */
-export function Composer({ onAdd }: { onAdd: (title: string) => void }) {
+export function Composer({
+  onAdd,
+  autoFocus = false,
+}: {
+  onAdd: (title: string) => void;
+  autoFocus?: boolean;
+}) {
   const [text, setText] = useState('');
   const empty = text.trim() === '';
   const submit = (e: FormEvent) => {
@@ -22,6 +28,7 @@ export function Composer({ onAdd }: { onAdd: (title: string) => void }) {
         onChange={(e) => setText(e.target.value)}
         placeholder="ناوي تعمل إيه؟"
         aria-label="ناوي تعمل إيه؟"
+        autoFocus={autoFocus}
         enterKeyHint="done"
         autoComplete="off"
         maxLength={1000}
