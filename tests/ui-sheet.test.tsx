@@ -5,7 +5,7 @@ import { Sheet } from '@/ui/sheet';
 // Unmounting a sheet pops its history entry asynchronously; let that settle between tests.
 afterEach(async () => {
   cleanup();
-  await new Promise((r) => setTimeout(r, 50));
+  await new Promise((r) => setTimeout(r, 600));
 });
 
 const open = (onClose = vi.fn(), onSubmit?: () => void) => {
