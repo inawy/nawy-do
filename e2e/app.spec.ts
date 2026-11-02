@@ -168,3 +168,32 @@ test('keeps working offline once the service worker has cached the app', async (
   await add(page, 'اتكتبت بلا إنترنت');
   await context.setOffline(false);
 });
+
+test('the Back button closes a sheet instead of leaving the app', async ({ page }) => {
+  await add(page, 'مهمة للرجوع');
+  await page.getByRole('button', { name: 'تفاصيل: مهمة للرجوع' }).click();
+  await expect(page.getByRole('dialog')).toBeVisible();
+  await page.goBack();
+  await expect(page.getByRole('dialog')).toBeHidden();
+  await expect(page.getByText('مهمة للرجوع', { exact: true })).toBeVisible();
+});
+
+test('dragging the sheet handle down closes it; a short drag does not', async ({ page }) => {
+  await add(page, 'مهمة للسحب');
+  await page.getByRole('button', { name: 'تفاصيل: مهمة للسحب' }).click();
+  const handle = page.locator('.sheet-grab');
+  const box = await handle.boundingBox();
+  if (!box) throw new Error('no handle');
+  const x = box.x + box.width / 2;
+  const y = box.y + box.height / 2;
+  await page.mouse.move(x, y);
+  await page.mouse.down();
+  await page.mouse.move(x, y + 30, { steps: 4 });
+  await page.mouse.up();
+  await expect(page.getByRole('dialog')).toBeVisible();
+  await page.mouse.move(x, y);
+  await page.mouse.down();
+  await page.mouse.move(x, y + 250, { steps: 8 });
+  await page.mouse.up();
+  await expect(page.getByRole('dialog')).toBeHidden();
+});
