@@ -44,10 +44,11 @@ export function App({ repositories, db, now = systemClock, today = systemToday }
   // The sheet shows the task as it is now; if it was deleted elsewhere it simply closes.
   const editing = tasks.tasks.find((t) => t.id === openId);
 
+  const more = lists.removedStack.length + tasks.removedStack.length - 1;
   const removed = lists.lastRemoved
-    ? { kind: 'list' as const, label: lists.lastRemoved.name }
+    ? { kind: 'list' as const, label: lists.lastRemoved.name, more }
     : tasks.lastRemoved
-      ? { kind: 'task' as const, label: tasks.lastRemoved.title }
+      ? { kind: 'task' as const, label: tasks.lastRemoved.title, more }
       : null;
 
   return (

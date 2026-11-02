@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
-import { planListMove, type TaskList } from '@/core/model';
+import { MAX_UNDO, planListMove, type TaskList } from '@/core/model';
 import type { ListRepository } from '@/core/ports';
 
 export interface ListsApi {
   lists: TaskList[];
-  /** The list just deleted, available to undo until dismissed. */
+  /** The lists deleted lately, newest last; each undo takes the newest back. */
+  removedStack: TaskList[];
   lastRemoved: TaskList | null;
   /** Returns the new list, or why it was refused. */
   add: (name: string) => Promise<TaskList | 'empty' | 'limit' | 'failed'>;
@@ -19,7 +20,7 @@ export interface ListsApi {
 /** `now` is injected so nothing below the app reads the clock (D-005). */
 export function useLists(repo: ListRepository, now: () => number, newId: () => string): ListsApi {
   const [lists, setLists] = useState<TaskList[]>([]);
-  const [lastRemoved, setLastRemoved] = useState<TaskList | null>(null);
+  const [removedStack, setRemovedStack] = useState<TaskList[]>([]);
 
   useEffect(() => repo.watch(setLists, () => undefined), [repo]);
 
@@ -45,7 +46,7 @@ export function useLists(repo: ListRepository, now: () => number, newId: () => s
   const remove = useCallback(
     async (list: TaskList) => {
       const done = await repo.remove(list.id, now()).catch(() => undefined);
-      if (done) setLastRemoved(list);
+      if (done) setRemovedStack((s) => [...s, list].slice(-MAX_UNDO));
     },
     [repo, now],
   );
@@ -58,13 +59,23 @@ export function useLists(repo: ListRepository, now: () => number, newId: () => s
   );
 
   const undoRemove = useCallback(async () => {
-    if (!lastRemoved) return;
-    const list = lastRemoved;
-    setLastRemoved(null);
+    const list = removedStack[removedStack.length - 1];
+    if (!list) return;
+    setRemovedStack((s) => s.slice(0, -1));
     await repo.restore(list, now()).catch(() => undefined);
-  }, [repo, now, lastRemoved]);
+  }, [repo, now, removedStack]);
 
-  const dismissUndo = useCallback(() => setLastRemoved(null), []);
+  const dismissUndo = useCallback(() => setRemovedStack([]), []);
 
-  return { lists, lastRemoved, add, rename, remove, move, undoRemove, dismissUndo };
+  return {
+    lists,
+    removedStack,
+    lastRemoved: removedStack[removedStack.length - 1] ?? null,
+    add,
+    rename,
+    remove,
+    move,
+    undoRemove,
+    dismissUndo,
+  };
 }

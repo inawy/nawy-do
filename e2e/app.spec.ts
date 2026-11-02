@@ -248,3 +248,17 @@ test('a normal tap still opens the details (no long press)', async ({ page }) =>
   await page.getByRole('button', { name: 'تفاصيل: ضغطة قصيرة' }).click();
   await expect(page.getByRole('dialog')).toBeVisible();
 });
+
+test('two deletions in a row can be undone one after the other', async ({ page }) => {
+  await add(page, 'الأولى');
+  await add(page, 'التانية');
+  await swipe(page, 'التانية', 200);
+  await expect(page.getByText('اتحذفت: التانية')).toBeVisible();
+  await swipe(page, 'الأولى', 200);
+  await expect(page.getByText('اتحذفت: الأولى (+1)')).toBeVisible();
+  await page.getByRole('button', { name: 'تراجع' }).click();
+  await expect(page.getByText('الأولى', { exact: true })).toBeVisible();
+  await expect(page.getByText('اتحذفت: التانية')).toBeVisible();
+  await page.getByRole('button', { name: 'تراجع' }).click();
+  await expect(page.getByText('التانية', { exact: true })).toBeVisible();
+});

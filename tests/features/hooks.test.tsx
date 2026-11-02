@@ -1,5 +1,6 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
+import { MAX_UNDO } from '@/core/model';
 import { useBackup } from '@/features/backup';
 import { useLists } from '@/features/lists';
 import { useTasks } from '@/features/tasks';
@@ -40,6 +41,42 @@ describe('useTasks on the ports', () => {
     expect(repos.dump().tasks[0]?.deletedAt).toBeDefined(); // a tombstone, not a removal
     await act(() => result.current.undoRemove());
     await waitFor(() => expect(result.current.tasks).toHaveLength(1));
+  });
+
+  it('undo is stacked: several deletions come back newest first', async () => {
+    const repos = createMemoryRepositories();
+    const { result } = renderHook(() => useTasks(repos.tasks, now, newId));
+    for (const title of ['أولى', 'تانية', 'تالتة']) await act(() => result.current.add(title));
+    await waitFor(() => expect(result.current.tasks).toHaveLength(3));
+    for (const title of ['أولى', 'تانية', 'تالتة']) {
+      const t = result.current.tasks.find((x) => x.title === title);
+      if (!t) throw new Error('no task');
+      await act(() => result.current.remove(t));
+    }
+    await waitFor(() => expect(result.current.tasks).toHaveLength(0));
+    expect(result.current.removedStack.map((t) => t.title)).toEqual(['أولى', 'تانية', 'تالتة']);
+    await act(() => result.current.undoRemove());
+    await waitFor(() => expect(result.current.tasks.map((t) => t.title)).toEqual(['تالتة']));
+    await act(() => result.current.undoRemove());
+    await waitFor(() => expect(result.current.tasks).toHaveLength(2));
+    expect(result.current.lastRemoved?.title).toBe('أولى');
+    act(() => result.current.dismissUndo());
+    expect(result.current.removedStack).toEqual([]);
+  });
+
+  it('keeps at most MAX_UNDO deletions to undo', async () => {
+    const repos = createMemoryRepositories();
+    const { result } = renderHook(() => useTasks(repos.tasks, now, newId));
+    const total = MAX_UNDO + 2;
+    for (let i = 0; i < total; i++) await act(() => result.current.add(`م${i}`));
+    await waitFor(() => expect(result.current.tasks).toHaveLength(total));
+    for (let i = 0; i < total; i++) {
+      const t = result.current.tasks.find((x) => x.title === `م${i}`);
+      if (!t) throw new Error('no task');
+      await act(() => result.current.remove(t));
+    }
+    expect(result.current.removedStack).toHaveLength(MAX_UNDO);
+    expect(result.current.lastRemoved?.title).toBe(`م${total - 1}`);
   });
 
   it('shows the failure when the repository cannot be read', async () => {

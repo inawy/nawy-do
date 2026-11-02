@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { groupTasks, planMove, type Task, type TaskPatch } from '@/core/model';
+import { groupTasks, MAX_UNDO, planMove, type Task, type TaskPatch } from '@/core/model';
 import type { NewTaskOptions, TaskRepository } from '@/core/ports';
 
 export interface TasksApi {
@@ -8,7 +8,9 @@ export interface TasksApi {
   ready: boolean;
   /** The database could not be opened or read. */
   failed: boolean;
-  /** The task just deleted, available to undo until dismissed. */
+  /** The tasks deleted lately, newest last; each undo takes the newest back. */
+  removedStack: Task[];
+  /** The newest of them (or null). */
   lastRemoved: Task | null;
   add: (title: string, options?: NewTaskOptions) => Promise<void>;
   toggle: (task: Task) => Promise<void>;
@@ -28,7 +30,7 @@ export function useTasks(repo: TaskRepository, now: () => number, newId: () => s
   const [tasks, setTasks] = useState<Task[]>([]);
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
-  const [lastRemoved, setLastRemoved] = useState<Task | null>(null);
+  const [removedStack, setRemovedStack] = useState<Task[]>([]);
 
   useEffect(
     () =>
@@ -101,26 +103,27 @@ export function useTasks(repo: TaskRepository, now: () => number, newId: () => s
     async (task: Task) => {
       await guard(async () => {
         await repo.remove(task.id, now());
-        setLastRemoved(task);
+        setRemovedStack((s) => [...s, task].slice(-MAX_UNDO));
       });
     },
     [repo, now, guard],
   );
 
   const undoRemove = useCallback(async () => {
-    if (!lastRemoved) return;
-    const task = lastRemoved;
-    setLastRemoved(null);
+    const task = removedStack[removedStack.length - 1];
+    if (!task) return;
+    setRemovedStack((s) => s.slice(0, -1));
     await guard(() => repo.restore(task, now()));
-  }, [repo, now, guard, lastRemoved]);
+  }, [repo, now, guard, removedStack]);
 
-  const dismissUndo = useCallback(() => setLastRemoved(null), []);
+  const dismissUndo = useCallback(() => setRemovedStack([]), []);
 
   return {
     tasks,
     ready,
     failed,
-    lastRemoved,
+    removedStack,
+    lastRemoved: removedStack[removedStack.length - 1] ?? null,
     add,
     toggle,
     edit,

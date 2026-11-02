@@ -131,9 +131,9 @@ export function TasksScreen(p: TasksScreenProps) {
       {p.removed && (
         <UndoToast
           message={
-            p.removed.kind === 'list'
+            (p.removed.kind === 'list'
               ? `اتحذفت القائمة: ${p.removed.label}`
-              : `اتحذفت: ${p.removed.label}`
+              : `اتحذفت: ${p.removed.label}`) + (p.removed.more > 0 ? ` (+${p.removed.more})` : '')
           }
           onUndo={p.onUndo}
           onDismiss={p.onDismissUndo}
