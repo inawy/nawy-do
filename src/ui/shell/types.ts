@@ -27,6 +27,10 @@ export interface TasksScreenProps {
   removed: { kind: 'task' | 'list'; label: string; more: number } | null;
   /** Set when a new app version is waiting. */
   applyUpdate: (() => void) | undefined;
+  /** Set while the browser offers to install the app. */
+  onInstall: (() => void) | undefined;
+  /** Opened by the «new intention» shortcut: focus the add field. */
+  focusAdd: boolean;
   onSelect: (s: Selection) => void;
   onAdd: (title: string) => void;
   onToggle: (t: Task) => void;

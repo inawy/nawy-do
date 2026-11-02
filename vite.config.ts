@@ -27,9 +27,26 @@ export default defineConfig({
         description: 'ناوي تعمل إيه؟ مهامك على جهازك، وتشتغل بلا إنترنت.',
         lang: 'ar',
         dir: 'rtl',
+        id: './',
         start_url: './',
         scope: './',
         display: 'standalone',
+        display_override: ['standalone', 'minimal-ui'],
+        categories: ['productivity'],
+        shortcuts: [
+          {
+            name: 'نية جديدة',
+            short_name: 'نية جديدة',
+            url: './?new=1',
+            icons: [{ src: 'icons/icon-192.png', sizes: '192x192', type: 'image/png' }],
+          },
+        ],
+        // Sharing text from any Android app (GET, so it works with the offline-first shell).
+        share_target: {
+          action: './',
+          method: 'GET',
+          params: { title: 'share_title', text: 'share_text', url: 'share_url' },
+        },
         theme_color: '#f8fafc',
         background_color: '#f8fafc',
         icons: [

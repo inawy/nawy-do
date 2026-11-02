@@ -11,3 +11,4 @@ export * from './lists';
 export * from './selection';
 export * from './search';
 export * from './view';
+export * from './launch';
