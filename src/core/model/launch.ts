@@ -13,12 +13,13 @@ const MAX_SHARED = 1000;
 
 export function parseLaunch(search: string): Launch {
   const q = new URLSearchParams(search);
-  const parts: string[] = [];
-  for (const key of ['share_title', 'share_text', 'share_url']) {
-    const v = (q.get(key) ?? '').replace(/\s+/g, ' ').trim();
-    // Android often repeats the title inside the text, or the URL inside the text.
-    if (v !== '' && !parts.some((p) => p.includes(v))) parts.push(v);
-  }
+  const all = ['share_title', 'share_text', 'share_url']
+    .map((key) => (q.get(key) ?? '').replace(/\s+/g, ' ').trim())
+    .filter((v) => v !== '');
+  // Android often repeats the title inside the text, or the URL inside the text: keep the longer.
+  const parts = all.filter(
+    (v, i) => !all.some((o, j) => j !== i && o.includes(v) && (o !== v || j < i)),
+  );
   const joined = parts.join(' ').slice(0, MAX_SHARED).trim();
   return { newTask: q.get('new') === '1', shared: joined === '' ? undefined : joined };
 }
