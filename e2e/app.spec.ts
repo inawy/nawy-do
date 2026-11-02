@@ -197,3 +197,34 @@ test('dragging the sheet handle down closes it; a short drag does not', async ({
   await page.mouse.up();
   await expect(page.getByRole('dialog')).toBeHidden();
 });
+
+async function swipe(page: Page, title: string, dx: number) {
+  const box = await page.getByRole('button', { name: `تفاصيل: ${title}` }).boundingBox();
+  if (!box) throw new Error('no row');
+  const x = box.x + box.width / 2;
+  const y = box.y + box.height / 2;
+  await page.mouse.move(x, y);
+  await page.mouse.down();
+  await page.mouse.move(x + dx, y, { steps: 8 });
+  await page.mouse.up();
+}
+
+test('swiping a row toward the line end completes it (RTL: leftwards)', async ({ page }) => {
+  await add(page, 'مهمة السحب');
+  await swipe(page, 'مهمة السحب', -200);
+  await expect(page.getByText('المنجزة (1)')).toBeVisible();
+  await expect(page.getByRole('dialog')).toBeHidden(); // the release did not open the details
+});
+
+test('swiping toward the line start deletes with undo; a short swipe does nothing', async ({
+  page,
+}) => {
+  await add(page, 'مهمة الحذف');
+  await swipe(page, 'مهمة الحذف', 40);
+  await expect(page.getByText('مهمة الحذف', { exact: true })).toBeVisible();
+  await expect(page.getByText('المنجزة (1)')).toBeHidden();
+  await swipe(page, 'مهمة الحذف', 200);
+  await expect(page.getByText('اتحذفت: مهمة الحذف')).toBeVisible();
+  await page.getByRole('button', { name: 'تراجع' }).click();
+  await expect(page.getByText('مهمة الحذف', { exact: true })).toBeVisible();
+});

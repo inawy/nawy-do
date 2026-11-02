@@ -85,6 +85,7 @@ export function TasksScreen(p: TasksScreenProps) {
             onToggle={p.onToggle}
             onStar={p.onStar}
             onOpen={p.onOpen}
+            onRemove={p.onRemove}
             onMove={p.onMove}
             picked={ui.picked ?? undefined}
             onPick={ui.pick}

@@ -17,6 +17,7 @@ interface Props {
   onToggle: (task: Task) => void;
   onStar: (task: Task) => void;
   onOpen: (task: Task) => void;
+  onRemove: (task: Task) => void;
   onMove: (id: string, toIndex: number) => void;
   /** Selection mode when present. */
   picked?: ReadonlySet<string>;
@@ -38,6 +39,7 @@ export function TaskList({
   onToggle,
   onStar,
   onOpen,
+  onRemove,
   onMove,
   picked,
   onPick,
@@ -53,6 +55,7 @@ export function TaskList({
       onToggle={onToggle}
       onStar={onStar}
       onOpen={onOpen}
+      onRemove={onRemove}
       sort={sort}
       pick={picked && onPick ? { on: picked.has(t.id), onToggle: () => onPick(t.id) } : undefined}
     />
