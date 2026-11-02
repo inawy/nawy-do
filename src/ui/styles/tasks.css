@@ -66,6 +66,8 @@
   padding-inline-end: 0.25rem;
   background: var(--page);
   touch-action: pan-y;
+  -webkit-touch-callout: none;
+  user-select: none;
 }
 .row:hover .row-slide {
   background: var(--hover);
