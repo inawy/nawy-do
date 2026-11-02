@@ -29,6 +29,8 @@ export interface Task {
 }
 
 export const MAX_LISTS = 50;
+/** How many deletions (tasks or lists) can be undone one after another. */
+export const MAX_UNDO = 10;
 export const MAX_LIST_NAME = 100;
 
 /** A named list of tasks (D-017). The main list is implicit: it has no record. */

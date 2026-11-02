@@ -23,7 +23,8 @@ export interface TasksScreenProps {
   failed: boolean;
   editing: Task | undefined;
   /** The task or list just deleted (at most one is offered for undo). */
-  removed: { kind: 'task' | 'list'; label: string } | null;
+  /** The newest deletion; `more` = how many older ones can be undone after it. */
+  removed: { kind: 'task' | 'list'; label: string; more: number } | null;
   /** Set when a new app version is waiting. */
   applyUpdate: (() => void) | undefined;
   onSelect: (s: Selection) => void;
