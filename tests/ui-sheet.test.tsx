@@ -34,10 +34,9 @@ describe('Sheet', () => {
     expect(onClose).toHaveBeenCalledTimes(2);
   });
 
-  it('closes on the system Back button (popstate) and pushes only one history entry', () => {
-    const before = window.history.length;
+  it('closes on the system Back button (popstate) and owns a history entry', () => {
     const onClose = open();
-    expect(window.history.length).toBe(before + 1);
+    expect(window.history.state).toEqual({ nawySheet: true });
     act(() => {
       window.dispatchEvent(new PopStateEvent('popstate'));
     });
