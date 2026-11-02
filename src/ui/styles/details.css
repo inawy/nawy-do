@@ -15,9 +15,21 @@
   overflow: auto;
   background: var(--card);
   border-radius: 20px 20px 0 0;
+  padding: 0 1rem calc(1rem + env(safe-area-inset-bottom));
+}
+.sheet-grab {
   display: grid;
-  gap: 0.75rem;
-  padding: 0.5rem 1rem calc(1rem + env(safe-area-inset-bottom));
+  place-items: center;
+  block-size: 1.5rem;
+  margin-inline: -1rem;
+  touch-action: none;
+  cursor: grab;
+}
+.sheet-grab span {
+  inline-size: 2.5rem;
+  block-size: 0.25rem;
+  border-radius: 999px;
+  background: var(--line);
 }
 .sheet-head {
   display: flex;
@@ -84,7 +96,6 @@
   }
   .sheet {
     border-radius: 20px;
-    padding-block-start: 0.75rem;
     box-shadow: 0 12px 40px rgb(0 0 0 / 0.3);
   }
 }

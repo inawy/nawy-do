@@ -1,5 +1,6 @@
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { Button, CloseIcon, IconButton } from '../primitives';
+import { Sheet } from '../sheet';
 
 export type Outcome =
   | { kind: 'exported' }
@@ -64,85 +65,69 @@ export function BackupSheet({
 }: Props) {
   const file = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [onClose]);
-
   return (
-    <div className="backdrop" onClick={onClose}>
-      <div
-        className="sheet"
-        role="dialog"
-        aria-modal="true"
-        aria-label="بياناتي"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="sheet-head">
-          <h2 className="sheet-heading">بياناتي</h2>
-          <IconButton label="إغلاق" onClick={onClose}>
-            <CloseIcon />
-          </IconButton>
-        </div>
-        <p className="hint">كل نواياك محفوظة على جهازك بس. خُد نسخة احتياطية تحفظها عندك.</p>
-        {storage === 'persisted' ? (
-          <p className="form-ok">التخزين محمي من المسح التلقائي.</p>
-        ) : storage === 'best-effort' || storage === 'unsupported' ? (
-          <p className="form-warn">
-            المتصفح ممكن يمسح بيانات الموقع لو الجهاز ضاق. ثبّت التطبيق على الشاشة الرئيسية وخُد
-            نسخة احتياطية بانتظام.
-          </p>
-        ) : null}
-        <div className="actions data-actions">
-          <Button variant="primary" onClick={onExport}>
-            تنزيل نسخة احتياطية
-          </Button>
-          <Button onClick={() => file.current?.click()}>استيراد من ملف</Button>
-          <input
-            ref={file}
-            type="file"
-            accept="application/json,.json"
-            hidden
-            aria-label="ملف النسخة الاحتياطية"
-            onChange={(e) => {
-              const picked = e.target.files?.[0];
-              e.target.value = '';
-              if (picked) onImport(picked);
-            }}
-          />
-        </div>
-        {outcome && (
-          <p
-            className={outcome.kind === 'error' ? 'form-error' : 'form-ok'}
-            role={outcome.kind === 'error' ? 'alert' : 'status'}
-          >
-            {describeOutcome(outcome)}
-          </p>
-        )}
-        {snapshots.length > 0 && (
-          <section className="snapshots">
-            <h3>نسخ أمان قبل التحديثات</h3>
-            <p className="hint">
-              التطبيق بياخد نسخة تلقائيًا قبل ما يغيّر شكل التخزين. الاسترجاع بيدمجها مع بياناتك
-              الحالية.
-            </p>
-            <ul>
-              {snapshots.map((s) => (
-                <li key={s.id}>
-                  <span>{s.label}</span>
-                  <Button onClick={() => onRestore(s.id)}>
-                    استرجاع
-                    <span className="sr-only"> نسخة {s.label}</span>
-                  </Button>
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
+    <Sheet label="بياناتي" onClose={onClose}>
+      <div className="sheet-head">
+        <h2 className="sheet-heading">بياناتي</h2>
+        <IconButton label="إغلاق" onClick={onClose}>
+          <CloseIcon />
+        </IconButton>
       </div>
-    </div>
+      <p className="hint">كل نواياك محفوظة على جهازك بس. خُد نسخة احتياطية تحفظها عندك.</p>
+      {storage === 'persisted' ? (
+        <p className="form-ok">التخزين محمي من المسح التلقائي.</p>
+      ) : storage === 'best-effort' || storage === 'unsupported' ? (
+        <p className="form-warn">
+          المتصفح ممكن يمسح بيانات الموقع لو الجهاز ضاق. ثبّت التطبيق على الشاشة الرئيسية وخُد نسخة
+          احتياطية بانتظام.
+        </p>
+      ) : null}
+      <div className="actions data-actions">
+        <Button variant="primary" onClick={onExport}>
+          تنزيل نسخة احتياطية
+        </Button>
+        <Button onClick={() => file.current?.click()}>استيراد من ملف</Button>
+        <input
+          ref={file}
+          type="file"
+          accept="application/json,.json"
+          hidden
+          aria-label="ملف النسخة الاحتياطية"
+          onChange={(e) => {
+            const picked = e.target.files?.[0];
+            e.target.value = '';
+            if (picked) onImport(picked);
+          }}
+        />
+      </div>
+      {outcome && (
+        <p
+          className={outcome.kind === 'error' ? 'form-error' : 'form-ok'}
+          role={outcome.kind === 'error' ? 'alert' : 'status'}
+        >
+          {describeOutcome(outcome)}
+        </p>
+      )}
+      {snapshots.length > 0 && (
+        <section className="snapshots">
+          <h3>نسخ أمان قبل التحديثات</h3>
+          <p className="hint">
+            التطبيق بياخد نسخة تلقائيًا قبل ما يغيّر شكل التخزين. الاسترجاع بيدمجها مع بياناتك
+            الحالية.
+          </p>
+          <ul>
+            {snapshots.map((s) => (
+              <li key={s.id}>
+                <span>{s.label}</span>
+                <Button onClick={() => onRestore(s.id)}>
+                  استرجاع
+                  <span className="sr-only"> نسخة {s.label}</span>
+                </Button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+    </Sheet>
   );
 }
