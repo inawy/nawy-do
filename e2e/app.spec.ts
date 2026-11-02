@@ -228,3 +228,23 @@ test('swiping toward the line start deletes with undo; a short swipe does nothin
   await page.getByRole('button', { name: 'تراجع' }).click();
   await expect(page.getByText('مهمة الحذف', { exact: true })).toBeVisible();
 });
+
+test('a long press on a row starts selection with it picked', async ({ page }) => {
+  await add(page, 'ضغطة طويلة');
+  await add(page, 'نية تانية');
+  const box = await page.getByRole('button', { name: 'تفاصيل: ضغطة طويلة' }).boundingBox();
+  if (!box) throw new Error('no row');
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.down();
+  await page.waitForTimeout(700);
+  await page.mouse.up();
+  await expect(page.getByRole('checkbox', { name: 'تحديد: ضغطة طويلة' })).toBeChecked();
+  await expect(page.getByRole('checkbox', { name: 'تحديد: نية تانية' })).not.toBeChecked();
+  await expect(page.getByRole('dialog')).toBeHidden();
+});
+
+test('a normal tap still opens the details (no long press)', async ({ page }) => {
+  await add(page, 'ضغطة قصيرة');
+  await page.getByRole('button', { name: 'تفاصيل: ضغطة قصيرة' }).click();
+  await expect(page.getByRole('dialog')).toBeVisible();
+});

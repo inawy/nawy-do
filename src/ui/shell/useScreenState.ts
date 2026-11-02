@@ -30,6 +30,11 @@ export function useScreenState() {
       setPicked((cur) => (cur ? null : new Set()));
     },
     stopSelecting: () => setPicked(null),
+    /** Long press on a row: selection starts with that row picked (search is left). */
+    startSelecting: (id: string) => {
+      setQuery(null);
+      setPicked(new Set([id]));
+    },
     pick: (id: string) =>
       setPicked((cur) => {
         const next = new Set(cur);

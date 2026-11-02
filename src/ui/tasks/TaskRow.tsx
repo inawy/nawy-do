@@ -11,6 +11,8 @@ interface Props {
   onOpen: (task: Task) => void;
   /** Swipe toward the line's start deletes (with undo). */
   onRemove: (task: Task) => void;
+  /** Long press starts selection with this task picked. */
+  onLongPress?: (task: Task) => void;
   /** Present only when the row can be re-ordered. */
   sort?: SortState;
   /** Selection mode: the row is picked instead of completed, starred or opened. */
@@ -18,7 +20,17 @@ interface Props {
 }
 
 /** One intention: circle to complete, the text opens the details, the star marks it. */
-export function TaskRow({ task, today, onToggle, onStar, onOpen, onRemove, sort, pick }: Props) {
+export function TaskRow({
+  task,
+  today,
+  onToggle,
+  onStar,
+  onOpen,
+  onRemove,
+  onLongPress,
+  sort,
+  pick,
+}: Props) {
   const done = task.status === 'done';
   const state = task.due ? dueState(task.due, today) : undefined;
   const progress = stepProgress(task);
@@ -27,6 +39,7 @@ export function TaskRow({ task, today, onToggle, onStar, onOpen, onRemove, sort,
     enabled: !pick && !sort?.dragging,
     onComplete: () => onToggle(task),
     onRemove: () => onRemove(task),
+    onLongPress: onLongPress && !pick ? () => onLongPress(task) : undefined,
   });
   return (
     <li

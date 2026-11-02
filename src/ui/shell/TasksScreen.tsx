@@ -86,6 +86,7 @@ export function TasksScreen(p: TasksScreenProps) {
             onStar={p.onStar}
             onOpen={p.onOpen}
             onRemove={p.onRemove}
+            onLongPress={(t) => ui.startSelecting(t.id)}
             onMove={p.onMove}
             picked={ui.picked ?? undefined}
             onPick={ui.pick}
