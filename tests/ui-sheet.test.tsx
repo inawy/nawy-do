@@ -2,7 +2,11 @@ import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { Sheet } from '@/ui/sheet';
 
-afterEach(cleanup);
+// Unmounting a sheet pops its history entry asynchronously; let that settle between tests.
+afterEach(async () => {
+  cleanup();
+  await new Promise((r) => setTimeout(r, 50));
+});
 
 const open = (onClose = vi.fn(), onSubmit?: () => void) => {
   const props = onSubmit ? { onSubmit } : {};
