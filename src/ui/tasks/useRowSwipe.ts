@@ -48,6 +48,8 @@ export function useRowSwipe({ enabled, onComplete, onRemove, onLongPress }: Opti
   const handlers = {
     onPointerDown(e: PointerEvent<HTMLElement>) {
       if (!enabled || (e.pointerType === 'mouse' && e.button !== 0)) return;
+      // A drag started on the re-order handle belongs to the drag library, not to a swipe.
+      if ((e.target as Element).closest('[data-no-swipe]')) return;
       track.current = { x0: e.clientX, y0: e.clientY, active: false, dx: 0, passed: false };
       stopTimer();
       if (onLongPress) {
