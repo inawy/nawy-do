@@ -16,6 +16,19 @@ export function parseCivil(s: string): { y: number; m: number; d: number } | und
   return { y, m, d };
 }
 
+const TIME_SHAPE = /^([01]\d|2[0-3]):[0-5]\d$/;
+/** A time of day, `HH:MM`, 24 h. */
+export const isCivilTime = (s: string): boolean => TIME_SHAPE.test(s);
+
+/** `21:30` → «9:30 م». Anything that is not a time is returned as it is. */
+export function formatTime(time: string): string {
+  if (!isCivilTime(time)) return time;
+  const h = Number(time.slice(0, 2));
+  const minutes = time.slice(3);
+  const hour12 = h % 12 === 0 ? 12 : h % 12;
+  return `${hour12}:${minutes} ${h < 12 ? 'ص' : 'م'}`;
+}
+
 export const isCivilDate = (s: string): boolean => parseCivil(s) !== undefined;
 
 /** Days since 1970-01-01 (Hinnant's algorithm). */

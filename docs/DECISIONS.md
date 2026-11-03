@@ -212,3 +212,7 @@ Tailwind 4.3.3 via `@tailwindcss/vite`, as the design system prescribes. Only `t
 ## D-031 — Sort mode is a per-device preference, not data
 
 Manual / by date / alphabetical applies to open tasks in the main list, a list and favourites (scheduled and today are always by date). It is stored in `localStorage` (guarded; the app works without it), never in the database or the backup file, so it cannot conflict in a merge and does not change the schema. Sorting is a stable, pure view over the manual order (`core/model/sorting.ts`); dragging is available in manual order only, because a drop position means nothing in a sorted list.
+
+## D-032 — Due time is a civil time of day
+
+`Task.dueTime` (`HH:MM`, 24 h, no time zone, needs `due`), like the date: «9:30 صباحًا where the user is». It is stored in the record (envelope `schemaVersion` 4; versions 2 and 3 still import), shown on the row, and used to order tasks within a day (all-day before timed). It does not by itself make a task overdue (the core has no clock, D-005) and it fires nothing: reminders are a separate decision, because without a server they can only run while the app is open or through limited browser mechanisms. Completing a repeating task keeps its time.

@@ -23,7 +23,7 @@ export function sortOpen(tasks: readonly Task[], mode: SortMode): Task[] {
   const rank = (t: Task): number => index.get(t.id) ?? 0;
   const byDate = (a: Task, b: Task): number =>
     a.due === b.due
-      ? 0
+      ? (a.dueTime ?? '').localeCompare(b.dueTime ?? '') // all-day before timed, same day
       : a.due === undefined
         ? 1
         : b.due === undefined

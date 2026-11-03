@@ -26,7 +26,12 @@ export interface ScheduledGroups {
 export function groupScheduled(tasks: readonly Task[], today: string): ScheduledGroups {
   const dated = tasks
     .filter((t) => t.status === 'open' && t.deletedAt === undefined && t.due !== undefined)
-    .sort((a, b) => (a.due ?? '').localeCompare(b.due ?? '') || a.sortOrder - b.sortOrder);
+    .sort(
+      (a, b) =>
+        (a.due ?? '').localeCompare(b.due ?? '') ||
+        (a.dueTime ?? '').localeCompare(b.dueTime ?? '') ||
+        a.sortOrder - b.sortOrder,
+    );
   return {
     overdue: dated.filter((t) => (t.due ?? '') < today),
     today: dated.filter((t) => t.due === today),

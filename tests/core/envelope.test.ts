@@ -41,7 +41,7 @@ describe('envelope', () => {
     expect(parseEnvelope('{')).toEqual({ ok: false, error: { code: 'not-json' } });
     const wrong = parseEnvelope(text({ ...base, app: 'nawy-today' }));
     expect(!wrong.ok && wrong.error.code).toBe('wrong-app');
-    const newer = parseEnvelope(text({ ...base, schemaVersion: 4 }));
+    const newer = parseEnvelope(text({ ...base, schemaVersion: 5 }));
     expect(!newer.ok && newer.error.code).toBe('newer-version');
     const bad = parseEnvelope(text({ ...base, tasks: [{ ...t, status: 'zzz' }] }));
     expect(!bad.ok && bad.error).toEqual({ code: 'invalid-record', index: 0, reason: 'status' });
@@ -82,7 +82,7 @@ describe('envelope with lists (version 2)', () => {
   it('upgrades a real version-1 file with the shipped migration (no lists, tasks kept)', () => {
     const v1 = { app: 'nawy-do', schemaVersion: 1, exportedAt: 1, tasks: [t] };
     const r = parseEnvelope(text(v1));
-    expect(r.ok && r.value.schemaVersion).toBe(3);
+    expect(r.ok && r.value.schemaVersion).toBe(4);
     expect(r.ok && r.value.tasks).toEqual([t]);
     expect(r.ok && r.value.lists).toEqual([]);
   });
@@ -142,5 +142,18 @@ describe('version 3 (repeating tasks)', () => {
     const v2 = { app: 'nawy-do', schemaVersion: 2, exportedAt: 1, tasks: [t], lists: [] };
     const r = parseEnvelope(JSON.stringify(v2));
     expect(r.ok && r.value.tasks).toEqual([t]);
+  });
+});
+
+describe('version 4 (time of day)', () => {
+  it('round-trips a timed task and still reads version 2 and 3 files', () => {
+    const timed = { ...t, due: '2026-11-03', dueTime: '09:30' };
+    const back = parseEnvelope(JSON.stringify(buildEnvelope([timed], [], 5)));
+    expect(back.ok && back.value.tasks[0]?.dueTime).toBe('09:30');
+    for (const schemaVersion of [2, 3]) {
+      const old = { app: 'nawy-do', schemaVersion, exportedAt: 1, tasks: [t], lists: [] };
+      const r = parseEnvelope(JSON.stringify(old));
+      expect(r.ok && r.value.tasks).toEqual([t]);
+    }
   });
 });

@@ -43,6 +43,7 @@ export function DetailsSheet({ task, lists, today, onSave, onRemove, onClose }: 
   const [title, setTitle] = useState(task.title);
   const [notes, setNotes] = useState(task.notes ?? '');
   const [due, setDue] = useState(task.due ?? '');
+  const [dueTime, setDueTime] = useState(task.dueTime ?? '');
   const [repeat, setRepeat] = useState<Repeat | ''>(task.repeat ?? '');
   const [starred, setStarred] = useState(task.starred);
   const [steps, setSteps] = useState<Step[]>(task.steps ?? []);
@@ -72,6 +73,7 @@ export function DetailsSheet({ task, lists, today, onSave, onRemove, onClose }: 
           title,
           notes,
           due,
+          dueTime: due === '' ? '' : dueTime,
           repeat: due === '' ? '' : repeat,
           steps: all,
           starred,
@@ -138,6 +140,15 @@ export function DetailsSheet({ task, lists, today, onSave, onRemove, onClose }: 
             بدون تاريخ
           </Chip>
         </span>
+      </Field>
+
+      <Field label="الساعة">
+        <TextInput
+          type="time"
+          value={due === '' ? '' : dueTime}
+          disabled={due === ''}
+          onChange={(e) => setDueTime(e.target.value)}
+        />
       </Field>
 
       <Field label="تكرار">

@@ -1,4 +1,4 @@
-import { isCivilDate } from './civil';
+import { isCivilDate, isCivilTime } from './civil';
 import { err, ok, type Result } from './result';
 import {
   MAX_LIST_NAME,
@@ -66,6 +66,12 @@ export function parseTask(raw: unknown): Result<Task, string> {
   if (r['due'] !== undefined) {
     if (typeof r['due'] !== 'string' || !isCivilDate(r['due'])) return err('due');
     task.due = r['due'];
+  }
+  if (r['dueTime'] !== undefined) {
+    if (typeof r['dueTime'] !== 'string' || !isCivilTime(r['dueTime']) || task.due === undefined) {
+      return err('dueTime');
+    }
+    task.dueTime = r['dueTime'];
   }
   if (r['repeat'] !== undefined) {
     const repeat = REPEATS.find((x) => x === r['repeat']);

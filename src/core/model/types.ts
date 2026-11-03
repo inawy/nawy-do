@@ -21,6 +21,8 @@ export interface Task {
   starred: boolean;
   /** Due date, civil `YYYY-MM-DD`, no time zone. */
   due?: string;
+  /** Time of day of the due date, `HH:MM` (24 h, local, no time zone). Needs `due`. */
+  dueTime?: string;
   /**
    * Completing a repeating task moves `due` to the next occurrence and keeps the task open (one
    * record, so two devices completing the same occurrence agree instead of duplicating).
