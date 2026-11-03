@@ -331,3 +331,13 @@ test('sorting alphabetically orders the list, hides dragging, and is remembered'
   await chooseFromMenu(page, 'ترتيب يدوي', 'menuitemradio');
   expect(await titles()).toEqual(['تاء', 'ألف', 'باء']);
 });
+
+test('a due time is set with the date and shown on the row', async ({ page }) => {
+  await add(page, 'اجتماع');
+  await page.getByRole('button', { name: 'تفاصيل: اجتماع' }).click();
+  await expect(page.getByLabel('الساعة')).toBeDisabled(); // no date yet
+  await page.getByRole('button', { name: 'النهارده' }).click();
+  await page.getByLabel('الساعة').fill('21:30');
+  await page.getByRole('button', { name: 'حفظ' }).click();
+  await expect(page.getByText('النهارده · 9:30 م')).toBeVisible();
+});

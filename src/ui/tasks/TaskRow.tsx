@@ -1,4 +1,11 @@
-import { dueState, formatDue, REPEAT_LABEL, stepProgress, type Task } from '@/core/model';
+import {
+  dueState,
+  formatDue,
+  formatTime,
+  REPEAT_LABEL,
+  stepProgress,
+  type Task,
+} from '@/core/model';
 import { AllIcon, GripIcon, StarIcon, TrashIcon } from '../primitives';
 import type { SortState } from '../sortable';
 import { useRowSwipe } from './useRowSwipe';
@@ -89,6 +96,7 @@ export function TaskRow({
               {task.due && (
                 <span className={done ? 'chip' : `chip ${state ?? ''}`}>
                   {formatDue(task.due, today)}
+                  {task.dueTime && ` · ${formatTime(task.dueTime)}`}
                 </span>
               )}
               {repeatText && !done && <span className="chip">{repeatText}</span>}

@@ -1,4 +1,4 @@
-import { isCivilDate } from './civil';
+import { isCivilDate, isCivilTime } from './civil';
 import { isRepeating, nextDue } from './recurrence';
 import { MAX_STEPS, MAX_STEP_TITLE, type Repeat, type Step, type Task } from './types';
 
@@ -24,7 +24,7 @@ export function createTask(id: string, title: string, now: number, sortOrder = n
 }
 
 export type TaskPatch = Partial<
-  Pick<Task, 'title' | 'notes' | 'starred' | 'due' | 'sortOrder' | 'steps' | 'listId'>
+  Pick<Task, 'title' | 'notes' | 'starred' | 'due' | 'dueTime' | 'sortOrder' | 'steps' | 'listId'>
 > & {
   /** `''` removes the repetition. */
   repeat?: Repeat | '';
@@ -84,8 +84,18 @@ export function updateTask(task: Task, patch: TaskPatch, now: number): Task {
       else next.due = task.due;
     }
   }
-  // A repetition needs a date to repeat from.
-  if (next.due === undefined) delete next.repeat;
+  if ('dueTime' in patch) {
+    if (patch.dueTime === undefined || patch.dueTime === '') delete next.dueTime;
+    else if (!isCivilTime(patch.dueTime)) {
+      if (task.dueTime === undefined) delete next.dueTime;
+      else next.dueTime = task.dueTime;
+    }
+  }
+  // A repetition and a time of day need a date to hang on.
+  if (next.due === undefined) {
+    delete next.repeat;
+    delete next.dueTime;
+  }
   return next;
 }
 
