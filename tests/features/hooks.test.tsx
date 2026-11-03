@@ -113,7 +113,7 @@ describe('useTasks on the ports', () => {
 describe('useLists on the ports', () => {
   it('creates, renames, reorders, and undoes a delete', async () => {
     const repos = createMemoryRepositories();
-    const { result } = renderHook(() => useLists(repos.lists, now, newId, today));
+    const { result } = renderHook(() => useLists(repos.lists, now, newId));
     await act(async () => {
       expect(typeof (await result.current.add('أ'))).toBe('object');
       expect(typeof (await result.current.add('ب'))).toBe('object');

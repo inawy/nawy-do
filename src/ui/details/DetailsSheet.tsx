@@ -140,6 +140,22 @@ export function DetailsSheet({ task, lists, today, onSave, onRemove, onClose }: 
         </span>
       </Field>
 
+      <Field label="تكرار">
+        <Select
+          aria-label="تكرار"
+          value={due === '' ? '' : repeat}
+          disabled={due === ''}
+          onChange={(e) => setRepeat(REPEATS.find((r) => r === e.target.value) ?? '')}
+        >
+          <option value="">بدون تكرار</option>
+          {REPEATS.map((r) => (
+            <option key={r} value={r}>
+              {REPEAT_LABEL[r]}
+            </option>
+          ))}
+        </Select>
+      </Field>
+
       <fieldset className="steps">
         <legend>الخطوات</legend>
         <ul className="list" aria-label="الخطوات">
