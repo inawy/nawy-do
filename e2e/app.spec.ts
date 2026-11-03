@@ -377,5 +377,6 @@ test('dropping a dragged intention on a list in the navigation moves it there', 
   await expect(page.getByText('منقولة', { exact: true })).toBeHidden();
   await expect(page.getByText('باقية', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: /^هدف/ }).click();
+  expect(await page.locator('body').innerText()).toContain('منقولة');
   await expect(page.getByText('منقولة', { exact: true })).toBeVisible();
 });
