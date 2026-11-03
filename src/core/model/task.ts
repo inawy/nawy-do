@@ -1,5 +1,6 @@
 import { isCivilDate } from './civil';
-import { MAX_STEPS, MAX_STEP_TITLE, type Step, type Task } from './types';
+import { isRepeating, nextDue } from './recurrence';
+import { MAX_STEPS, MAX_STEP_TITLE, type Repeat, type Step, type Task } from './types';
 
 /**
  * The next `updatedAt`: the current time, but strictly greater than the previous value, so two
@@ -24,7 +25,10 @@ export function createTask(id: string, title: string, now: number, sortOrder = n
 
 export type TaskPatch = Partial<
   Pick<Task, 'title' | 'notes' | 'starred' | 'due' | 'sortOrder' | 'steps' | 'listId'>
->;
+> & {
+  /** `''` removes the repetition. */
+  repeat?: Repeat | '';
+};
 
 /** Trims titles, drops empty ones and duplicate ids, and caps the count. */
 export function cleanSteps(steps: readonly Step[]): Step[] {
@@ -51,7 +55,12 @@ export function stepProgress(task: Task): { done: number; total: number } | unde
  * or `due` set to `undefined` or `''` removes the field.
  */
 export function updateTask(task: Task, patch: TaskPatch, now: number): Task {
-  const next: Task = { ...task, ...patch, updatedAt: nextUpdatedAt(task.updatedAt, now) };
+  const { repeat, ...rest } = patch;
+  const next: Task = { ...task, ...rest, updatedAt: nextUpdatedAt(task.updatedAt, now) };
+  if ('repeat' in patch) {
+    if (repeat === undefined || repeat === '') delete next.repeat;
+    else next.repeat = repeat;
+  }
   if (patch.title !== undefined) {
     const title = patch.title.trim();
     if (title === '') next.title = task.title;
@@ -75,12 +84,23 @@ export function updateTask(task: Task, patch: TaskPatch, now: number): Task {
       else next.due = task.due;
     }
   }
+  // A repetition needs a date to repeat from.
+  if (next.due === undefined) delete next.repeat;
   return next;
 }
 
-export function completeTask(task: Task, now: number): Task {
+/**
+ * Completes a task. A repeating one is not finished: its due date moves to the next occurrence
+ * (after `today`), its steps start over, and it stays open.
+ */
+export function completeTask(task: Task, now: number, today: string): Task {
   if (task.status === 'done') return task;
   const t = nextUpdatedAt(task.updatedAt, now);
+  if (isRepeating(task)) {
+    const next: Task = { ...task, due: nextDue(task.due, task.repeat, today), updatedAt: t };
+    if (task.steps) next.steps = task.steps.map((s) => ({ ...s, done: false }));
+    return next;
+  }
   return { ...task, status: 'done', doneAt: t, updatedAt: t };
 }
 

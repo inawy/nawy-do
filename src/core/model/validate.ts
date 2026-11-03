@@ -4,6 +4,8 @@ import {
   MAX_LIST_NAME,
   MAX_STEPS,
   MAX_STEP_TITLE,
+  REPEATS,
+  type Repeat,
   type Step,
   type Task,
   type TaskList,
@@ -64,6 +66,11 @@ export function parseTask(raw: unknown): Result<Task, string> {
   if (r['due'] !== undefined) {
     if (typeof r['due'] !== 'string' || !isCivilDate(r['due'])) return err('due');
     task.due = r['due'];
+  }
+  if (r['repeat'] !== undefined) {
+    const repeat = REPEATS.find((x) => x === r['repeat']);
+    if (repeat === undefined || task.due === undefined) return err('repeat');
+    task.repeat = repeat satisfies Repeat;
   }
   if (r['steps'] !== undefined) {
     const steps = parseSteps(r['steps']);

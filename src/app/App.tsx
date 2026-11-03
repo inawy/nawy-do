@@ -29,7 +29,7 @@ export function App({ repositories, db, now = systemClock, today = systemToday }
     () => repositories ?? createDexieRepositories(db ?? getDb()),
     [repositories, db],
   );
-  const tasks = useTasks(repos.tasks, now, newId);
+  const tasks = useTasks(repos.tasks, now, newId, today);
   const lists = useLists(repos.lists, now, newId);
   const backup = useBackup(repos.backup, now);
   const applyUpdate = useSyncExternalStore(updateSignal.subscribe, updateSignal.get);
