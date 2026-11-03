@@ -27,10 +27,9 @@ export function nextDue(due: string, repeat: Repeat, today: string): string {
   const tc = parseCivil(today);
   if (a === undefined || t === undefined || !c || !tc) return due;
   if (repeat === 'monthly') {
-    let k = Math.max(1, tc.y * 12 + tc.m - (c.y * 12 + c.m));
-    let next = addMonths(due, k);
-    if (next <= today) next = addMonths(due, ++k);
-    return next;
+    const k = Math.max(1, tc.y * 12 + tc.m - (c.y * 12 + c.m));
+    const next = addMonths(due, k);
+    return next > today ? next : addMonths(due, k + 1);
   }
   const step = repeat === 'daily' ? 1 : 7;
   const k = Math.max(1, Math.floor((t - a) / step) + 1);

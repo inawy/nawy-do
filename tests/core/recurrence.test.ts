@@ -104,7 +104,7 @@ describe('parseTask with repeat', () => {
   });
   it('refuses an unknown one, or one without a date', () => {
     expect(parseTask({ ...base, repeat: 'hourly' })).toEqual({ ok: false, error: 'repeat' });
-    const { due: _due, ...noDue } = base;
-    expect(parseTask({ ...noDue, repeat: 'daily' })).toEqual({ ok: false, error: 'repeat' });
+    const noDue = { ...createTask('a', 'a', 100), repeat: 'daily' };
+    expect(parseTask(noDue)).toEqual({ ok: false, error: 'repeat' });
   });
 });
