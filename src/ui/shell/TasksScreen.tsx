@@ -12,7 +12,7 @@ import { useScreenState } from './useScreenState';
 
 export type { DataProps, TasksScreenProps } from './types';
 
-const TITLES = { main: 'نواياي', starred: 'المفضلة', scheduled: 'مجدولة' } as const;
+const TITLES = { main: 'نواياي', today: 'اليوم', starred: 'المفضلة', scheduled: 'مجدولة' } as const;
 
 /** The whole screen as a function of its props: easy to test and to preview without a database. */
 export function TasksScreen(p: TasksScreenProps) {
@@ -22,7 +22,7 @@ export function TasksScreen(p: TasksScreenProps) {
   const visible =
     ui.searching && ui.query !== null
       ? searchTasks(p.tasks, ui.query)
-      : tasksIn(p.tasks, p.lists, selection);
+      : tasksIn(p.tasks, p.lists, selection, p.today);
   const { editing } = p;
 
   return (
@@ -32,7 +32,7 @@ export function TasksScreen(p: TasksScreenProps) {
       </header>
       <Nav
         selection={selection}
-        counts={countsFor(p.tasks, p.lists)}
+        counts={countsFor(p.tasks, p.lists, p.today)}
         lists={p.lists}
         onSelect={(s) => {
           ui.reset();

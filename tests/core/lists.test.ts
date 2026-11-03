@@ -10,6 +10,7 @@ import {
   listSelection,
   mergeRecord,
   mergeRecords,
+  newTaskDefaults,
   planListMove,
   renameList,
   restoreList,
@@ -86,6 +87,7 @@ describe('which list a task is in', () => {
 });
 
 describe('selection', () => {
+  const T = '2026-11-01';
   const tasks = [
     inList('m1'),
     inList('w1', 'L1'),
@@ -102,20 +104,49 @@ describe('selection', () => {
   });
 
   it('shows each list its own tasks, and main also the orphans', () => {
-    expect(tasksIn(tasks, lists, 'main').map((t) => t.id)).toEqual(['m1', 'orphan']);
-    expect(tasksIn(tasks, lists, listSelection('L1')).map((t) => t.id)).toEqual(['w1', 'w2']);
-    expect(tasksIn(tasks, lists, 'starred').map((t) => t.id)).toEqual(['w2']);
-    expect(tasksIn(tasks, lists, 'scheduled')).toHaveLength(5);
-    expect(groupIn(tasks, lists, listSelection('L2')).open.map((t) => t.id)).toEqual(['h1']);
+    expect(tasksIn(tasks, lists, 'main', T).map((t) => t.id)).toEqual(['m1', 'orphan']);
+    expect(tasksIn(tasks, lists, listSelection('L1'), T).map((t) => t.id)).toEqual(['w1', 'w2']);
+    expect(tasksIn(tasks, lists, 'starred', T).map((t) => t.id)).toEqual(['w2']);
+    expect(tasksIn(tasks, lists, 'scheduled', T)).toHaveLength(5);
+    expect(groupIn(tasks, lists, listSelection('L2'), T).open.map((t) => t.id)).toEqual(['h1']);
   });
 
   it('counts per list, with orphans counted in main', () => {
-    expect(countsFor(tasks, lists)).toEqual({
+    expect(countsFor(tasks, lists, T)).toEqual({
       main: 2,
+      today: 1,
       starred: 1,
       scheduled: 1,
       lists: { L1: 2, L2: 1 },
     });
+  });
+});
+
+describe('the today view', () => {
+  const T = '2026-11-01';
+  const make = (id: string, due: string | undefined, done = false) => {
+    const t = inList(id, undefined, due === undefined ? {} : { due });
+    return done ? { ...t, status: 'done' as const } : t;
+  };
+  const tasks = [
+    make('late', '2026-10-30'),
+    make('now', T),
+    make('later', '2026-11-02'),
+    make('none', undefined),
+    make('doneToday', T, true),
+    make('doneOld', '2026-10-30', true),
+  ];
+
+  it('shows open overdue and due-today tasks, and what was done today', () => {
+    expect(tasksIn(tasks, [], 'today', T).map((t) => t.id)).toEqual(['late', 'now', 'doneToday']);
+  });
+
+  it('counts only open overdue and due-today tasks', () => {
+    expect(countsFor(tasks, [], T).today).toBe(2);
+  });
+
+  it('gives a new task today as its date', () => {
+    expect(newTaskDefaults('today', T)).toEqual({ due: T });
   });
 });
 

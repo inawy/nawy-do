@@ -1,5 +1,12 @@
 import { listSelection, type Counts, type Selection, type TaskList } from '@/core/model';
-import { AllIcon, CalendarIcon, ListIcon, PlusIcon, StarredNavIcon } from '../primitives';
+import {
+  AllIcon,
+  CalendarIcon,
+  ListIcon,
+  PlusIcon,
+  StarredNavIcon,
+  TodayIcon,
+} from '../primitives';
 
 const SMART: {
   id: Selection;
@@ -8,6 +15,7 @@ const SMART: {
   count: keyof Counts;
 }[] = [
   { id: 'main', label: 'نواياي', icon: AllIcon, count: 'main' },
+  { id: 'today', label: 'اليوم', icon: TodayIcon, count: 'today' },
   { id: 'starred', label: 'المفضلة', icon: StarredNavIcon, count: 'starred' },
   { id: 'scheduled', label: 'مجدولة', icon: CalendarIcon, count: 'scheduled' },
 ];

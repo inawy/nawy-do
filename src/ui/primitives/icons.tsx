@@ -14,12 +14,14 @@ import MoreSvg from '../../assets/icons/more_vert.svg?react';
 import SearchSvg from '../../assets/icons/search.svg?react';
 import StarSvg from '../../assets/icons/star.svg?react';
 import StarFilledSvg from '../../assets/icons/star_fill1.svg?react';
+import TodaySvg from '../../assets/icons/today.svg?react';
 import TaskSvg from '../../assets/icons/task_alt.svg?react';
 
 export const PlusIcon = () => <AddSvg />;
 export const StarIcon = ({ on }: { on: boolean }) => (on ? <StarFilledSvg /> : <StarSvg />);
 export const AllIcon = () => <TaskSvg />;
 export const StarredNavIcon = () => <StarFilledSvg />;
+export const TodayIcon = () => <TodaySvg />;
 export const CalendarIcon = () => <CalendarSvg />;
 export const ChevronIcon = () => <ExpandSvg />;
 export const TrashIcon = () => <DeleteSvg />;

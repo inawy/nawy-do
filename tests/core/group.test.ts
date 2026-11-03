@@ -35,8 +35,9 @@ describe('countsFor', () => {
     const b = createTask('b', 'b', 2);
     const done = completeTask({ ...createTask('c', 'c', 3), starred: true }, 4);
     const dead = tombstoneTask(createTask('d', 'd', 5), 6);
-    expect(countsFor([a, b, done, dead], [])).toEqual({
+    expect(countsFor([a, b, done, dead], [], '2026-11-01')).toEqual({
       main: 2,
+      today: 1,
       starred: 1,
       scheduled: 1,
       lists: {},

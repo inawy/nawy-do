@@ -31,6 +31,7 @@ const EMPTY = {
   starred: 'مفيش نوايا مميزة. دوس على النجمة جنب أي نية.',
   search: 'مفيش نتايج. جرّب كلمة تانية.',
   scheduled: 'مفيش نوايا بتاريخ. افتح نية وحدد لها يوم.',
+  today: 'مفيش حاجة مستحقة النهارده. اكتب نية فوق وهتتحدد لها النهارده.',
 } as const;
 
 export function TaskList({
@@ -93,10 +94,10 @@ export function TaskList({
     );
   };
 
-  if (view === 'scheduled') {
+  if (view === 'scheduled' || view === 'today') {
     const g = groupScheduled(tasks, today);
     if (g.overdue.length + g.today.length + g.upcoming.length === 0) {
-      return <Empty text={EMPTY.scheduled} />;
+      return <Empty text={EMPTY[view]} />;
     }
     return (
       <>
