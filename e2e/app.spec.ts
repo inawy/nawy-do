@@ -314,3 +314,20 @@ test('completing a repeating task keeps it open on its next date', async ({ page
   await expect(page.getByText('بكرة')).toBeVisible();
   await expect(page.getByText('المنجزة')).toBeHidden();
 });
+
+test('sorting alphabetically orders the list, hides dragging, and is remembered', async ({
+  page,
+}) => {
+  await add(page, 'باء');
+  await add(page, 'ألف');
+  const titles = () => page.locator('.row .title').allTextContents();
+  expect(await titles()).toEqual(['ألف', 'باء']); // manual: newest on top
+  await add(page, 'تاء');
+  await chooseFromMenu(page, 'ترتيب أبجدي', 'menuitemradio');
+  expect(await titles()).toEqual(['ألف', 'باء', 'تاء']);
+  await expect(page.locator('.grip')).toHaveCount(0);
+  await page.reload();
+  expect(await titles()).toEqual(['ألف', 'باء', 'تاء']);
+  await chooseFromMenu(page, 'ترتيب يدوي', 'menuitemradio');
+  expect(await titles()).toEqual(['تاء', 'ألف', 'باء']);
+});

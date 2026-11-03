@@ -1,4 +1,11 @@
-import { countsFor, resolveSelection, searchTasks, selectedListId, tasksIn } from '@/core/model';
+import {
+  countsFor,
+  isSortable,
+  resolveSelection,
+  searchTasks,
+  selectedListId,
+  tasksIn,
+} from '@/core/model';
 import { BackupSheet } from '../backup';
 import { DetailsSheet } from '../details';
 import { TaskList as Tasks, UndoToast } from '../tasks';
@@ -56,6 +63,11 @@ export function TasksScreen(p: TasksScreenProps) {
           onSearch={ui.toggleSearch}
           onSelect={ui.toggleSelecting}
           onInstall={p.onInstall}
+          sort={
+            isSortable(selection) && !ui.searching
+              ? { mode: p.sort, onChange: p.onSort }
+              : undefined
+          }
           onData={() => {
             p.data.onOpen();
             ui.setDataOpen(true);
@@ -88,6 +100,7 @@ export function TasksScreen(p: TasksScreenProps) {
             onStar={p.onStar}
             onOpen={p.onOpen}
             onRemove={p.onRemove}
+            sort={p.sort}
             onLongPress={(t) => ui.startSelecting(t.id)}
             onMove={p.onMove}
             picked={ui.picked ?? undefined}

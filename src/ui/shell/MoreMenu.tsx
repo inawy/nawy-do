@@ -4,6 +4,8 @@ import { IconButton, MoreIcon } from '../primitives';
 export interface MenuAction {
   label: string;
   onPick: () => void;
+  /** Present for one of several exclusive choices: whether this one is the current. */
+  checked?: boolean;
 }
 
 /** The "more" menu: secondary actions behind one 48dp button. Closes on pick, Escape or outside tap. */
@@ -41,7 +43,8 @@ export function MoreMenu({ actions }: { actions: MenuAction[] }) {
             <button
               key={a.label}
               type="button"
-              role="menuitem"
+              role={a.checked === undefined ? 'menuitem' : 'menuitemradio'}
+              aria-checked={a.checked}
               onClick={() => {
                 setOpen(false);
                 a.onPick();

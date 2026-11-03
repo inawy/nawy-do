@@ -1,7 +1,11 @@
 import type { Page } from '@playwright/test';
 
 /** Opens the «more» menu and picks an item. */
-export async function chooseFromMenu(page: Page, name: string) {
+export async function chooseFromMenu(
+  page: Page,
+  name: string,
+  role: 'menuitem' | 'menuitemradio' = 'menuitem',
+) {
   await page.getByRole('button', { name: 'المزيد' }).click();
-  await page.getByRole('menuitem', { name }).click();
+  await page.getByRole(role, { name }).click();
 }
