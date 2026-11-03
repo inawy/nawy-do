@@ -216,3 +216,7 @@ Manual / by date / alphabetical applies to open tasks in the main list, a list a
 ## D-032 — Due time is a civil time of day
 
 `Task.dueTime` (`HH:MM`, 24 h, no time zone, needs `due`), like the date: «9:30 صباحًا where the user is». It is stored in the record (envelope `schemaVersion` 4; versions 2 and 3 still import), shown on the row, and used to order tasks within a day (all-day before timed). It does not by itself make a task overdue (the core has no clock, D-005) and it fires nothing: reminders are a separate decision, because without a server they can only run while the app is open or through limited browser mechanisms. Completing a repeating task keeps its time.
+
+## D-033 — List colours are palette names
+
+`TaskList.color` is one of eight names (`blue`, `green`, …), never a free colour: the values live in the design tokens (`--list-*`, built on the semantic colours), so a list colour follows the theme and an imported file cannot inject arbitrary CSS (`parseList` refuses anything outside the palette). Envelope `schemaVersion` 5 (versions 2–4 still import). The list repository's `rename` became `edit(id, patch)`: a name and a colour change in one write.

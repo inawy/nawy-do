@@ -1,4 +1,12 @@
-import type { Selection, SortMode, Task, TaskList, TaskPatch } from '@/core/model';
+import type {
+  ListColor,
+  ListPatch,
+  Selection,
+  SortMode,
+  Task,
+  TaskList,
+  TaskPatch,
+} from '@/core/model';
 import type { Outcome, SnapshotItem, StorageStatus } from '../backup';
 
 /** Everything the «بياناتي» sheet needs; the screen only shows it. */
@@ -45,8 +53,8 @@ export interface TasksScreenProps {
   onClose: () => void;
   onSave: (t: Task, patch: TaskPatch) => void;
   onRemove: (t: Task) => void;
-  onAddList: (name: string) => Promise<TaskList | 'empty' | 'limit' | 'failed'>;
-  onRenameList: (list: TaskList, name: string) => void;
+  onAddList: (name: string, color?: ListColor) => Promise<TaskList | 'empty' | 'limit' | 'failed'>;
+  onEditList: (list: TaskList, patch: ListPatch) => void;
   onDeleteList: (list: TaskList) => void;
   onMoveList: (list: TaskList, delta: -1 | 1) => void;
   onUndo: () => void;

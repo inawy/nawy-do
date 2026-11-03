@@ -32,3 +32,15 @@
     --danger: #ff8a80;
   }
 }
+
+/* List colours: product tokens (the design system defines the semantic colours these build on). */
+:root {
+  --list-blue: var(--nawy-color-brand);
+  --list-green: var(--nawy-color-success);
+  --list-amber: var(--nawy-color-warning);
+  --list-red: var(--nawy-color-danger);
+  --list-purple: #7a5af8;
+  --list-teal: #0e9384;
+  --list-pink: #d6409f;
+  --list-gray: #667085;
+}

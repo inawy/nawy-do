@@ -3,6 +3,8 @@ import type {
   EnvelopeOptions,
   ListOrderChange,
   OrderChange,
+  ListColor,
+  ListPatch,
   Result,
   Task,
   TaskList,
@@ -49,8 +51,8 @@ export type AddListResult = { ok: true; list: TaskList } | { ok: false; reason: 
 export interface ListRepository {
   /** Live lists in display order. */
   watch: Watch<TaskList>;
-  add(id: string, name: string, now: number): Promise<AddListResult>;
-  rename(id: string, name: string, now: number): Promise<TaskList | undefined>;
+  add(id: string, name: string, now: number, color?: ListColor): Promise<AddListResult>;
+  edit(id: string, patch: ListPatch, now: number): Promise<TaskList | undefined>;
   remove(id: string, now: number): Promise<TaskList | undefined>;
   restore(previous: TaskList, now: number): Promise<TaskList | undefined>;
   saveOrder(changes: readonly ListOrderChange[], now: number): Promise<number>;

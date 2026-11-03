@@ -106,7 +106,7 @@ export function App({ repositories, db, now = systemClock, today = systemToday }
       onSave={(t, patch) => void tasks.edit(t, patch)}
       onRemove={(t) => void tasks.remove(t)}
       onAddList={lists.add}
-      onRenameList={(l, name) => void lists.rename(l, name)}
+      onEditList={(l, patch) => void lists.edit(l, patch)}
       onDeleteList={(l) => void lists.remove(l)}
       onMoveList={(l, delta) => void lists.move(l, delta)}
       onUndo={() => void (lists.lastRemoved ? lists.undoRemove() : tasks.undoRemove())}

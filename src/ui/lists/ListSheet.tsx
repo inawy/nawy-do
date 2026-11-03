@@ -1,14 +1,16 @@
 import { useState } from 'react';
-import { MAX_LIST_NAME } from '@/core/model';
+import { MAX_LIST_NAME, type ListColor } from '@/core/model';
+import { ColorPicker } from './ColorPicker';
 import { Button, CloseIcon, Field, IconButton, TextInput, TrashIcon } from '../primitives';
 import { Sheet } from '../sheet';
 
 interface Props {
   mode: 'create' | 'edit';
   initialName: string;
+  initialColor?: ListColor | undefined;
   /** Why the last save was refused, shown under the field. */
   error?: string | undefined;
-  onSave: (name: string) => void;
+  onSave: (name: string, color: ListColor | '') => void;
   /** Edit mode: whether the list can move earlier / later, and the move itself. */
   canMoveEarlier?: boolean;
   canMoveLater?: boolean;
@@ -22,6 +24,7 @@ interface Props {
 export function ListSheet({
   mode,
   initialName,
+  initialColor,
   error,
   canMoveEarlier,
   canMoveLater,
@@ -31,6 +34,7 @@ export function ListSheet({
   onClose,
 }: Props) {
   const [name, setName] = useState(initialName);
+  const [color, setColor] = useState<ListColor | ''>(initialColor ?? '');
   const [confirming, setConfirming] = useState(false);
 
   const empty = name.trim() === '';
@@ -39,7 +43,7 @@ export function ListSheet({
       label={mode === 'create' ? 'قائمة جديدة' : 'خيارات القائمة'}
       onClose={onClose}
       onSubmit={() => {
-        if (!empty) onSave(name);
+        if (!empty) onSave(name, color);
       }}
     >
       <div className="sheet-head">
@@ -57,6 +61,7 @@ export function ListSheet({
           autoComplete="off"
         />
       </Field>
+      <ColorPicker value={color} onChange={setColor} />
       {mode === 'edit' && onMove && (
         <div className="move-row" role="group" aria-label="ترتيب القائمة">
           <Button disabled={!canMoveEarlier} onClick={() => onMove(-1)}>
