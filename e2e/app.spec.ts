@@ -293,3 +293,12 @@ test('the web manifest declares shortcuts and a share target', async ({ page, re
   expect(m.shortcuts?.[0]?.url).toContain('new=1');
   expect(m.display_override).toContain('standalone');
 });
+
+test('the today view takes new intentions as due today', async ({ page }) => {
+  await page.getByRole('button', { name: /^اليوم/ }).click();
+  await expect(page.getByRole('heading', { name: 'اليوم' })).toBeVisible();
+  await add(page, 'مهمة النهارده');
+  await expect(page.getByRole('heading', { name: 'النهارده', level: 2 })).toBeVisible();
+  await page.getByRole('button', { name: /^نواياي/ }).click();
+  await expect(page.getByText('مهمة النهارده', { exact: true })).toBeVisible();
+});

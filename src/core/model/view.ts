@@ -30,6 +30,6 @@ export function newTaskDefaults(selection: Selection, today: string): NewTaskDef
   const listId = selectedListId(selection);
   if (listId !== undefined) return { listId };
   if (selection === 'starred') return { starred: true };
-  if (selection === 'scheduled') return { due: today };
+  if (selection === 'scheduled' || selection === 'today') return { due: today };
   return {};
 }

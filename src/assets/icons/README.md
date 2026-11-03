@@ -8,6 +8,7 @@ Source: <https://github.com/google/material-design-icons> at commit `10ecc147906
 | `star.svg`, `star_fill1.svg` | favourite (outline / selected) and the favourites view |
 | `task_alt.svg`               | «نواياي» (all tasks)                                   |
 | `calendar_month.svg`         | scheduled view                                         |
+| `today.svg`                  | «اليوم» (today view)                                   |
 | `expand_more.svg`            | collapse chevron (rotated by CSS)                      |
 | `delete.svg`                 | delete                                                 |
 | `close.svg`                  | close a sheet                                          |
