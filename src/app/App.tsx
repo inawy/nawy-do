@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
-import { newTaskDefaults, resolveSelection, type Selection } from '@/core/model';
+import { newTaskDefaults, resolveSelection, type Selection, type SortMode } from '@/core/model';
 import type { Repositories } from '@/core/ports';
 import { createDexieRepositories, type NawyDoDb } from '@/data';
 import { useBackup } from '@/features/backup';
@@ -11,6 +11,7 @@ import { getDb } from './db';
 import { downloadText } from './files';
 import { installSignal } from './install';
 import { newId } from './ids';
+import { loadSort, saveSort } from './prefs';
 import { takeLaunch } from './launch';
 import { requestPersistence, type StorageState } from './storage';
 import { updateSignal } from './updateSignal';
@@ -36,6 +37,7 @@ export function App({ repositories, db, now = systemClock, today = systemToday }
   const onInstall = useSyncExternalStore(installSignal.subscribe, installSignal.get);
   const [launch] = useState(takeLaunch);
   const shareDone = useRef(false);
+  const [sort, setSort] = useState<SortMode>(loadSort);
   const [chosen, setChosen] = useState<Selection>('main');
   const [storage, setStorage] = useState<StorageState | 'unknown'>('unknown');
   const [openId, setOpenId] = useState<string | null>(null);
@@ -84,6 +86,11 @@ export function App({ repositories, db, now = systemClock, today = systemToday }
       failed={tasks.failed}
       editing={editing}
       removed={removed}
+      sort={sort}
+      onSort={(mode) => {
+        setSort(mode);
+        saveSort(mode);
+      }}
       applyUpdate={applyUpdate}
       onInstall={onInstall}
       focusAdd={launch.newTask}

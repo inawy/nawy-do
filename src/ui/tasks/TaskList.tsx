@@ -2,6 +2,9 @@ import {
   canReorder,
   groupScheduled,
   groupTasks,
+  isSortable,
+  sortOpen,
+  type SortMode,
   selectedListId,
   type Selection,
   type Task,
@@ -18,6 +21,7 @@ interface Props {
   onStar: (task: Task) => void;
   onOpen: (task: Task) => void;
   onRemove: (task: Task) => void;
+  sort: SortMode;
   onLongPress?: (task: Task) => void;
   onMove: (id: string, toIndex: number) => void;
   /** Selection mode when present. */
@@ -42,13 +46,15 @@ export function TaskList({
   onStar,
   onOpen,
   onRemove,
+  sort,
   onLongPress,
   onMove,
   picked,
   onPick,
 }: Props) {
   const grouped = groupTasks(view === 'starred' ? tasks.filter((t) => t.starred) : tasks);
-  const canSort = !picked && canReorder(view, grouped.open.length);
+  const openSorted = isSortable(view) ? sortOpen(grouped.open, sort) : grouped.open;
+  const canSort = !picked && canReorder(view, grouped.open.length, sort);
 
   const row = (t: Task, sort?: SortState) => (
     <TaskRow
@@ -123,7 +129,8 @@ export function TaskList({
     );
   }
 
-  const { open, done } = grouped;
+  const { done } = grouped;
+  const open = openSorted;
   return (
     <>
       {open.length === 0 && done.length === 0 ? (

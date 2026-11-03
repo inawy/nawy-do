@@ -1,4 +1,4 @@
-import type { Selection, Task, TaskList, TaskPatch } from '@/core/model';
+import type { Selection, SortMode, Task, TaskList, TaskPatch } from '@/core/model';
 import type { Outcome, SnapshotItem, StorageStatus } from '../backup';
 
 /** Everything the «بياناتي» sheet needs; the screen only shows it. */
@@ -25,6 +25,8 @@ export interface TasksScreenProps {
   /** The task or list just deleted (at most one is offered for undo). */
   /** The newest deletion; `more` = how many older ones can be undone after it. */
   removed: { kind: 'task' | 'list'; label: string; more: number } | null;
+  sort: SortMode;
+  onSort: (mode: SortMode) => void;
   /** Set when a new app version is waiting. */
   applyUpdate: (() => void) | undefined;
   /** Set while the browser offers to install the app. */

@@ -10,6 +10,8 @@ interface Props {
   onSearch: () => void;
   onSelect: () => void;
   onData: () => void;
+  /** Present when the view can be sorted: the current mode and how to change it. */
+  sort?: { mode: SortMode; onChange: (mode: SortMode) => void } | undefined;
   /** Present while the browser offers to install the app. */
   onInstall?: (() => void) | undefined;
 }
@@ -20,6 +22,13 @@ export function TitleBar(p: Props) {
     { label: 'تحديد', onPick: p.onSelect },
     { label: 'بياناتي', onPick: p.onData },
   ];
+  for (const mode of p.sort ? SORT_MODES : []) {
+    actions.push({
+      label: SORT_LABEL[mode],
+      checked: p.sort?.mode === mode,
+      onPick: () => p.sort?.onChange(mode),
+    });
+  }
   if (p.onInstall) actions.push({ label: 'تثبيت التطبيق', onPick: p.onInstall });
   if (p.onListOptions) actions.push({ label: 'خيارات القائمة', onPick: p.onListOptions });
   return (
