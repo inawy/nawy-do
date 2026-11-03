@@ -8,6 +8,10 @@ export interface Step {
 export const MAX_STEPS = 50;
 export const MAX_STEP_TITLE = 500;
 
+/** How often a task comes back once it is completed (it needs a due date). */
+export type Repeat = 'daily' | 'weekly' | 'monthly';
+export const REPEATS: readonly Repeat[] = ['daily', 'weekly', 'monthly'];
+
 /** A task («نية»). Dates are `YYYY-MM-DD` civil dates; instants are epoch milliseconds. */
 export interface Task {
   id: string;
@@ -17,6 +21,11 @@ export interface Task {
   starred: boolean;
   /** Due date, civil `YYYY-MM-DD`, no time zone. */
   due?: string;
+  /**
+   * Completing a repeating task moves `due` to the next occurrence and keeps the task open (one
+   * record, so two devices completing the same occurrence agree instead of duplicating).
+   */
+  repeat?: Repeat;
   steps?: Step[];
   /** The list it belongs to. Absent = the main list. A list that no longer exists = main too. */
   listId?: string;

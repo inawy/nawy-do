@@ -12,3 +12,4 @@ export * from './selection';
 export * from './search';
 export * from './view';
 export * from './launch';
+export * from './recurrence';

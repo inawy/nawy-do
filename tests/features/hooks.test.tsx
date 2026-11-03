@@ -10,13 +10,14 @@ import { createMemoryRepositories } from '../support/memory-repositories';
 // only with Dexie they would depend on it; passing here is the proof of the port (D-024).
 let clock = 1_000;
 const now = () => ++clock;
+const today = () => '2026-11-03';
 let counter = 0;
 const newId = () => `id-${++counter}`;
 
 describe('useTasks on the ports', () => {
   it('adds with the injected id, completes, and orders newest first', async () => {
     const repos = createMemoryRepositories();
-    const { result } = renderHook(() => useTasks(repos.tasks, now, newId));
+    const { result } = renderHook(() => useTasks(repos.tasks, now, newId, today));
     await act(() => result.current.add('أولى'));
     await act(() => result.current.add('ثانية'));
     await waitFor(() => expect(result.current.tasks).toHaveLength(2));
@@ -31,7 +32,7 @@ describe('useTasks on the ports', () => {
 
   it('delete writes a tombstone and undo brings the task back', async () => {
     const repos = createMemoryRepositories();
-    const { result } = renderHook(() => useTasks(repos.tasks, now, newId));
+    const { result } = renderHook(() => useTasks(repos.tasks, now, newId, today));
     await act(() => result.current.add('مؤقتة'));
     await waitFor(() => expect(result.current.tasks).toHaveLength(1));
     const task = result.current.tasks[0];
@@ -45,7 +46,7 @@ describe('useTasks on the ports', () => {
 
   it('undo is stacked: several deletions come back newest first', async () => {
     const repos = createMemoryRepositories();
-    const { result } = renderHook(() => useTasks(repos.tasks, now, newId));
+    const { result } = renderHook(() => useTasks(repos.tasks, now, newId, today));
     for (const title of ['أولى', 'تانية', 'تالتة']) await act(() => result.current.add(title));
     await waitFor(() => expect(result.current.tasks).toHaveLength(3));
     for (const title of ['أولى', 'تانية', 'تالتة']) {
@@ -66,7 +67,7 @@ describe('useTasks on the ports', () => {
 
   it('keeps at most MAX_UNDO deletions to undo', async () => {
     const repos = createMemoryRepositories();
-    const { result } = renderHook(() => useTasks(repos.tasks, now, newId));
+    const { result } = renderHook(() => useTasks(repos.tasks, now, newId, today));
     const total = MAX_UNDO + 2;
     for (let i = 0; i < total; i++) await act(() => result.current.add(`م${i}`));
     await waitFor(() => expect(result.current.tasks).toHaveLength(total));
@@ -88,13 +89,13 @@ describe('useTasks on the ports', () => {
         return () => undefined;
       },
     };
-    const { result } = renderHook(() => useTasks(broken as never, now, newId));
+    const { result } = renderHook(() => useTasks(broken as never, now, newId, today));
     await waitFor(() => expect(result.current.failed).toBe(true));
   });
 
   it('moves and completes a selection in one call', async () => {
     const repos = createMemoryRepositories();
-    const tasks = renderHook(() => useTasks(repos.tasks, now, newId));
+    const tasks = renderHook(() => useTasks(repos.tasks, now, newId, today));
     for (const t of ['أ', 'ب', 'ج']) await act(() => tasks.result.current.add(t));
     await waitFor(() => expect(tasks.result.current.tasks).toHaveLength(3));
     const ids = tasks.result.current.tasks.slice(0, 2).map((t) => t.id);

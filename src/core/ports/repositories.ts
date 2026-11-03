@@ -31,7 +31,8 @@ export interface TaskRepository {
   watch: Watch<Task>;
   add(id: string, title: string, now: number, options?: NewTaskOptions): Promise<Task>;
   edit(id: string, patch: TaskPatch, now: number): Promise<Task | undefined>;
-  complete(id: string, now: number): Promise<Task | undefined>;
+  /** `today` (civil date) is where a repeating task's next occurrence is counted from. */
+  complete(id: string, now: number, today: string): Promise<Task | undefined>;
   reopen(id: string, now: number): Promise<Task | undefined>;
   /** A tombstone; nothing is removed (D-006). */
   remove(id: string, now: number): Promise<Task | undefined>;
@@ -40,7 +41,7 @@ export interface TaskRepository {
   saveOrder(changes: readonly OrderChange[], now: number): Promise<number>;
   /** `listId` undefined moves them to the main list. Returns how many changed. */
   moveToList(ids: readonly string[], listId: string | undefined, now: number): Promise<number>;
-  completeMany(ids: readonly string[], now: number): Promise<number>;
+  completeMany(ids: readonly string[], now: number, today: string): Promise<number>;
 }
 
 export type AddListResult = { ok: true; list: TaskList } | { ok: false; reason: 'empty' | 'limit' };

@@ -94,9 +94,9 @@ export function createMemoryRepositories(): Repositories & {
         const t = liveTask(id);
         return t ? putTask(updateTask(t, patch, now)) : undefined;
       },
-      complete: async (id, now) => {
+      complete: async (id, now, today) => {
         const t = liveTask(id);
-        return t ? putTask(completeTask(t, now)) : undefined;
+        return t ? putTask(completeTask(t, now, today)) : undefined;
       },
       reopen: async (id, now) => {
         const t = liveTask(id);
@@ -124,8 +124,8 @@ export function createMemoryRepositories(): Repositories & {
       },
       moveToList: (ids, listId, now) =>
         changeMany(ids, (t) => updateTask(t, { listId: listId ?? '' }, now)),
-      completeMany: (ids, now) =>
-        changeMany(ids, (t) => (t.status === 'open' ? completeTask(t, now) : t)),
+      completeMany: (ids, now, today) =>
+        changeMany(ids, (t) => (t.status === 'open' ? completeTask(t, now, today) : t)),
     },
     lists: {
       watch: watchOf(listSubs, () => liveLists([...lists.values()])),

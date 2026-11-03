@@ -4,6 +4,9 @@ import {
   MAX_STEPS,
   MAX_STEP_TITLE,
   quickDueOptions,
+  REPEAT_LABEL,
+  REPEATS,
+  type Repeat,
   type Step,
   type Task,
   type TaskList,
@@ -40,6 +43,7 @@ export function DetailsSheet({ task, lists, today, onSave, onRemove, onClose }: 
   const [title, setTitle] = useState(task.title);
   const [notes, setNotes] = useState(task.notes ?? '');
   const [due, setDue] = useState(task.due ?? '');
+  const [repeat, setRepeat] = useState<Repeat | ''>(task.repeat ?? '');
   const [starred, setStarred] = useState(task.starred);
   const [steps, setSteps] = useState<Step[]>(task.steps ?? []);
   const [newStep, setNewStep] = useState('');
@@ -64,7 +68,15 @@ export function DetailsSheet({ task, lists, today, onSave, onRemove, onClose }: 
           pending !== '' && steps.length < MAX_STEPS
             ? [...steps, { id: crypto.randomUUID(), title: pending, done: false }]
             : steps;
-        onSave({ title, notes, due, steps: all, starred, listId });
+        onSave({
+          title,
+          notes,
+          due,
+          repeat: due === '' ? '' : repeat,
+          steps: all,
+          starred,
+          listId,
+        });
         onClose();
       }}
     >
@@ -126,6 +138,22 @@ export function DetailsSheet({ task, lists, today, onSave, onRemove, onClose }: 
             بدون تاريخ
           </Chip>
         </span>
+      </Field>
+
+      <Field label="تكرار">
+        <Select
+          aria-label="تكرار"
+          value={due === '' ? '' : repeat}
+          disabled={due === ''}
+          onChange={(e) => setRepeat(REPEATS.find((r) => r === e.target.value) ?? '')}
+        >
+          <option value="">بدون تكرار</option>
+          {REPEATS.map((r) => (
+            <option key={r} value={r}>
+              {REPEAT_LABEL[r]}
+            </option>
+          ))}
+        </Select>
       </Field>
 
       <fieldset className="steps">

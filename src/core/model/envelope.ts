@@ -5,7 +5,7 @@ import { parseList, parseTask } from './validate';
 // The export/backup file format (D-008). Every parse goes through here.
 export const APP_ID = 'nawy-do';
 /** Bump when the format changes, and add a step to MIGRATIONS for the previous version. */
-export const SCHEMA_VERSION = 2;
+export const SCHEMA_VERSION = 3;
 export const MAX_RECORDS = 100_000;
 
 export interface Envelope {
@@ -35,6 +35,8 @@ export type Migration = (envelope: Record<string, unknown>) => Record<string, un
 export const MIGRATIONS: Readonly<Record<number, Migration>> = {
   // 1 → 2: lists were added; a version-1 file has none.
   1: (envelope) => ({ ...envelope, lists: [] }),
+  // 2 → 3: tasks may repeat (an optional field); nothing to convert.
+  2: (envelope) => envelope,
 };
 
 export interface EnvelopeOptions {

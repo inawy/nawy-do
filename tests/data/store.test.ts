@@ -34,7 +34,7 @@ describe('store', () => {
     await addTask(db, 'a', 'one', 100);
     await addTask(db, 'b', 'two', 200);
     expect((await listTasks(db)).map((t) => t.id)).toEqual(['a', 'b']);
-    expect((await completeTaskById(db, 'a', 300))?.status).toBe('done');
+    expect((await completeTaskById(db, 'a', 300, '2026-11-03'))?.status).toBe('done');
     expect((await reopenTaskById(db, 'a', 400))?.status).toBe('open');
   });
 
@@ -172,8 +172,8 @@ describe('selections', () => {
   it('completes only open picked tasks', async () => {
     await addTask(db, 'a', 'أ', 1);
     await addTask(db, 'b', 'ب', 2);
-    await completeTaskById(db, 'b', 3);
-    expect(await completeTasksByIds(db, ['a', 'b'], 10)).toBe(1);
+    await completeTaskById(db, 'b', 3, '2026-11-03');
+    expect(await completeTasksByIds(db, ['a', 'b'], 10, '2026-11-03')).toBe(1);
     expect((await listTasks(db)).every((t) => t.status === 'done')).toBe(true);
   });
 });

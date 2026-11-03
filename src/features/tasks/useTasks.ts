@@ -26,7 +26,12 @@ export interface TasksApi {
 }
 
 /** Time and ids are injected so nothing below the app reads the clock or makes ids (D-005). */
-export function useTasks(repo: TaskRepository, now: () => number, newId: () => string): TasksApi {
+export function useTasks(
+  repo: TaskRepository,
+  now: () => number,
+  newId: () => string,
+  today: () => string,
+): TasksApi {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -63,10 +68,12 @@ export function useTasks(repo: TaskRepository, now: () => number, newId: () => s
   const toggle = useCallback(
     async (task: Task) => {
       await guard(() =>
-        task.status === 'open' ? repo.complete(task.id, now()) : repo.reopen(task.id, now()),
+        task.status === 'open'
+          ? repo.complete(task.id, now(), today())
+          : repo.reopen(task.id, now()),
       );
     },
-    [repo, now, guard],
+    [repo, now, today, guard],
   );
 
   const edit = useCallback(
@@ -94,9 +101,9 @@ export function useTasks(repo: TaskRepository, now: () => number, newId: () => s
 
   const completeMany = useCallback(
     async (ids: readonly string[]) => {
-      await guard(() => repo.completeMany(ids, now()));
+      await guard(() => repo.completeMany(ids, now(), today()));
     },
-    [repo, now, guard],
+    [repo, now, today, guard],
   );
 
   const remove = useCallback(

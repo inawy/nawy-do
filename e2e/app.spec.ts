@@ -302,3 +302,15 @@ test('the today view takes new intentions as due today', async ({ page }) => {
   await page.getByRole('button', { name: /^نواياي/ }).click();
   await expect(page.getByText('مهمة النهارده', { exact: true })).toBeVisible();
 });
+
+test('completing a repeating task keeps it open on its next date', async ({ page }) => {
+  await add(page, 'دواء');
+  await page.getByRole('button', { name: 'تفاصيل: دواء' }).click();
+  await page.getByRole('button', { name: 'النهارده' }).click();
+  await page.getByLabel('تكرار').selectOption('daily');
+  await page.getByRole('button', { name: 'حفظ' }).click();
+  await page.getByRole('checkbox', { name: 'إنجاز: دواء' }).click();
+  await expect(page.getByText('دواء', { exact: true })).toBeVisible();
+  await expect(page.getByText('بكرة')).toBeVisible();
+  await expect(page.getByText('المنجزة')).toBeHidden();
+});

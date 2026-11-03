@@ -41,7 +41,7 @@ describe('envelope', () => {
     expect(parseEnvelope('{')).toEqual({ ok: false, error: { code: 'not-json' } });
     const wrong = parseEnvelope(text({ ...base, app: 'nawy-today' }));
     expect(!wrong.ok && wrong.error.code).toBe('wrong-app');
-    const newer = parseEnvelope(text({ ...base, schemaVersion: 3 }));
+    const newer = parseEnvelope(text({ ...base, schemaVersion: 4 }));
     expect(!newer.ok && newer.error.code).toBe('newer-version');
     const bad = parseEnvelope(text({ ...base, tasks: [{ ...t, status: 'zzz' }] }));
     expect(!bad.ok && bad.error).toEqual({ code: 'invalid-record', index: 0, reason: 'status' });
@@ -82,7 +82,7 @@ describe('envelope with lists (version 2)', () => {
   it('upgrades a real version-1 file with the shipped migration (no lists, tasks kept)', () => {
     const v1 = { app: 'nawy-do', schemaVersion: 1, exportedAt: 1, tasks: [t] };
     const r = parseEnvelope(text(v1));
-    expect(r.ok && r.value.schemaVersion).toBe(2);
+    expect(r.ok && r.value.schemaVersion).toBe(3);
     expect(r.ok && r.value.tasks).toEqual([t]);
     expect(r.ok && r.value.lists).toEqual([]);
   });
@@ -131,5 +131,16 @@ describe('records from the future', () => {
     expect(clamped.ok && clamped.value.lists[0]?.updatedAt).toBe(limit);
     const raw = parseEnvelope(file);
     expect(raw.ok && raw.value.tasks[0]?.updatedAt).toBe(far);
+  });
+});
+
+describe('version 3 (repeating tasks)', () => {
+  it('round-trips a repeating task and still reads a version-2 file', () => {
+    const rep = { ...t, due: '2026-11-03', repeat: 'weekly' as const };
+    const back = parseEnvelope(JSON.stringify(buildEnvelope([rep], [], 5)));
+    expect(back.ok && back.value.tasks[0]?.repeat).toBe('weekly');
+    const v2 = { app: 'nawy-do', schemaVersion: 2, exportedAt: 1, tasks: [t], lists: [] };
+    const r = parseEnvelope(JSON.stringify(v2));
+    expect(r.ok && r.value.tasks).toEqual([t]);
   });
 });

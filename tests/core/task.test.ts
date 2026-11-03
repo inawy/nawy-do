@@ -23,9 +23,9 @@ describe('task model', () => {
 
   it('completes and reopens', () => {
     const t = createTask('a', 'x', 100);
-    const done = completeTask(t, 200);
+    const done = completeTask(t, 200, '2026-11-03');
     expect(done).toMatchObject({ status: 'done', doneAt: 200, updatedAt: 200 });
-    expect(completeTask(done, 300)).toBe(done);
+    expect(completeTask(done, 300, '2026-11-03')).toBe(done);
     const back = reopenTask(done, 300);
     expect(back.status).toBe('open');
     expect('doneAt' in back).toBe(false);

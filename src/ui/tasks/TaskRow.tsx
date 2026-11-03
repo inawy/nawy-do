@@ -1,4 +1,4 @@
-import { dueState, formatDue, stepProgress, type Task } from '@/core/model';
+import { dueState, formatDue, REPEAT_LABEL, stepProgress, type Task } from '@/core/model';
 import { AllIcon, GripIcon, StarIcon, TrashIcon } from '../primitives';
 import type { SortState } from '../sortable';
 import { useRowSwipe } from './useRowSwipe';
@@ -35,6 +35,7 @@ export function TaskRow({
   const state = task.due ? dueState(task.due, today) : undefined;
   const progress = stepProgress(task);
   const hasMeta = Boolean(task.due) || progress !== undefined;
+  const repeatText = task.repeat ? REPEAT_LABEL[task.repeat] : undefined;
   const swipe = useRowSwipe({
     enabled: !pick && !sort?.dragging,
     onComplete: () => onToggle(task),
@@ -90,6 +91,7 @@ export function TaskRow({
                   {formatDue(task.due, today)}
                 </span>
               )}
+              {repeatText && !done && <span className="chip">{repeatText}</span>}
               {progress && (
                 <span className="chip">
                   خطوات {progress.done}/{progress.total}

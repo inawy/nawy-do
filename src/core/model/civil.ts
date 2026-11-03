@@ -3,7 +3,7 @@
 const SHAPE = /^(\d{4})-(\d{2})-(\d{2})$/;
 
 const isLeap = (y: number): boolean => (y % 4 === 0 && y % 100 !== 0) || y % 400 === 0;
-const monthLength = (y: number, m: number): number =>
+export const monthLength = (y: number, m: number): number =>
   m === 2 ? (isLeap(y) ? 29 : 28) : [4, 6, 9, 11].includes(m) ? 30 : 31;
 
 export function parseCivil(s: string): { y: number; m: number; d: number } | undefined {

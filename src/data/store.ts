@@ -59,8 +59,8 @@ async function change(
 
 export const editTask = (db: NawyDoDb, id: string, patch: TaskPatch, now: number) =>
   change(db, id, (t) => updateTask(t, patch, now));
-export const completeTaskById = (db: NawyDoDb, id: string, now: number) =>
-  change(db, id, (t) => completeTask(t, now));
+export const completeTaskById = (db: NawyDoDb, id: string, now: number, today: string) =>
+  change(db, id, (t) => completeTask(t, now, today));
 export const reopenTaskById = (db: NawyDoDb, id: string, now: number) =>
   change(db, id, (t) => reopenTask(t, now));
 /** Deleting writes a tombstone; the record is never removed here (D-006). */
@@ -148,5 +148,9 @@ export const moveTasksToList = (
   now: number,
 ) => changeMany(db, ids, (t) => updateTask(t, { listId: listId ?? '' }, now));
 
-export const completeTasksByIds = (db: NawyDoDb, ids: readonly string[], now: number) =>
-  changeMany(db, ids, (t) => (t.status === 'open' ? completeTask(t, now) : t));
+export const completeTasksByIds = (
+  db: NawyDoDb,
+  ids: readonly string[],
+  now: number,
+  today: string,
+) => changeMany(db, ids, (t) => (t.status === 'open' ? completeTask(t, now, today) : t));

@@ -9,8 +9,8 @@ describe('groupTasks', () => {
     expect(groupTasks([a, b, dead]).open.map((t) => t.id)).toEqual(['b', 'a']);
   });
   it('orders done tasks by completion time, newest first', () => {
-    const a = completeTask(createTask('a', 'a', 100), 500);
-    const b = completeTask(createTask('b', 'b', 100), 600);
+    const a = completeTask(createTask('a', 'a', 100), 500, '2026-11-03');
+    const b = completeTask(createTask('b', 'b', 100), 600, '2026-11-03');
     const g = groupTasks([a, b, createTask('c', 'c', 1)]);
     expect(g.done.map((t) => t.id)).toEqual(['b', 'a']);
     expect(g.open.map((t) => t.id)).toEqual(['c']);
@@ -33,7 +33,7 @@ describe('countsFor', () => {
     const { countsFor } = await import('@/core/model');
     const a = { ...createTask('a', 'a', 1), starred: true, due: '2026-11-01' };
     const b = createTask('b', 'b', 2);
-    const done = completeTask({ ...createTask('c', 'c', 3), starred: true }, 4);
+    const done = completeTask({ ...createTask('c', 'c', 3), starred: true }, 4, '2026-11-03');
     const dead = tombstoneTask(createTask('d', 'd', 5), 6);
     expect(countsFor([a, b, done, dead], [], '2026-11-01')).toEqual({
       main: 2,
