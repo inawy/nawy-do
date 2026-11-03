@@ -75,7 +75,7 @@ export function Nav({ selection, counts, lists, onSelect, onNewList }: Props) {
       )}
       {lists.length > 0 && <hr className="nav-sep" />}
       {lists.map((l) =>
-        item(listSelection(l.id), l.name, ListIcon, counts.lists[l.id] ?? 0, '', l.color),
+        item(listSelection(l.id), l.name, ListIcon, counts.lists[l.id] ?? 0, '', l.color, l.id),
       )}
       <button type="button" className="nav-item nav-new" onClick={onNewList}>
         <span className="nav-icon">
