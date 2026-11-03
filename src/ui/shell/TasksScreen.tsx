@@ -103,6 +103,9 @@ export function TasksScreen(p: TasksScreenProps) {
             sort={p.sort}
             onLongPress={(t) => ui.startSelecting(t.id)}
             onMove={p.onMove}
+            onDropOnList={(id, target) =>
+              p.onMoveMany([id], target === 'main' ? undefined : target)
+            }
             picked={ui.picked ?? undefined}
             onPick={ui.pick}
           />

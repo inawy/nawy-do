@@ -354,3 +354,28 @@ test('a list can be given a colour, and it shows in the navigation', async ({ pa
   await page.getByRole('button', { name: 'حفظ' }).click();
   await expect(page.locator('.nav-item[data-list-color]')).toHaveCount(0);
 });
+
+test('dropping a dragged intention on a list in the navigation moves it there', async ({
+  page,
+}) => {
+  await page.getByRole('button', { name: 'قائمة جديدة' }).click();
+  await page.getByLabel('اسم القائمة').fill('هدف');
+  await page.getByRole('button', { name: 'حفظ' }).click();
+  await page.getByRole('button', { name: /^نواياي/ }).click();
+  await add(page, 'باقية');
+  await add(page, 'منقولة');
+  const grip = page.getByRole('button', { name: 'تحريك: منقولة' });
+  const from = await grip.boundingBox();
+  const to = await page.getByRole('button', { name: /^هدف/ }).boundingBox();
+  if (!from || !to) throw new Error('no boxes');
+  await page.mouse.move(from.x + from.width / 2, from.y + from.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(from.x + from.width / 2 + 10, from.y + from.height / 2 + 10, { steps: 3 });
+  await page.mouse.move(to.x + to.width / 2, to.y + to.height / 2, { steps: 12 });
+  await expect(page.getByRole('button', { name: /^هدف/ })).toHaveAttribute('data-drop-over', '');
+  await page.mouse.up();
+  await expect(page.getByText('منقولة', { exact: true })).toBeHidden();
+  await expect(page.getByText('باقية', { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: /^هدف/ }).click();
+  await expect(page.getByText('منقولة', { exact: true })).toBeVisible();
+});
