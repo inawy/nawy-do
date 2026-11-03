@@ -44,10 +44,26 @@ export const MAX_LISTS = 50;
 export const MAX_UNDO = 10;
 export const MAX_LIST_NAME = 100;
 
+/** A list's colour: a name from a fixed palette (the values live in the design tokens). */
+export const LIST_COLORS = [
+  'blue',
+  'green',
+  'amber',
+  'red',
+  'purple',
+  'teal',
+  'pink',
+  'gray',
+] as const;
+export type ListColor = (typeof LIST_COLORS)[number];
+export const isListColor = (v: unknown): v is ListColor => LIST_COLORS.some((c) => c === v);
+
 /** A named list of tasks (D-017). The main list is implicit: it has no record. */
 export interface TaskList {
   id: string;
   name: string;
+  /** Absent = no colour (the default look). */
+  color?: ListColor;
   sortOrder: number;
   createdAt: number;
   updatedAt: number;

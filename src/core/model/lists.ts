@@ -1,10 +1,34 @@
-import { MAX_LIST_NAME, type Task, type TaskList } from './types';
+import { MAX_LIST_NAME, type ListColor, type Task, type TaskList } from './types';
 import { nextUpdatedAt } from './task';
 
 export const cleanListName = (name: string): string => name.trim().slice(0, MAX_LIST_NAME);
 
-export function createList(id: string, name: string, now: number): TaskList {
-  return { id, name: cleanListName(name), sortOrder: now, createdAt: now, updatedAt: now };
+export function createList(id: string, name: string, now: number, color?: ListColor): TaskList {
+  const list: TaskList = {
+    id,
+    name: cleanListName(name),
+    sortOrder: now,
+    createdAt: now,
+    updatedAt: now,
+  };
+  if (color !== undefined) list.color = color;
+  return list;
+}
+
+/** What can be changed on a list. `color: ''` removes the colour. */
+export interface ListPatch {
+  name?: string;
+  color?: ListColor | '';
+}
+
+/** Applies a patch in one step (one `updatedAt`). An empty name is ignored. */
+export function updateList(list: TaskList, patch: ListPatch, now: number): TaskList {
+  const next = renameList(list, patch.name ?? list.name, now);
+  if ('color' in patch) {
+    if (patch.color === undefined || patch.color === '') delete next.color;
+    else next.color = patch.color;
+  }
+  return next;
 }
 
 /** An empty name is ignored (the old one stays). */

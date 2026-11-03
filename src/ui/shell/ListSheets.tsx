@@ -1,5 +1,11 @@
 import { useState } from 'react';
-import { listSelection, type Selection, type TaskList } from '@/core/model';
+import {
+  listSelection,
+  type ListColor,
+  type ListPatch,
+  type Selection,
+  type TaskList,
+} from '@/core/model';
 import { ListSheet } from '../lists';
 import type { ListSheetState } from './useScreenState';
 
@@ -13,8 +19,8 @@ interface Props {
   lists: TaskList[];
   onClose: () => void;
   onSelect: (s: Selection) => void;
-  onAdd: (name: string) => Promise<TaskList | 'empty' | 'limit' | 'failed'>;
-  onRename: (list: TaskList, name: string) => void;
+  onAdd: (name: string, color?: ListColor) => Promise<TaskList | 'empty' | 'limit' | 'failed'>;
+  onEdit: (list: TaskList, patch: ListPatch) => void;
   onDelete: (list: TaskList) => void;
   onMove: (list: TaskList, delta: -1 | 1) => void;
 }
@@ -26,7 +32,7 @@ export function ListSheets({
   onClose,
   onSelect,
   onAdd,
-  onRename,
+  onEdit,
   onDelete,
   onMove,
 }: Props) {
@@ -45,8 +51,8 @@ export function ListSheets({
         initialName=""
         error={error}
         onClose={close}
-        onSave={(name) => {
-          void onAdd(name).then((result) => {
+        onSave={(name, color) => {
+          void onAdd(name, color === '' ? undefined : color).then((result) => {
             if (typeof result === 'object') {
               onSelect(listSelection(result.id));
               close();
@@ -63,12 +69,13 @@ export function ListSheets({
     <ListSheet
       mode="edit"
       initialName={editing.name}
+      initialColor={editing.color}
       canMoveEarlier={index > 0}
       canMoveLater={index < lists.length - 1}
       onMove={(delta) => onMove(editing, delta)}
       onClose={close}
-      onSave={(name) => {
-        onRename(editing, name);
+      onSave={(name, color) => {
+        onEdit(editing, { name, color });
         close();
       }}
       onDelete={() => {

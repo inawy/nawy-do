@@ -341,3 +341,16 @@ test('a due time is set with the date and shown on the row', async ({ page }) =>
   await page.getByRole('button', { name: 'حفظ' }).click();
   await expect(page.getByText('النهارده · 9:30 م')).toBeVisible();
 });
+
+test('a list can be given a colour, and it shows in the navigation', async ({ page }) => {
+  await page.getByRole('button', { name: 'قائمة جديدة' }).click();
+  await page.getByLabel('اسم القائمة').fill('سفر');
+  await page.getByRole('radio', { name: 'أخضر' }).click();
+  await expect(page.getByRole('radio', { name: 'أخضر' })).toBeChecked();
+  await page.getByRole('button', { name: 'حفظ' }).click();
+  await expect(page.locator('.nav-item[data-list-color="green"]')).toContainText('سفر');
+  await chooseFromMenu(page, 'خيارات القائمة');
+  await page.getByRole('radio', { name: 'أخضر' }).click(); // the same swatch again clears it
+  await page.getByRole('button', { name: 'حفظ' }).click();
+  await expect(page.locator('.nav-item[data-list-color]')).toHaveCount(0);
+});

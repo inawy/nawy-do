@@ -36,12 +36,14 @@ export function Nav({ selection, counts, lists, onSelect, onNewList }: Props) {
     Icon: () => React.JSX.Element,
     count: number,
     extra = '',
+    color?: string,
   ) => (
     <button
       key={id}
       type="button"
       className={`${selection === id ? 'nav-item on' : 'nav-item'}${extra}`}
       aria-current={selection === id ? 'page' : undefined}
+      data-list-color={color}
       onClick={() => onSelect(id)}
     >
       <span className="nav-icon">
@@ -60,7 +62,9 @@ export function Nav({ selection, counts, lists, onSelect, onNewList }: Props) {
     <nav className="nav" aria-label="العرض">
       {SMART.map(({ id, label, icon, count }) => item(id, label, icon, counts[count] as number))}
       {lists.length > 0 && <hr className="nav-sep" />}
-      {lists.map((l) => item(listSelection(l.id), l.name, ListIcon, counts.lists[l.id] ?? 0))}
+      {lists.map((l) =>
+        item(listSelection(l.id), l.name, ListIcon, counts.lists[l.id] ?? 0, '', l.color),
+      )}
       <button type="button" className="nav-item nav-new" onClick={onNewList}>
         <span className="nav-icon">
           <PlusIcon />

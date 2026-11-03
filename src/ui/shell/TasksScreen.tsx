@@ -128,7 +128,7 @@ export function TasksScreen(p: TasksScreenProps) {
         onClose={() => ui.setSheet(null)}
         onSelect={p.onSelect}
         onAdd={p.onAddList}
-        onRename={p.onRenameList}
+        onEdit={p.onEditList}
         onDelete={p.onDeleteList}
         onMove={p.onMoveList}
       />

@@ -17,7 +17,7 @@ import {
   purgeTombstones,
   saveListOrder,
   removeList,
-  renameListById,
+  editListById,
   restoreRemovedList,
   snapshotBeforeUpgrade,
   TOMBSTONE_TTL_MS,
@@ -46,11 +46,11 @@ describe('lists store', () => {
 
   it('renames, deletes with a tombstone, and undo restores', async () => {
     const added = await addList(db, 'a', 'العمل', 100);
-    expect((await renameListById(db, 'a', 'شغل', 200))?.name).toBe('شغل');
+    expect((await editListById(db, 'a', { name: 'شغل' }, 200))?.name).toBe('شغل');
     const dead = await removeList(db, 'a', 300);
     expect(dead).toMatchObject({ name: '', deletedAt: 300 });
     expect(await listLists(db)).toEqual([]);
-    expect(await renameListById(db, 'a', 'x', 400)).toBeUndefined();
+    expect(await editListById(db, 'a', { name: 'x' }, 400)).toBeUndefined();
     const prev = added.ok ? { ...added.list, name: 'شغل' } : undefined;
     if (!prev) throw new Error('add failed');
     expect((await restoreRemovedList(db, prev, 500))?.name).toBe('شغل');

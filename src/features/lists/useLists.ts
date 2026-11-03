@@ -1,5 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
-import { MAX_UNDO, planListMove, type TaskList } from '@/core/model';
+import {
+  MAX_UNDO,
+  planListMove,
+  type ListColor,
+  type ListPatch,
+  type TaskList,
+} from '@/core/model';
 import type { ListRepository } from '@/core/ports';
 
 export interface ListsApi {
@@ -8,8 +14,8 @@ export interface ListsApi {
   removedStack: TaskList[];
   lastRemoved: TaskList | null;
   /** Returns the new list, or why it was refused. */
-  add: (name: string) => Promise<TaskList | 'empty' | 'limit' | 'failed'>;
-  rename: (list: TaskList, name: string) => Promise<void>;
+  add: (name: string, color?: ListColor) => Promise<TaskList | 'empty' | 'limit' | 'failed'>;
+  edit: (list: TaskList, patch: ListPatch) => Promise<void>;
   remove: (list: TaskList) => Promise<void>;
   /** One place earlier (-1) or later (+1) in the navigation. */
   move: (list: TaskList, delta: -1 | 1) => Promise<void>;
@@ -25,9 +31,9 @@ export function useLists(repo: ListRepository, now: () => number, newId: () => s
   useEffect(() => repo.watch(setLists, () => undefined), [repo]);
 
   const add = useCallback(
-    async (name: string) => {
+    async (name: string, color?: ListColor) => {
       try {
-        const result = await repo.add(newId(), name, now());
+        const result = await repo.add(newId(), name, now(), color);
         return result.ok ? result.list : result.reason;
       } catch {
         return 'failed' as const;
@@ -36,9 +42,9 @@ export function useLists(repo: ListRepository, now: () => number, newId: () => s
     [repo, now, newId],
   );
 
-  const rename = useCallback(
-    async (list: TaskList, name: string) => {
-      await repo.rename(list.id, name, now()).catch(() => undefined);
+  const edit = useCallback(
+    async (list: TaskList, patch: ListPatch) => {
+      await repo.edit(list.id, patch, now()).catch(() => undefined);
     },
     [repo, now],
   );
@@ -72,7 +78,7 @@ export function useLists(repo: ListRepository, now: () => number, newId: () => s
     removedStack,
     lastRemoved: removedStack[removedStack.length - 1] ?? null,
     add,
-    rename,
+    edit,
     remove,
     move,
     undoRemove,

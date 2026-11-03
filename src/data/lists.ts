@@ -5,8 +5,10 @@ import {
   MAX_LISTS,
   mergeRecord,
   nextUpdatedAt,
+  type ListColor,
   type ListOrderChange,
-  renameList,
+  type ListPatch,
+  updateList,
   restoreList,
   tombstoneList,
   type TaskList,
@@ -27,6 +29,7 @@ export async function addList(
   id: string,
   name: string,
   now: number,
+  color?: ListColor,
 ): Promise<AddListResult> {
   if (cleanListName(name) === '') return { ok: false, reason: 'empty' };
   return db.transaction('rw', db.lists, async (): Promise<AddListResult> => {
@@ -34,7 +37,7 @@ export async function addList(
     if (live.length >= MAX_LISTS) return { ok: false, reason: 'limit' };
     // Strictly after every existing list so the new one is last, even within one millisecond.
     const last = live.at(-1)?.sortOrder ?? 0;
-    const list = createList(id, name, Math.max(now, last + 1));
+    const list = createList(id, name, Math.max(now, last + 1), color);
     await db.lists.add(list);
     return { ok: true, list };
   });
@@ -54,8 +57,8 @@ async function changeList(
   });
 }
 
-export const renameListById = (db: NawyDoDb, id: string, name: string, now: number) =>
-  changeList(db, id, (l) => renameList(l, name, now));
+export const editListById = (db: NawyDoDb, id: string, patch: ListPatch, now: number) =>
+  changeList(db, id, (l) => updateList(l, patch, now));
 
 /** Writes a tombstone. The list's tasks are untouched: they show in the main list (D-017). */
 export const removeList = (db: NawyDoDb, id: string, now: number) =>

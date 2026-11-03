@@ -1,6 +1,6 @@
 import type { Repositories } from '@/core/ports';
 import { exportBackup, importBackup } from './backup';
-import { addList, removeList, renameListById, restoreRemovedList, saveListOrder } from './lists';
+import { addList, removeList, editListById, restoreRemovedList, saveListOrder } from './lists';
 import { watchLists, watchTasks } from './live';
 import type { NawyDoDb } from './schema';
 import { listSnapshots } from './snapshot';
@@ -33,8 +33,8 @@ export function createDexieRepositories(db: NawyDoDb): Repositories {
     },
     lists: {
       watch: (onChange, onError) => watchLists(db, onChange, onError),
-      add: (id, name, now) => addList(db, id, name, now),
-      rename: (id, name, now) => renameListById(db, id, name, now),
+      add: (id, name, now, color) => addList(db, id, name, now, color),
+      edit: (id, patch, now) => editListById(db, id, patch, now),
       remove: (id, now) => removeList(db, id, now),
       restore: (previous, now) => restoreRemovedList(db, previous, now),
       saveOrder: (changes, now) => saveListOrder(db, changes, now),

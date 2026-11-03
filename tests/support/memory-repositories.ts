@@ -8,7 +8,7 @@ import {
   MAX_LISTS,
   nextUpdatedAt,
   parseEnvelope,
-  renameList,
+  updateList,
   reopenTask,
   restoreList,
   restoreTask,
@@ -129,16 +129,16 @@ export function createMemoryRepositories(): Repositories & {
     },
     lists: {
       watch: watchOf(listSubs, () => liveLists([...lists.values()])),
-      add: async (id, name, now) => {
+      add: async (id, name, now, color) => {
         if (cleanListName(name) === '') return { ok: false, reason: 'empty' };
         const live = liveLists([...lists.values()]);
         if (live.length >= MAX_LISTS) return { ok: false, reason: 'limit' };
         const last = live.at(-1)?.sortOrder ?? 0;
-        return { ok: true, list: putList(createList(id, name, Math.max(now, last + 1))) };
+        return { ok: true, list: putList(createList(id, name, Math.max(now, last + 1), color)) };
       },
-      rename: async (id, name, now) => {
+      edit: async (id, patch, now) => {
         const l = lists.get(id);
-        return l && l.deletedAt === undefined ? putList(renameList(l, name, now)) : undefined;
+        return l && l.deletedAt === undefined ? putList(updateList(l, patch, now)) : undefined;
       },
       remove: async (id, now) => {
         const l = lists.get(id);

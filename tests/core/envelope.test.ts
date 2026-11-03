@@ -41,7 +41,7 @@ describe('envelope', () => {
     expect(parseEnvelope('{')).toEqual({ ok: false, error: { code: 'not-json' } });
     const wrong = parseEnvelope(text({ ...base, app: 'nawy-today' }));
     expect(!wrong.ok && wrong.error.code).toBe('wrong-app');
-    const newer = parseEnvelope(text({ ...base, schemaVersion: 5 }));
+    const newer = parseEnvelope(text({ ...base, schemaVersion: 6 }));
     expect(!newer.ok && newer.error.code).toBe('newer-version');
     const bad = parseEnvelope(text({ ...base, tasks: [{ ...t, status: 'zzz' }] }));
     expect(!bad.ok && bad.error).toEqual({ code: 'invalid-record', index: 0, reason: 'status' });
@@ -82,7 +82,7 @@ describe('envelope with lists (version 2)', () => {
   it('upgrades a real version-1 file with the shipped migration (no lists, tasks kept)', () => {
     const v1 = { app: 'nawy-do', schemaVersion: 1, exportedAt: 1, tasks: [t] };
     const r = parseEnvelope(text(v1));
-    expect(r.ok && r.value.schemaVersion).toBe(4);
+    expect(r.ok && r.value.schemaVersion).toBe(5);
     expect(r.ok && r.value.tasks).toEqual([t]);
     expect(r.ok && r.value.lists).toEqual([]);
   });

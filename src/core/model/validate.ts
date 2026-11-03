@@ -1,6 +1,7 @@
 import { isCivilDate, isCivilTime } from './civil';
 import { err, ok, type Result } from './result';
 import {
+  isListColor,
   MAX_LIST_NAME,
   MAX_STEPS,
   MAX_STEP_TITLE,
@@ -118,6 +119,10 @@ export function parseList(raw: unknown): Result<TaskList, string> {
     createdAt: r['createdAt'],
     updatedAt: r['updatedAt'],
   };
+  if (r['color'] !== undefined) {
+    if (!isListColor(r['color'])) return err('color');
+    list.color = r['color'];
+  }
   if (r['deletedAt'] !== undefined) {
     if (!isTime(r['deletedAt'])) return err('deletedAt');
     list.deletedAt = r['deletedAt'];
