@@ -45,6 +45,11 @@ export function useDropTargets() {
     };
   };
 
-  useEffect(() => stop, []);
+  useEffect(
+    () => () => {
+      stop();
+    },
+    [],
+  );
   return { start, stop };
 }
