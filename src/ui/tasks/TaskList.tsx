@@ -23,7 +23,7 @@ interface Props {
   onRemove: (task: Task) => void;
   sort: SortMode;
   onLongPress?: (task: Task) => void;
-  onMove: (id: string, toIndex: number) => void;
+  onMove: (id: string, toIndex: number, shown: readonly string[]) => void;
   /** Dropping a row on a list in the navigation: the task id and the target (`main` or a list id). */
   onDropOnList?: (id: string, target: string) => void;
   /** Selection mode when present. */
@@ -87,7 +87,7 @@ export function TaskList({
         ids={list.map((t) => t.id)}
         ariaLabel={label}
         describe={(id) => byId.get(id)?.title ?? ''}
-        onMove={onMove}
+        onMove={(id, to) => onMove(id, to, list.map((t) => t.id))}
         onDropOnList={onDropOnList}
         currentTarget={selectedListId(view) ?? 'main'}
       >

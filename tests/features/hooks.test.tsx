@@ -1,6 +1,6 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { MAX_UNDO } from '@/core/model';
+import { groupTasks, MAX_UNDO } from '@/core/model';
 import { useBackup } from '@/features/backup';
 import { useLists } from '@/features/lists';
 import { useTasks } from '@/features/tasks';
@@ -27,6 +27,27 @@ describe('useTasks on the ports', () => {
     await act(() => result.current.toggle(first));
     await waitFor(() =>
       expect(result.current.tasks.find((t) => t.id === first.id)?.status).toBe('done'),
+    );
+  });
+
+  it('reorders inside one list without touching the others', async () => {
+    const repos = createMemoryRepositories();
+    const { result } = renderHook(() => useTasks(repos.tasks, now, newId, today));
+    for (const title of ['١', '٢', '٣', '٤', '٥', '٦']) await act(() => result.current.add(title));
+    await waitFor(() => expect(result.current.tasks).toHaveLength(6));
+    const open = () => groupTasks(result.current.tasks).open;
+    const evens = open().filter((_, i) => i % 2 === 1);
+    await act(() => result.current.moveMany(evens.map((t) => t.id), 'L'));
+    await waitFor(() => expect(open().filter((t) => t.listId === 'L')).toHaveLength(3));
+    const inL = () => open().filter((t) => t.listId === 'L').map((t) => t.id);
+    const mainBefore = open().filter((t) => t.listId !== 'L').map((t) => `${t.id}:${t.updatedAt}`);
+    const shown = inL();
+    const last = shown[2];
+    if (!last) throw new Error('no task');
+    await act(() => result.current.move(last, 0, shown));
+    await waitFor(() => expect(inL()).toEqual([last, shown[0], shown[1]]));
+    expect(open().filter((t) => t.listId !== 'L').map((t) => `${t.id}:${t.updatedAt}`)).toEqual(
+      mainBefore,
     );
   });
 
