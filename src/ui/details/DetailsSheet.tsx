@@ -2,7 +2,6 @@ import { useState } from 'react';
 import {
   listOf,
   MAX_STEPS,
-  MAX_STEP_TITLE,
   quickDueOptions,
   REPEAT_LABEL,
   REPEATS,
@@ -25,7 +24,8 @@ import {
   TrashIcon,
 } from '../primitives';
 import { Sheet } from '../sheet';
-import { changedFields, type DetailsForm } from './formPatch';
+import { changedFields, formOf } from './formPatch';
+import { StepsField } from './StepsField';
 
 interface Props {
   task: Task;
@@ -53,16 +53,7 @@ export function DetailsSheet({ task, lists, today, onSave, newId, onRemove, onCl
   // A task whose list was deleted shows as belonging to the main list, but keeps its listId
   // until the person picks another list (changedFields leaves it alone).
   const [listId, setListId] = useState(listOf(task, lists) ?? '');
-  const [initial] = useState<DetailsForm>(() => ({
-    title: task.title,
-    notes: task.notes ?? '',
-    due: task.due ?? '',
-    dueTime: task.dueTime ?? '',
-    repeat: task.repeat ?? '',
-    starred: task.starred,
-    steps: task.steps ?? [],
-    listId: listOf(task, lists) ?? '',
-  }));
+  const [initial] = useState(() => formOf(task, lists));
 
   const addStep = () => {
     const text = newStep.trim();
@@ -181,53 +172,13 @@ export function DetailsSheet({ task, lists, today, onSave, newId, onRemove, onCl
         </Select>
       </Field>
 
-      <fieldset className="steps">
-        <legend>الخطوات</legend>
-        <ul className="list" aria-label="الخطوات">
-          {steps.map((st) => (
-            <li key={st.id} className="step">
-              <label className="hit">
-                <input
-                  type="checkbox"
-                  className="circle small"
-                  aria-label={st.title}
-                  checked={st.done}
-                  onChange={() =>
-                    setSteps(steps.map((x) => (x.id === st.id ? { ...x, done: !x.done } : x)))
-                  }
-                />
-              </label>
-              <span className={st.done ? 'step-title done-title' : 'step-title'}>{st.title}</span>
-              <IconButton
-                label={`حذف الخطوة: ${st.title}`}
-                onClick={() => setSteps(steps.filter((x) => x.id !== st.id))}
-              >
-                <CloseIcon />
-              </IconButton>
-            </li>
-          ))}
-        </ul>
-        <div className="add-step">
-          <TextInput
-            className="min-w-0 flex-1"
-            value={newStep}
-            onChange={(e) => setNewStep(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                addStep();
-              }
-            }}
-            placeholder="خطوة جديدة"
-            aria-label="خطوة جديدة"
-            maxLength={MAX_STEP_TITLE}
-            disabled={steps.length >= MAX_STEPS}
-          />
-          <Button onClick={addStep} disabled={newStep.trim() === ''}>
-            أضف خطوة
-          </Button>
-        </div>
-      </fieldset>
+      <StepsField
+        steps={steps}
+        onChange={setSteps}
+        draft={newStep}
+        onDraft={setNewStep}
+        onAdd={addStep}
+      />
 
       <div className="actions">
         <Button variant="danger" onClick={onRemove}>

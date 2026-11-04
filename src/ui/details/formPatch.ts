@@ -1,4 +1,11 @@
-import type { Repeat, Step, TaskPatch } from '@/core/model';
+import {
+  listOf,
+  type Repeat,
+  type Step,
+  type Task,
+  type TaskList,
+  type TaskPatch,
+} from '@/core/model';
 
 /** What the details form holds; `''` means "none" for the optional text fields. */
 export interface DetailsForm {
@@ -35,4 +42,18 @@ export function changedFields(before: DetailsForm, after: DetailsForm): TaskPatc
   if (!sameSteps(before.steps, after.steps)) patch.steps = after.steps;
   if (after.listId !== before.listId) patch.listId = after.listId;
   return patch;
+}
+
+/** The form as it starts: a task whose list was deleted reads as the main list (`''`). */
+export function formOf(task: Task, lists: readonly TaskList[]): DetailsForm {
+  return {
+    title: task.title,
+    notes: task.notes ?? '',
+    due: task.due ?? '',
+    dueTime: task.dueTime ?? '',
+    repeat: task.repeat ?? '',
+    starred: task.starred,
+    steps: task.steps ?? [],
+    listId: listOf(task, lists) ?? '',
+  };
 }
