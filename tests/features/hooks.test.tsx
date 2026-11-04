@@ -66,8 +66,12 @@ describe('useTasks on the ports', () => {
   it('a double tap completes a repeating task once', async () => {
     const repos = createMemoryRepositories();
     const { result } = renderHook(() => useTasks(repos.tasks, now, newId, today));
-    await act(() => result.current.add('يومية', { due: '2026-11-03', repeat: 'daily' }));
+    await act(() => result.current.add('يومية', { due: '2026-11-03' }));
     await waitFor(() => expect(result.current.tasks).toHaveLength(1));
+    const first = result.current.tasks[0];
+    if (!first) throw new Error('no task');
+    await act(() => result.current.edit(first, { repeat: 'daily' }));
+    await waitFor(() => expect(result.current.tasks[0]?.repeat).toBe('daily'));
     const task = result.current.tasks[0];
     if (!task) throw new Error('no task');
     await act(async () => {
