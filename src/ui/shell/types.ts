@@ -26,6 +26,7 @@ export interface TasksScreenProps {
   tasks: Task[];
   lists: TaskList[];
   today: string;
+  newId: () => string;
   selection: Selection;
   ready: boolean;
   failed: boolean;

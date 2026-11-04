@@ -117,6 +117,7 @@ export function TasksScreen(p: TasksScreenProps) {
           task={editing}
           lists={p.lists}
           today={p.today}
+          newId={p.newId}
           onSave={(patch) => p.onSave(editing, patch)}
           onRemove={() => {
             p.onRemove(editing);

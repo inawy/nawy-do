@@ -2,7 +2,6 @@ import { useState } from 'react';
 import {
   listOf,
   MAX_STEPS,
-  MAX_STEP_TITLE,
   quickDueOptions,
   REPEAT_LABEL,
   REPEATS,
@@ -25,12 +24,15 @@ import {
   TrashIcon,
 } from '../primitives';
 import { Sheet } from '../sheet';
+import { changedFields, formOf } from './formPatch';
+import { StepsField } from './StepsField';
 
 interface Props {
   task: Task;
   lists: TaskList[];
   today: string;
   onSave: (patch: TaskPatch) => void;
+  newId: () => string;
   onRemove: () => void;
   onClose: () => void;
 }
@@ -39,7 +41,7 @@ interface Props {
  * Details of one intention: a bottom sheet on phones, a centred card on wide screens. Saving an
  * empty title keeps the old one; clearing the date or notes removes them.
  */
-export function DetailsSheet({ task, lists, today, onSave, onRemove, onClose }: Props) {
+export function DetailsSheet({ task, lists, today, onSave, newId, onRemove, onClose }: Props) {
   const [title, setTitle] = useState(task.title);
   const [notes, setNotes] = useState(task.notes ?? '');
   const [due, setDue] = useState(task.due ?? '');
@@ -48,13 +50,15 @@ export function DetailsSheet({ task, lists, today, onSave, onRemove, onClose }: 
   const [starred, setStarred] = useState(task.starred);
   const [steps, setSteps] = useState<Step[]>(task.steps ?? []);
   const [newStep, setNewStep] = useState('');
-  // A task whose list was deleted shows (and saves) as belonging to the main list.
+  // A task whose list was deleted shows as belonging to the main list, but keeps its listId
+  // until the person picks another list (changedFields leaves it alone).
   const [listId, setListId] = useState(listOf(task, lists) ?? '');
+  const [initial] = useState(() => formOf(task, lists));
 
   const addStep = () => {
     const text = newStep.trim();
     if (text === '' || steps.length >= MAX_STEPS) return;
-    setSteps([...steps, { id: crypto.randomUUID(), title: text, done: false }]);
+    setSteps([...steps, { id: newId(), title: text, done: false }]);
     setNewStep('');
   };
 
@@ -67,18 +71,19 @@ export function DetailsSheet({ task, lists, today, onSave, onRemove, onClose }: 
         const pending = newStep.trim();
         const all =
           pending !== '' && steps.length < MAX_STEPS
-            ? [...steps, { id: crypto.randomUUID(), title: pending, done: false }]
+            ? [...steps, { id: newId(), title: pending, done: false }]
             : steps;
-        onSave({
+        const patch = changedFields(initial, {
           title,
           notes,
           due,
-          dueTime: due === '' ? '' : dueTime,
-          repeat: due === '' ? '' : repeat,
+          dueTime,
+          repeat,
           steps: all,
           starred,
           listId,
         });
+        if (Object.keys(patch).length > 0) onSave(patch);
         onClose();
       }}
     >
@@ -167,53 +172,13 @@ export function DetailsSheet({ task, lists, today, onSave, onRemove, onClose }: 
         </Select>
       </Field>
 
-      <fieldset className="steps">
-        <legend>الخطوات</legend>
-        <ul className="list" aria-label="الخطوات">
-          {steps.map((st) => (
-            <li key={st.id} className="step">
-              <label className="hit">
-                <input
-                  type="checkbox"
-                  className="circle small"
-                  aria-label={st.title}
-                  checked={st.done}
-                  onChange={() =>
-                    setSteps(steps.map((x) => (x.id === st.id ? { ...x, done: !x.done } : x)))
-                  }
-                />
-              </label>
-              <span className={st.done ? 'step-title done-title' : 'step-title'}>{st.title}</span>
-              <IconButton
-                label={`حذف الخطوة: ${st.title}`}
-                onClick={() => setSteps(steps.filter((x) => x.id !== st.id))}
-              >
-                <CloseIcon />
-              </IconButton>
-            </li>
-          ))}
-        </ul>
-        <div className="add-step">
-          <TextInput
-            className="min-w-0 flex-1"
-            value={newStep}
-            onChange={(e) => setNewStep(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                addStep();
-              }
-            }}
-            placeholder="خطوة جديدة"
-            aria-label="خطوة جديدة"
-            maxLength={MAX_STEP_TITLE}
-            disabled={steps.length >= MAX_STEPS}
-          />
-          <Button onClick={addStep} disabled={newStep.trim() === ''}>
-            أضف خطوة
-          </Button>
-        </div>
-      </fieldset>
+      <StepsField
+        steps={steps}
+        onChange={setSteps}
+        draft={newStep}
+        onDraft={setNewStep}
+        onAdd={addStep}
+      />
 
       <div className="actions">
         <Button variant="danger" onClick={onRemove}>

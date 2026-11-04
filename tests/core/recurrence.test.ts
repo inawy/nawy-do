@@ -108,3 +108,10 @@ describe('parseTask with repeat', () => {
     expect(parseTask(noDue)).toEqual({ ok: false, error: 'repeat' });
   });
 });
+
+describe('the end of the calendar', () => {
+  it('never produces a year with five digits', () => {
+    expect(addMonths('9999-12-15', 1)).toBe('9999-12-15');
+    expect(addMonths('9999-11-30', 3)).toBe('9999-12-30');
+  });
+});

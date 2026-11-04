@@ -81,6 +81,7 @@ export function App({ repositories, db, now = systemClock, today = systemToday }
       tasks={tasks.tasks}
       lists={lists.lists}
       today={today()}
+      newId={newId}
       selection={selection}
       ready={tasks.ready}
       failed={tasks.failed}

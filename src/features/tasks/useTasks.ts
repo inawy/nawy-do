@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { MAX_UNDO, planMove, type Task, type TaskPatch } from '@/core/model';
 import type { NewTaskOptions, TaskRepository } from '@/core/ports';
 
@@ -68,13 +68,22 @@ export function useTasks(
     [repo, now, newId, guard],
   );
 
+  // A second tap (or swipe + tap) on a task whose first write is still running would complete a
+  // repeating task twice and skip an occurrence, so one toggle per task at a time.
+  const toggling = useRef(new Set<string>());
   const toggle = useCallback(
     async (task: Task) => {
-      await guard(() =>
-        task.status === 'open'
-          ? repo.complete(task.id, now(), today())
-          : repo.reopen(task.id, now()),
-      );
+      if (toggling.current.has(task.id)) return;
+      toggling.current.add(task.id);
+      try {
+        await guard(() =>
+          task.status === 'open'
+            ? repo.complete(task.id, now(), today())
+            : repo.reopen(task.id, now()),
+        );
+      } finally {
+        toggling.current.delete(task.id);
+      }
     },
     [repo, now, today, guard],
   );
