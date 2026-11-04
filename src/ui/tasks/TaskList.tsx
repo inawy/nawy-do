@@ -87,7 +87,13 @@ export function TaskList({
         ids={list.map((t) => t.id)}
         ariaLabel={label}
         describe={(id) => byId.get(id)?.title ?? ''}
-        onMove={(id, to) => onMove(id, to, list.map((t) => t.id))}
+        onMove={(id, to) =>
+          onMove(
+            id,
+            to,
+            list.map((t) => t.id),
+          )
+        }
         onDropOnList={onDropOnList}
         currentTarget={selectedListId(view) ?? 'main'}
       >

@@ -37,18 +37,30 @@ describe('useTasks on the ports', () => {
     await waitFor(() => expect(result.current.tasks).toHaveLength(6));
     const open = () => groupTasks(result.current.tasks).open;
     const evens = open().filter((_, i) => i % 2 === 1);
-    await act(() => result.current.moveMany(evens.map((t) => t.id), 'L'));
+    await act(() =>
+      result.current.moveMany(
+        evens.map((t) => t.id),
+        'L',
+      ),
+    );
     await waitFor(() => expect(open().filter((t) => t.listId === 'L')).toHaveLength(3));
-    const inL = () => open().filter((t) => t.listId === 'L').map((t) => t.id);
-    const mainBefore = open().filter((t) => t.listId !== 'L').map((t) => `${t.id}:${t.updatedAt}`);
+    const inL = () =>
+      open()
+        .filter((t) => t.listId === 'L')
+        .map((t) => t.id);
+    const mainBefore = open()
+      .filter((t) => t.listId !== 'L')
+      .map((t) => `${t.id}:${t.updatedAt}`);
     const shown = inL();
     const last = shown[2];
     if (!last) throw new Error('no task');
     await act(() => result.current.move(last, 0, shown));
     await waitFor(() => expect(inL()).toEqual([last, shown[0], shown[1]]));
-    expect(open().filter((t) => t.listId !== 'L').map((t) => `${t.id}:${t.updatedAt}`)).toEqual(
-      mainBefore,
-    );
+    expect(
+      open()
+        .filter((t) => t.listId !== 'L')
+        .map((t) => `${t.id}:${t.updatedAt}`),
+    ).toEqual(mainBefore);
   });
 
   it('delete writes a tombstone and undo brings the task back', async () => {
