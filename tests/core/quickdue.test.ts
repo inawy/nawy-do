@@ -28,3 +28,10 @@ describe('quickDueOptions', () => {
     ]);
   });
 });
+
+describe('addDays at the edges', () => {
+  it('clamps to 9999-12-31 and 0000-01-01', () => {
+    expect(addDays('9999-12-30', 5)).toBe('9999-12-31');
+    expect(addDays('0000-01-02', -5)).toBe('0000-01-01');
+  });
+});

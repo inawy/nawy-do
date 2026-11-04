@@ -7,7 +7,7 @@ const pad = (n: number, width: number): string => String(n).padStart(width, '0')
 export function addMonths(date: string, n: number): string {
   const c = parseCivil(date);
   if (!c) return date;
-  const total = c.y * 12 + (c.m - 1) + n;
+  const total = Math.min(9999 * 12 + 11, Math.max(0, c.y * 12 + (c.m - 1) + n));
   const y = Math.floor(total / 12);
   const m = (total % 12) + 1;
   const d = Math.min(c.d, monthLength(y, m));

@@ -25,12 +25,14 @@ import {
   TrashIcon,
 } from '../primitives';
 import { Sheet } from '../sheet';
+import { changedFields, type DetailsForm } from './formPatch';
 
 interface Props {
   task: Task;
   lists: TaskList[];
   today: string;
   onSave: (patch: TaskPatch) => void;
+  newId: () => string;
   onRemove: () => void;
   onClose: () => void;
 }
@@ -39,7 +41,7 @@ interface Props {
  * Details of one intention: a bottom sheet on phones, a centred card on wide screens. Saving an
  * empty title keeps the old one; clearing the date or notes removes them.
  */
-export function DetailsSheet({ task, lists, today, onSave, onRemove, onClose }: Props) {
+export function DetailsSheet({ task, lists, today, onSave, newId, onRemove, onClose }: Props) {
   const [title, setTitle] = useState(task.title);
   const [notes, setNotes] = useState(task.notes ?? '');
   const [due, setDue] = useState(task.due ?? '');
@@ -48,13 +50,24 @@ export function DetailsSheet({ task, lists, today, onSave, onRemove, onClose }: 
   const [starred, setStarred] = useState(task.starred);
   const [steps, setSteps] = useState<Step[]>(task.steps ?? []);
   const [newStep, setNewStep] = useState('');
-  // A task whose list was deleted shows (and saves) as belonging to the main list.
+  // A task whose list was deleted shows as belonging to the main list, but keeps its listId
+  // until the person picks another list (changedFields leaves it alone).
   const [listId, setListId] = useState(listOf(task, lists) ?? '');
+  const [initial] = useState<DetailsForm>(() => ({
+    title: task.title,
+    notes: task.notes ?? '',
+    due: task.due ?? '',
+    dueTime: task.dueTime ?? '',
+    repeat: task.repeat ?? '',
+    starred: task.starred,
+    steps: task.steps ?? [],
+    listId: listOf(task, lists) ?? '',
+  }));
 
   const addStep = () => {
     const text = newStep.trim();
     if (text === '' || steps.length >= MAX_STEPS) return;
-    setSteps([...steps, { id: crypto.randomUUID(), title: text, done: false }]);
+    setSteps([...steps, { id: newId(), title: text, done: false }]);
     setNewStep('');
   };
 
@@ -67,18 +80,19 @@ export function DetailsSheet({ task, lists, today, onSave, onRemove, onClose }: 
         const pending = newStep.trim();
         const all =
           pending !== '' && steps.length < MAX_STEPS
-            ? [...steps, { id: crypto.randomUUID(), title: pending, done: false }]
+            ? [...steps, { id: newId(), title: pending, done: false }]
             : steps;
-        onSave({
+        const patch = changedFields(initial, {
           title,
           notes,
           due,
-          dueTime: due === '' ? '' : dueTime,
-          repeat: due === '' ? '' : repeat,
+          dueTime,
+          repeat,
           steps: all,
           starred,
           listId,
         });
+        if (Object.keys(patch).length > 0) onSave(patch);
         onClose();
       }}
     >

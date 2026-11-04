@@ -99,7 +99,11 @@ function civilFromDays(z0: number): string {
 /** `date` plus `n` days (negative allowed); returns `date` unchanged if it is not a valid civil date. */
 export function addDays(date: string, n: number): string {
   const base = daysFromCivil(date);
-  return base === undefined ? date : civilFromDays(base + n);
+  if (base === undefined) return date;
+  // Stays inside years 0000–9999: a fifth digit would be a date its own import rejects.
+  const lo = daysFromCivil('0000-01-01') ?? 0;
+  const hi = daysFromCivil('9999-12-31') ?? 0;
+  return civilFromDays(Math.min(hi, Math.max(lo, base + n)));
 }
 
 export interface QuickDue {
