@@ -37,6 +37,7 @@ export function Nav({ selection, counts, lists, onSelect, onNewList }: Props) {
     count: number,
     extra = '',
     color?: string,
+    dropTarget?: string,
   ) => (
     <button
       key={id}
@@ -44,6 +45,7 @@ export function Nav({ selection, counts, lists, onSelect, onNewList }: Props) {
       className={`${selection === id ? 'nav-item on' : 'nav-item'}${extra}`}
       aria-current={selection === id ? 'page' : undefined}
       data-list-color={color}
+      data-drop-list={dropTarget}
       onClick={() => onSelect(id)}
     >
       <span className="nav-icon">
@@ -60,10 +62,20 @@ export function Nav({ selection, counts, lists, onSelect, onNewList }: Props) {
 
   return (
     <nav className="nav" aria-label="العرض">
-      {SMART.map(({ id, label, icon, count }) => item(id, label, icon, counts[count] as number))}
+      {SMART.map(({ id, label, icon, count }) =>
+        item(
+          id,
+          label,
+          icon,
+          counts[count] as number,
+          '',
+          undefined,
+          id === 'main' ? 'main' : undefined,
+        ),
+      )}
       {lists.length > 0 && <hr className="nav-sep" />}
       {lists.map((l) =>
-        item(listSelection(l.id), l.name, ListIcon, counts.lists[l.id] ?? 0, '', l.color),
+        item(listSelection(l.id), l.name, ListIcon, counts.lists[l.id] ?? 0, '', l.color, l.id),
       )}
       <button type="button" className="nav-item nav-new" onClick={onNewList}>
         <span className="nav-icon">

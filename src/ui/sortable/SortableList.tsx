@@ -17,6 +17,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useDropTargets } from './useDropTargets';
 
 interface Props {
   /** Ids in their current display order. */
@@ -26,6 +27,13 @@ interface Props {
   /** A human label for an id, used in screen-reader announcements. */
   describe: (id: string) => string;
   ariaLabel: string;
+  /**
+   * When given, a row can also be dropped on a navigation item (an element with
+   * `data-drop-list="<target>"`): called with the task id and the target, unless the target is
+   * `currentTarget` (then the drop is an ordinary re-order).
+   */
+  onDropOnList?: ((id: string, target: string) => void) | undefined;
+  currentTarget?: string;
   /** Renders the items in the order given (which previews a drop until it is saved). */
   children: (orderedIds: string[]) => ReactNode;
 }
@@ -41,10 +49,19 @@ const INSTRUCTIONS: ScreenReaderInstructions = {
  * only adapts it to the app: Arabic announcements, and keeping the dropped order on screen until
  * the saved order arrives, so a row never jumps back and forth.
  */
-export function SortableList({ ids, onMove, describe, ariaLabel, children }: Props) {
+export function SortableList({
+  ids,
+  onMove,
+  describe,
+  ariaLabel,
+  onDropOnList,
+  currentTarget,
+  children,
+}: Props) {
   const [preview, setPreview] = useState<string[] | null>(null);
   const idsKey = ids.join('\u0000');
   const timer = useRef(0);
+  const pointer = useDropTargets();
 
   // The saved order has arrived (or the list changed for another reason): drop the preview.
   useEffect(() => {
@@ -75,7 +92,16 @@ export function SortableList({ ids, onMove, describe, ariaLabel, children }: Pro
     onDragCancel: ({ active }) => `اتلغى تحريك «${describe(String(active.id))}».`,
   };
 
+  const onDragStart = () => {
+    if (onDropOnList) pointer.start();
+  };
+  const onDragCancel = () => pointer.stop();
   const onDragEnd = ({ active, over }: DragEndEvent) => {
+    const target = pointer.stop();
+    if (target && target !== currentTarget && onDropOnList) {
+      onDropOnList(String(active.id), target);
+      return;
+    }
     if (!over || active.id === over.id) return;
     const from = ids.indexOf(String(active.id));
     const to = ids.indexOf(String(over.id));
@@ -92,7 +118,9 @@ export function SortableList({ ids, onMove, describe, ariaLabel, children }: Pro
     <DndContext
       sensors={sensors}
       collisionDetection={closestCenter}
-      modifiers={[restrictToVerticalAxis, restrictToParentElement]}
+      modifiers={onDropOnList ? [] : [restrictToVerticalAxis, restrictToParentElement]}
+      onDragStart={onDragStart}
+      onDragCancel={onDragCancel}
       onDragEnd={onDragEnd}
       accessibility={{ announcements, screenReaderInstructions: INSTRUCTIONS }}
     >

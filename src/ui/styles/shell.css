@@ -294,3 +294,10 @@ html {
     0 0 0 2px var(--card),
     0 0 0 4px var(--list-color);
 }
+
+/* A row dragged over a list in the navigation: the list lights up as the drop target. */
+.nav-item[data-drop-over] {
+  background: var(--brand-soft);
+  outline: 2px solid var(--brand);
+  outline-offset: -2px;
+}

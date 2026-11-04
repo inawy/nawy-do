@@ -220,3 +220,7 @@ Manual / by date / alphabetical applies to open tasks in the main list, a list a
 ## D-033 — List colours are palette names
 
 `TaskList.color` is one of eight names (`blue`, `green`, …), never a free colour: the values live in the design tokens (`--list-*`, built on the semantic colours), so a list colour follows the theme and an imported file cannot inject arbitrary CSS (`parseList` refuses anything outside the palette). Envelope `schemaVersion` 5 (versions 2–4 still import). The list repository's `rename` became `edit(id, patch)`: a name and a colour change in one write.
+
+## D-034 — Drop on a list in the navigation by hit-testing, not a shared drag context
+
+The drag context stays inside `SortableList` (D-018). While a row is dragged, `useDropTargets` follows the pointer, finds the navigation item under it (`[data-drop-list]`, via `elementsFromPoint`), lights it up and, on drop, calls `onDropOnList` instead of re-ordering. This avoids lifting the context to the whole screen (a much larger change to a library integration that works) and keeps the navigation free of the drag library. In the main list and in a list the vertical-axis/parent modifiers are off so the row can follow the pointer out of the list. Not covered: keyboard and screen-reader users cannot drop on the navigation; their ways to move a task are the list field in the details sheet and «تحديد» then move. No confirmation or undo toast yet: the task leaves the view and is in the target list.

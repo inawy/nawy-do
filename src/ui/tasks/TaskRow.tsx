@@ -123,6 +123,7 @@ export function TaskRow({
           <button
             type="button"
             className="grip"
+            data-no-swipe
             aria-label={`تحريك: ${task.title}`}
             {...sort.handle}
           >

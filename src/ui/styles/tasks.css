@@ -285,7 +285,7 @@
   }
 }
 .row.dragging {
-  z-index: 3;
+  z-index: 20; /* above the fixed navigation, so it can be dropped on it */
   background: var(--card);
   border-radius: 12px;
   cursor: grabbing;
