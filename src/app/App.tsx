@@ -99,7 +99,7 @@ export function App({ repositories, db, now = systemClock, today = systemToday }
       onToggle={(t) => void tasks.toggle(t)}
       onStar={(t) => void tasks.edit(t, { starred: !t.starred })}
       onOpen={(t) => setOpenId(t.id)}
-      onMove={(id, to) => void tasks.move(id, to)}
+      onMove={(id, to, shown) => void tasks.move(id, to, shown)}
       onMoveMany={(ids, listId) => void tasks.moveMany(ids, listId)}
       onCompleteMany={(ids) => void tasks.completeMany(ids)}
       onClose={() => setOpenId(null)}

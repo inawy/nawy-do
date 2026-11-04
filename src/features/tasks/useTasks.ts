@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { groupTasks, MAX_UNDO, planMove, type Task, type TaskPatch } from '@/core/model';
+import { MAX_UNDO, planMove, type Task, type TaskPatch } from '@/core/model';
 import type { NewTaskOptions, TaskRepository } from '@/core/ports';
 
 export interface TasksApi {
@@ -15,8 +15,11 @@ export interface TasksApi {
   add: (title: string, options?: NewTaskOptions) => Promise<void>;
   toggle: (task: Task) => Promise<void>;
   edit: (task: Task, patch: TaskPatch) => Promise<void>;
-  /** Moves an open task to `toIndex` of the displayed (newest-first) list. */
-  move: (id: string, toIndex: number) => Promise<void>;
+  /**
+   * Moves an open task to `toIndex` of the list on screen. `shown` is that list's
+   * ids in display order: the index means nothing against any other ordering.
+   */
+  move: (id: string, toIndex: number, shown: readonly string[]) => Promise<void>;
   /** Moves a selection to a list (`undefined`: the main list). */
   moveMany: (ids: readonly string[], listId: string | undefined) => Promise<void>;
   completeMany: (ids: readonly string[]) => Promise<void>;
@@ -84,8 +87,10 @@ export function useTasks(
   );
 
   const move = useCallback(
-    async (id: string, toIndex: number) => {
-      const changes = planMove(groupTasks(tasks).open, id, toIndex);
+    async (id: string, toIndex: number, shown: readonly string[]) => {
+      const byId = new Map(tasks.map((t) => [t.id, t]));
+      const displayed = shown.flatMap((s) => byId.get(s) ?? []);
+      const changes = planMove(displayed, id, toIndex);
       if (changes.length === 0) return;
       await guard(() => repo.saveOrder(changes, now()));
     },

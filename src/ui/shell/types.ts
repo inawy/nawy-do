@@ -46,7 +46,7 @@ export interface TasksScreenProps {
   onToggle: (t: Task) => void;
   onStar: (t: Task) => void;
   onOpen: (t: Task) => void;
-  onMove: (id: string, toIndex: number) => void;
+  onMove: (id: string, toIndex: number, shown: readonly string[]) => void;
   /** Moves the selected tasks to a list (`undefined`: the main list). */
   onMoveMany: (ids: string[], listId: string | undefined) => void;
   onCompleteMany: (ids: string[]) => void;
