@@ -3,6 +3,8 @@ export interface Step {
   id: string;
   title: string;
   done: boolean;
+  /** 1: shown under the step before it (one level of nesting, like Google Tasks). Absent: top level. */
+  level?: 1;
 }
 
 export const MAX_STEPS = 50;

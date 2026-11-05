@@ -1,4 +1,4 @@
-import { MAX_STEPS, MAX_STEP_TITLE, type Step } from '@/core/model';
+import { canIndent, MAX_STEPS, MAX_STEP_TITLE, setStepLevel, type Step } from '@/core/model';
 import { Button, CloseIcon, IconButton, TextInput } from '../primitives';
 
 interface Props {
@@ -17,7 +17,7 @@ export function StepsField({ steps, onChange, draft, onDraft, onAdd }: Props) {
       <legend>الخطوات</legend>
       <ul className="list" aria-label="الخطوات">
         {steps.map((st) => (
-          <li key={st.id} className="step">
+          <li key={st.id} className="step" data-level={st.level}>
             <label className="hit">
               <input
                 type="checkbox"
@@ -30,6 +30,19 @@ export function StepsField({ steps, onChange, draft, onDraft, onAdd }: Props) {
               />
             </label>
             <span className={st.done ? 'step-title done-title' : 'step-title'}>{st.title}</span>
+            {(st.level === 1 || canIndent(steps, st.id)) && (
+              <Button
+                variant="text"
+                aria-label={
+                  st.level === 1
+                    ? `ارفع الخطوة للمستوى الأول: ${st.title}`
+                    : `اجعل الخطوة فرعية: ${st.title}`
+                }
+                onClick={() => onChange(setStepLevel(steps, st.id, st.level === 1 ? undefined : 1))}
+              >
+                {st.level === 1 ? 'رفع' : 'فرعية'}
+              </Button>
+            )}
             <IconButton
               label={`حذف الخطوة: ${st.title}`}
               onClick={() => onChange(steps.filter((x) => x.id !== st.id))}
