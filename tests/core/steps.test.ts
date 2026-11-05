@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   canIndent,
   cleanSteps,
+  moveStep,
   createTask,
   MAX_STEPS,
   parseTask,
@@ -78,5 +79,35 @@ describe('nested steps', () => {
     const parsed = parseTask({ ...base, steps: raw });
     expect(parsed.ok && parsed.value.steps?.map((x) => x.level)).toEqual([undefined, 1]);
     expect(parseTask({ ...base, steps: [{ ...st('a', 'أ'), level: 2 }] }).ok).toBe(false);
+  });
+});
+
+describe('moving steps', () => {
+  const ids = (steps: readonly { id: string }[] | undefined) => steps?.map((x) => x.id);
+  const nested = [
+    st('a', 'أ'),
+    { ...st('a1', 'أ١'), level: 1 as const },
+    { ...st('a2', 'أ٢'), level: 1 as const },
+    st('b', 'ب'),
+    st('c', 'ج'),
+  ];
+
+  it('a parent moves together with its nested steps', () => {
+    expect(ids(moveStep(nested, 'a', 1))).toEqual(['b', 'a', 'a1', 'a2', 'c']);
+    expect(ids(moveStep(nested, 'b', -1))).toEqual(['b', 'a', 'a1', 'a2', 'c']);
+    expect(ids(moveStep(nested, 'c', -1))).toEqual(['a', 'a1', 'a2', 'c', 'b']);
+  });
+
+  it('a nested step swaps with its sibling and never leaves its parent', () => {
+    expect(ids(moveStep(nested, 'a1', 1))).toEqual(['a', 'a2', 'a1', 'b', 'c']);
+    expect(moveStep(nested, 'a1', -1)).toBeUndefined();
+    expect(moveStep(nested, 'a2', 1)).toBeUndefined();
+  });
+
+  it('has nowhere to go at the ends, and keeps every step', () => {
+    expect(moveStep(nested, 'a', -1)).toBeUndefined();
+    expect(moveStep(nested, 'c', 1)).toBeUndefined();
+    expect(moveStep(nested, 'zzz', 1)).toBeUndefined();
+    expect(ids(moveStep(nested, 'b', 1))?.sort()).toEqual(['a', 'a1', 'a2', 'b', 'c']);
   });
 });

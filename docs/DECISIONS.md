@@ -231,7 +231,7 @@ The drag context stays inside `SortableList` (D-018). While a row is dragged, `u
 
 ## D-036 — Steps nest one level, stored in the same list
 
-A step may carry `level: 1` and then shows under the step before it (indent/lift buttons in the details sheet; envelope v7, older files import unchanged). One level only, like Google Tasks: deeper trees cost UI and merge complexity for little use, and steps stay inside the task record (D-013), so there is no new entity or sync path. A step cannot be indented if it is first or already has nested steps; lifting never loses data. Completing a parent does not complete its children (and the progress chip counts all steps). Not done: reordering steps, collapsing a parent, and real sub-tasks as separate records.
+A step may carry `level: 1` and then shows under the step before it (indent/lift buttons in the details sheet; envelope v7, older files import unchanged). One level only, like Google Tasks: deeper trees cost UI and merge complexity for little use, and steps stay inside the task record (D-013), so there is no new entity or sync path. A step cannot be indented if it is first or already has nested steps; lifting never loses data. Completing a parent does not complete its children (and the progress chip counts all steps). Steps reorder with up/down buttons (a parent moves with its nested steps; a nested step stays inside its parent) rather than drag: it is keyboard- and screen-reader-friendly and avoids drag-and-drop over a two-level list. Not done: collapsing a parent, and real sub-tasks as separate records.
 
 ## D-037 — A rolling local copy, honest about what it protects
 
