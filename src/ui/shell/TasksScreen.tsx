@@ -48,7 +48,26 @@ export function TasksScreen(p: TasksScreenProps) {
         onNewList={() => ui.setSheet({ mode: 'create' })}
       />
       <main className="main">
-        {p.backupNudge && (
+        {p.dueNotice && (
+          <div className="update" role="status">
+            <span>
+              محتاج انتباهك:{' '}
+              {[
+                p.dueNotice.overdue > 0 && `${p.dueNotice.overdue.toLocaleString('ar-EG')} متأخرة`,
+                p.dueNotice.today > 0 && `${p.dueNotice.today.toLocaleString('ar-EG')} النهارده`,
+              ]
+                .filter(Boolean)
+                .join('، ')}
+            </span>
+            <button type="button" onClick={p.dueNotice.onShow}>
+              اعرضها
+            </button>
+            <button type="button" className="later" onClick={p.dueNotice.onLater}>
+              بعدين
+            </button>
+          </div>
+        )}
+        {p.backupNudge && !p.dueNotice && (
           <div className="update" role="status">
             <span>عدّى وقت من آخر نسخة احتياطية. خُد نسخة تحفظها بره الجهاز.</span>
             <button
