@@ -34,6 +34,10 @@
   background: var(--brand-soft);
   border-radius: 12px;
 }
+.update .later {
+  background: transparent;
+  color: var(--brand);
+}
 .update button {
   border: 0;
   background: var(--brand);

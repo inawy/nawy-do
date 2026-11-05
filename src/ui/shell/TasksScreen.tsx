@@ -48,6 +48,23 @@ export function TasksScreen(p: TasksScreenProps) {
         onNewList={() => ui.setSheet({ mode: 'create' })}
       />
       <main className="main">
+        {p.backupNudge && (
+          <div className="update" role="status">
+            <span>عدّى وقت من آخر نسخة احتياطية. خُد نسخة تحفظها بره الجهاز.</span>
+            <button
+              type="button"
+              onClick={() => {
+                p.data.onOpen();
+                ui.setDataOpen(true);
+              }}
+            >
+              خُد نسخة
+            </button>
+            <button type="button" className="later" onClick={p.backupNudge.onLater}>
+              بعدين
+            </button>
+          </div>
+        )}
         {p.applyUpdate && (
           <div className="update" role="status">
             <span>في نسخة جديدة من ناوي دو.</span>
@@ -147,6 +164,8 @@ export function TasksScreen(p: TasksScreenProps) {
           snapshots={p.data.snapshots}
           outcome={p.data.outcome}
           onExport={p.data.onExport}
+          onShare={p.data.onShare}
+          lastExport={p.data.lastExport}
           onImport={p.data.onImport}
           onRestore={p.data.onRestore}
           onClose={() => ui.setDataOpen(false)}
