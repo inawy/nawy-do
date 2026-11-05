@@ -64,8 +64,8 @@ export function App({ repositories, db, now = systemClock, today = systemToday }
   const [due, setDue] = useState<DueSummary | undefined>(undefined);
   const { ready: tasksReady, tasks: allTasks } = tasks;
   useEffect(() => {
-    if (tasksReady && due === undefined) setDue(dueSummary(allTasks, systemToday()));
-  }, [tasksReady, allTasks, due]);
+    if (tasksReady && due === undefined) setDue(dueSummary(allTasks, today()));
+  }, [tasksReady, allTasks, due, today]);
 
   // Text shared from another app becomes a new intention (once per launch).
   const { add } = tasks;
