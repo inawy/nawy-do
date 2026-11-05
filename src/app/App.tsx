@@ -112,13 +112,14 @@ export function App({ repositories, db, now = systemClock, today = systemToday }
         onRestore: (id) => void backup.restore(id),
       }}
       dueNotice={
-        tasks.ready &&
+        due !== undefined &&
         !tasks.failed &&
         !dueLater &&
         selection !== 'today' &&
         due.overdue + due.today > 0
           ? {
-              ...due,
+              overdue: due.overdue,
+              today: due.today,
               onShow: () => {
                 setChosen('today');
                 setDueLater(true);
