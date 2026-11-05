@@ -115,3 +115,17 @@ describe('the end of the calendar', () => {
     expect(addMonths('9999-11-30', 3)).toBe('9999-12-30');
   });
 });
+
+describe('workdays and yearly', () => {
+  it('workdays skip Friday and Saturday (Sunday–Thursday week)', () => {
+    expect(nextDue('2026-11-04', 'workdays', '2026-11-04')).toBe('2026-11-05'); // Wed → Thu
+    expect(nextDue('2026-11-05', 'workdays', '2026-11-05')).toBe('2026-11-08'); // Thu → Sun
+    expect(nextDue('2026-10-01', 'workdays', '2026-11-05')).toBe('2026-11-08'); // missed: no pile-up
+  });
+
+  it('yearly keeps the date, and a leap day falls on the 28th', () => {
+    expect(nextDue('2026-11-03', 'yearly', '2026-11-03')).toBe('2027-11-03');
+    expect(nextDue('2024-02-29', 'yearly', '2024-02-29')).toBe('2025-02-28');
+    expect(nextDue('2020-05-01', 'yearly', '2026-11-05')).toBe('2027-05-01');
+  });
+});

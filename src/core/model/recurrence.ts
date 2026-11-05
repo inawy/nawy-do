@@ -31,6 +31,17 @@ export function nextDue(due: string, repeat: Repeat, today: string): string {
     const next = addMonths(due, k);
     return next > today ? next : addMonths(due, k + 1);
   }
+  if (repeat === 'yearly') {
+    const k = Math.max(1, tc.y - c.y);
+    const next = addMonths(due, 12 * k);
+    return next > today ? next : addMonths(due, 12 * (k + 1));
+  }
+  if (repeat === 'workdays') {
+    // 1970-01-01 was a Thursday; Friday (5) and Saturday (6) are the weekend.
+    let day = Math.max(a, t) + 1;
+    while ((day + 4) % 7 >= 5) day += 1;
+    return addDays(due, day - a);
+  }
   const step = repeat === 'daily' ? 1 : 7;
   const k = Math.max(1, Math.floor((t - a) / step) + 1);
   return addDays(due, k * step);
@@ -43,6 +54,8 @@ export const isRepeating = (task: Task): task is Task & { due: string; repeat: R
 /** How a repetition is shown to the user. */
 export const REPEAT_LABEL: Record<Repeat, string> = {
   daily: 'كل يوم',
+  workdays: 'أيام العمل (الأحد–الخميس)',
   weekly: 'كل أسبوع',
   monthly: 'كل شهر',
+  yearly: 'كل سنة',
 };
