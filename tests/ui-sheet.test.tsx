@@ -1,4 +1,4 @@
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { Sheet } from '@/ui/sheet';
 
@@ -61,6 +61,29 @@ describe('Sheet', () => {
     });
     expect(upper).toHaveBeenCalledTimes(1);
     expect(lower).not.toHaveBeenCalled();
+  });
+
+  it('moves focus into the dialog, wraps Tab inside it, and gives focus back on close', () => {
+    const opener = document.createElement('button');
+    document.body.append(opener);
+    opener.focus();
+    const { unmount } = render(
+      <Sheet label="فخ" onClose={vi.fn()}>
+        <button>أول</button>
+        <button>آخر</button>
+      </Sheet>,
+    );
+    const dialog = screen.getByRole('dialog');
+    expect(document.activeElement).toBe(dialog);
+    const [first, last] = within(dialog).getAllByRole('button');
+    last?.focus();
+    fireEvent.keyDown(last as HTMLElement, { key: 'Tab' });
+    expect(document.activeElement).toBe(first);
+    fireEvent.keyDown(first as HTMLElement, { key: 'Tab', shiftKey: true });
+    expect(document.activeElement).toBe(last);
+    unmount();
+    expect(document.activeElement).toBe(opener);
+    opener.remove();
   });
 
   it('does not push another history entry when the parent re-renders', () => {

@@ -17,6 +17,9 @@
   border-radius: 20px 20px 0 0;
   padding: 0 1rem calc(1rem + env(safe-area-inset-bottom));
 }
+.sheet:focus {
+  outline: none; /* focus lands here when the sheet opens; the fields show their own ring */
+}
 .sheet-grab {
   display: grid;
   place-items: center;
