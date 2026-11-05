@@ -20,3 +20,23 @@ export function saveSort(mode: SortMode): void {
     // Not saved: the choice still applies until the page closes.
   }
 }
+
+const EXPORT_KEY = 'nawy-do:last-export';
+
+/** When a backup file was last taken on this device (`undefined`: never, or storage unavailable). */
+export function loadLastExport(): number | undefined {
+  try {
+    const n = Number(window.localStorage.getItem(EXPORT_KEY));
+    return Number.isFinite(n) && n > 0 ? n : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+export function saveLastExport(at: number): void {
+  try {
+    window.localStorage.setItem(EXPORT_KEY, String(at));
+  } catch {
+    // Not saved: the reminder may come back sooner than needed, which is the safe side.
+  }
+}

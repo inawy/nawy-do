@@ -1,5 +1,11 @@
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
-import { newTaskDefaults, resolveSelection, type Selection, type SortMode } from '@/core/model';
+import {
+  needsBackupNudge,
+  newTaskDefaults,
+  resolveSelection,
+  type Selection,
+  type SortMode,
+} from '@/core/model';
 import type { Repositories } from '@/core/ports';
 import { createDexieRepositories, type NawyDoDb } from '@/data';
 import { useBackup } from '@/features/backup';
@@ -8,13 +14,14 @@ import { useTasks } from '@/features/tasks';
 import { TasksScreen } from '@/ui/shell';
 import { formatWhen, systemClock, systemToday } from './clock';
 import { getDb } from './db';
-import { downloadText } from './files';
+import { canShareFile, downloadText, shareText } from './files';
 import { installSignal } from './install';
 import { newId } from './ids';
 import { loadSort, saveSort } from './prefs';
 import { takeLaunch } from './launch';
 import { requestPersistence, type StorageState } from './storage';
 import { updateSignal } from './updateSignal';
+import { useExportLog } from './useExportLog';
 
 interface Props {
   /** Storage: the repositories to use, or a Dexie database to wrap, or (by default) the app's own. */
@@ -41,6 +48,8 @@ export function App({ repositories, db, now = systemClock, today = systemToday }
   const [chosen, setChosen] = useState<Selection>('main');
   const [storage, setStorage] = useState<StorageState | 'unknown'>('unknown');
   const [openId, setOpenId] = useState<string | null>(null);
+  const exportLog = useExportLog(now);
+  const [nudgeLater, setNudgeLater] = useState(false);
 
   useEffect(() => {
     void requestPersistence().then(setStorage);
@@ -74,10 +83,29 @@ export function App({ repositories, db, now = systemClock, today = systemToday }
         outcome: backup.outcome,
         onOpen: () => void backup.refresh(),
         onExport: () =>
-          void backup.exportJson().then((text) => downloadText(`nawy-do-${today()}.json`, text)),
+          void backup.exportJson().then((text) => {
+            downloadText(`nawy-do-${today()}.json`, text);
+            exportLog.mark();
+          }),
+        onShare: canShareFile()
+          ? () =>
+              void backup
+                .exportJson()
+                .then((text) => shareText(`nawy-do-${today()}.json`, text))
+                .then((shared) => shared && exportLog.mark())
+          : undefined,
+        lastExport: exportLog.last === undefined ? undefined : formatWhen(exportLog.last),
         onImport: (file) => void file.text().then(backup.importText),
         onRestore: (id) => void backup.restore(id),
       }}
+      backupNudge={
+        tasks.ready &&
+        !tasks.failed &&
+        !nudgeLater &&
+        needsBackupNudge(exportLog.last, now(), tasks.tasks.length)
+          ? { onLater: () => setNudgeLater(true) }
+          : undefined
+      }
       tasks={tasks.tasks}
       lists={lists.lists}
       today={today()}

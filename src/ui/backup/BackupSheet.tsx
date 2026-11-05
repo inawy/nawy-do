@@ -21,6 +21,8 @@ interface Props {
   snapshots: SnapshotItem[];
   outcome: Outcome | null;
   onExport: () => void;
+  onShare?: () => void;
+  lastExport?: string;
   onImport: (file: File) => void;
   onRestore: (id: number) => void;
   onClose: () => void;
@@ -59,6 +61,8 @@ export function BackupSheet({
   snapshots,
   outcome,
   onExport,
+  onShare,
+  lastExport,
   onImport,
   onRestore,
   onClose,
@@ -82,10 +86,14 @@ export function BackupSheet({
           احتياطية بانتظام.
         </p>
       ) : null}
+      <p className="hint">
+        {lastExport ? `آخر نسخة احتياطية: ${lastExport}` : 'لسه ماخدتش نسخة احتياطية.'}
+      </p>
       <div className="actions data-actions">
         <Button variant="primary" onClick={onExport}>
           تنزيل نسخة احتياطية
         </Button>
+        {onShare && <Button onClick={onShare}>مشاركة النسخة (Drive وغيره)</Button>}
         <Button onClick={() => file.current?.click()}>استيراد من ملف</Button>
         <input
           ref={file}

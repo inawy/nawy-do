@@ -17,12 +17,18 @@ export interface DataProps {
   /** Called when the sheet opens (loads the safety copies, clears the last result). */
   onOpen: () => void;
   onExport: () => void;
+  /** Hands the backup to the system share sheet; absent where the browser cannot. */
+  onShare?: () => void;
+  /** When the last backup file was taken, already formatted; absent: never. */
+  lastExport?: string;
   onImport: (file: File) => void;
   onRestore: (id: number) => void;
 }
 
 export interface TasksScreenProps {
   data: DataProps;
+  /** Set when it is time to ask for a backup; «خُد نسخة» opens «بياناتي», «بعدين» hides it. */
+  backupNudge?: { onLater: () => void };
   tasks: Task[];
   lists: TaskList[];
   today: string;
