@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import {
+  dueSummary,
+  type DueSummary,
   needsBackupNudge,
   newTaskDefaults,
   resolveSelection,
@@ -50,12 +52,20 @@ export function App({ repositories, db, now = systemClock, today = systemToday }
   const [openId, setOpenId] = useState<string | null>(null);
   const exportLog = useExportLog(now);
   const [nudgeLater, setNudgeLater] = useState(false);
+  const [dueLater, setDueLater] = useState(false);
 
   useEffect(() => {
     void requestPersistence().then(setStorage);
   }, []);
 
   const selection = resolveSelection(chosen, lists.lists);
+  // What needed attention when the app opened: counted once, so adding a task later does not
+  // pop the notice up mid-session.
+  const [due, setDue] = useState<DueSummary | undefined>(undefined);
+  const { ready: tasksReady, tasks: allTasks } = tasks;
+  useEffect(() => {
+    if (tasksReady && due === undefined) setDue(dueSummary(allTasks, systemToday()));
+  }, [tasksReady, allTasks, due]);
 
   // Text shared from another app becomes a new intention (once per launch).
   const { add } = tasks;
@@ -101,6 +111,22 @@ export function App({ repositories, db, now = systemClock, today = systemToday }
         onImport: (file) => void file.text().then(backup.importText),
         onRestore: (id) => void backup.restore(id),
       }}
+      dueNotice={
+        tasks.ready &&
+        !tasks.failed &&
+        !dueLater &&
+        selection !== 'today' &&
+        due.overdue + due.today > 0
+          ? {
+              ...due,
+              onShow: () => {
+                setChosen('today');
+                setDueLater(true);
+              },
+              onLater: () => setDueLater(true),
+            }
+          : undefined
+      }
       backupNudge={
         tasks.ready &&
         !tasks.failed &&

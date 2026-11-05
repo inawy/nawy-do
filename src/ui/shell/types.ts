@@ -28,6 +28,8 @@ export interface DataProps {
 export interface TasksScreenProps {
   data: DataProps;
   /** Set when it is time to ask for a backup; «خُد نسخة» opens «بياناتي», «بعدين» hides it. */
+  /** Overdue and due-today counts to flag when the app opens; «اعرضها» goes to «اليوم». */
+  dueNotice?: { overdue: number; today: number; onShow: () => void; onLater: () => void };
   backupNudge?: { onLater: () => void };
   tasks: Task[];
   lists: TaskList[];
