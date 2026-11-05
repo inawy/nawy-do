@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import {
+  canIndent,
   cleanSteps,
   createTask,
   MAX_STEPS,
   parseTask,
   restoreTask,
+  setStepLevel,
   stepProgress,
   tombstoneTask,
   updateTask,
@@ -46,5 +48,35 @@ describe('steps', () => {
       const r = parseTask({ ...base, steps });
       expect(!r.ok && r.error).toBe('steps');
     }
+  });
+});
+
+describe('nested steps', () => {
+  const list = [st('a', 'أ'), st('b', 'ب'), st('c', 'ج')];
+
+  it('indents under the step before; the first step and a parent cannot be indented', () => {
+    expect(canIndent(list, 'a')).toBe(false);
+    expect(canIndent(list, 'b')).toBe(true);
+    const nested = setStepLevel(list, 'c', 1);
+    expect(nested[2]?.level).toBe(1);
+    expect(canIndent(nested, 'b')).toBe(false); // it has a nested step now
+    expect(setStepLevel(nested, 'b', 1)).toEqual(nested);
+  });
+
+  it('lifting a step drops its level; a disallowed indent changes nothing', () => {
+    const nested = setStepLevel(list, 'b', 1);
+    expect(setStepLevel(nested, 'b', undefined)).toEqual(list);
+    expect(setStepLevel(list, 'a', 1)).toEqual(list);
+  });
+
+  it('cleanSteps and parseTask keep one level and drop a level on the first step', () => {
+    const raw = [
+      { ...st('a', 'أ'), level: 1 as const },
+      { ...st('b', 'ب'), level: 1 as const },
+    ];
+    expect(cleanSteps(raw).map((x) => x.level)).toEqual([undefined, 1]);
+    const parsed = parseTask({ ...base, steps: raw });
+    expect(parsed.ok && parsed.value.steps?.map((x) => x.level)).toEqual([undefined, 1]);
+    expect(parseTask({ ...base, steps: [{ ...st('a', 'أ'), level: 2 }] }).ok).toBe(false);
   });
 });

@@ -28,8 +28,11 @@ function parseSteps(raw: unknown): Step[] | undefined {
     if (typeof id !== 'string' || id === '' || id.length > 100 || seen.has(id)) return undefined;
     if (typeof title !== 'string' || title.length > MAX_STEP_TITLE) return undefined;
     if (typeof done !== 'boolean') return undefined;
+    if (o['level'] !== undefined && o['level'] !== 1) return undefined;
     seen.add(id);
-    out.push({ id, title, done });
+    out.push(
+      o['level'] === 1 && out.length > 0 ? { id, title, done, level: 1 } : { id, title, done },
+    );
   }
   return out;
 }

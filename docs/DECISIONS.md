@@ -228,3 +228,7 @@ The drag context stays inside `SortableList` (D-018). While a row is dragged, `u
 ## D-035 — More repeat kinds: workdays (Sunday–Thursday) and yearly
 
 `Repeat` gains `workdays` and `yearly` (envelope v6; v2–v5 files import unchanged, a v6 file is refused by older builds as «newer»). `workdays` follows the Sunday–Thursday week of the Arabic-speaking users this app is for (weekend Friday–Saturday) — a regional default, not configurable yet; a configurable week start/weekend and arbitrary custom weekday sets are a later step if asked for. Like the others it keeps one record and moves `due` to the first occurrence after both the due date and today. `yearly` keeps the day and month; 29 February lands on the 28th in other years (the anchor is not remembered, as in monthly).
+
+## D-036 — Steps nest one level, stored in the same list
+
+A step may carry `level: 1` and then shows under the step before it (indent/lift buttons in the details sheet; envelope v7, older files import unchanged). One level only, like Google Tasks: deeper trees cost UI and merge complexity for little use, and steps stay inside the task record (D-013), so there is no new entity or sync path. A step cannot be indented if it is first or already has nested steps; lifting never loses data. Completing a parent does not complete its children (and the progress chip counts all steps). Not done: reordering steps, collapsing a parent, and real sub-tasks as separate records.

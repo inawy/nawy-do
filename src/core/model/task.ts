@@ -38,7 +38,12 @@ export function cleanSteps(steps: readonly Step[]): Step[] {
     const title = step.title.trim().slice(0, MAX_STEP_TITLE);
     if (title === '' || seen.has(step.id)) continue;
     seen.add(step.id);
-    out.push({ id: step.id, title, done: step.done });
+    // A nested step needs a step before it to hang under.
+    out.push(
+      step.level === 1 && out.length > 0
+        ? { id: step.id, title, done: step.done, level: 1 }
+        : { id: step.id, title, done: step.done },
+    );
     if (out.length === MAX_STEPS) break;
   }
   return out;
