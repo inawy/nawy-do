@@ -20,6 +20,8 @@ import {
   editListById,
   restoreRemovedList,
   snapshotBeforeUpgrade,
+  snapshotDaily,
+  KEEP_DAILY,
   TOMBSTONE_TTL_MS,
   type NawyDoDb,
 } from '@/data';
@@ -214,5 +216,29 @@ describe('saveListOrder', () => {
     await addList(db, 'A', 'أ', 1000);
     await removeList(db, 'A', 2000);
     expect(await saveListOrder(db, [{ id: 'A', sortOrder: 5 }], 3000)).toBe(0);
+  });
+});
+
+describe('rolling daily copy', () => {
+  it('saves one a day only when data exists and changed, keeps seven, never pushes out upgrade copies', async () => {
+    const local = createDb(`daily-${n++}`);
+    const snaps = `snaps-${n++}`;
+    const DAY = 86_400_000;
+    expect(await snapshotDaily(local, DAY, snaps)).toBe('skipped'); // nothing to copy yet
+    await addTask(local, 'a', 'نية', 1);
+    expect(await snapshotDaily(local, DAY, snaps)).toBe('saved');
+    expect(await snapshotDaily(local, DAY + 1000, snaps)).toBe('skipped'); // same day
+    expect(await snapshotDaily(local, 3 * DAY, snaps)).toBe('skipped'); // unchanged
+    for (let i = 0; i < 9; i++) {
+      await addTask(local, `t${i}`, 'تانية', 10 + i);
+      expect(await snapshotDaily(local, (10 + i) * DAY, snaps)).toBe('saved');
+    }
+    const all = await listSnapshots(snaps);
+    expect(all.filter((s) => s.kind === 'daily')).toHaveLength(KEEP_DAILY);
+    const old = v1Name();
+    await makeV1(old);
+    await snapshotBeforeUpgrade(old, 1, snaps);
+    expect((await listSnapshots(snaps)).filter((s) => s.kind === 'upgrade')).toHaveLength(1);
+    local.close();
   });
 });

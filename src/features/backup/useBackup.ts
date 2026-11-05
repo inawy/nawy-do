@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { type EnvelopeError } from '@/core/model';
 import type { BackupRepository, SafetyCopy } from '@/core/ports';
 
@@ -13,6 +13,7 @@ export interface SnapshotInfo {
   id: number;
   createdAt: number;
   fromVersion: number;
+  kind: 'upgrade' | 'daily';
 }
 
 export interface BackupApi {
@@ -32,6 +33,7 @@ const info = (s: SafetyCopy): SnapshotInfo => ({
   id: s.id as number,
   createdAt: s.createdAt,
   fromVersion: s.fromVersion,
+  kind: s.kind,
 });
 
 /** Export, import and the pre-upgrade safety copies. `now` is injected (D-005). */
@@ -39,6 +41,12 @@ export function useBackup(repo: BackupRepository, now: () => number): BackupApi 
   const [snapshots, setSnapshots] = useState<SnapshotInfo[]>([]);
   const [copies, setCopies] = useState<SafetyCopy[]>([]);
   const [outcome, setOutcome] = useState<BackupOutcome | null>(null);
+
+  // The rolling daily copy: after the first screen is up, so it never slows the start.
+  useEffect(() => {
+    const timer = setTimeout(() => void repo.autoSnapshot(now()).catch(() => undefined), 3000);
+    return () => clearTimeout(timer);
+  }, [repo, now]);
 
   const refresh = useCallback(async () => {
     setOutcome(null);

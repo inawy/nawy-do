@@ -5,4 +5,5 @@ export * from './backup';
 export * from './purge';
 export * from './live';
 export * from './snapshot';
+export * from './autosnapshot';
 export * from './repos';

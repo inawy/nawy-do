@@ -3,7 +3,8 @@ import { exportBackup, importBackup } from './backup';
 import { addList, removeList, editListById, restoreRemovedList, saveListOrder } from './lists';
 import { watchLists, watchTasks } from './live';
 import type { NawyDoDb } from './schema';
-import { listSnapshots } from './snapshot';
+import { snapshotDaily } from './autosnapshot';
+import { listSnapshots, snapshotKind } from './snapshot';
 import {
   addTask,
   completeTaskById,
@@ -46,8 +47,17 @@ export function createDexieRepositories(db: NawyDoDb): Repositories {
         (await listSnapshots()).flatMap((s) =>
           s.id === undefined
             ? []
-            : [{ id: s.id, createdAt: s.createdAt, fromVersion: s.fromVersion, json: s.json }],
+            : [
+                {
+                  id: s.id,
+                  createdAt: s.createdAt,
+                  fromVersion: s.fromVersion,
+                  json: s.json,
+                  kind: snapshotKind(s),
+                },
+              ],
         ),
+      autoSnapshot: (now) => snapshotDaily(db, now),
     },
   };
 }

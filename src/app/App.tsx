@@ -79,7 +79,10 @@ export function App({ repositories, db, now = systemClock, today = systemToday }
     <TasksScreen
       data={{
         storage,
-        snapshots: backup.snapshots.map((s) => ({ id: s.id, label: formatWhen(s.createdAt) })),
+        snapshots: backup.snapshots.map((s) => ({
+          id: s.id,
+          label: `${s.kind === 'daily' ? 'تلقائية' : 'قبل تحديث'} · ${formatWhen(s.createdAt)}`,
+        })),
         outcome: backup.outcome,
         onOpen: () => void backup.refresh(),
         onExport: () =>

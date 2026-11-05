@@ -232,3 +232,7 @@ The drag context stays inside `SortableList` (D-018). While a row is dragged, `u
 ## D-036 — Steps nest one level, stored in the same list
 
 A step may carry `level: 1` and then shows under the step before it (indent/lift buttons in the details sheet; envelope v7, older files import unchanged). One level only, like Google Tasks: deeper trees cost UI and merge complexity for little use, and steps stay inside the task record (D-013), so there is no new entity or sync path. A step cannot be indented if it is first or already has nested steps; lifting never loses data. Completing a parent does not complete its children (and the progress chip counts all steps). Not done: reordering steps, collapsing a parent, and real sub-tasks as separate records.
+
+## D-037 — A rolling local copy, honest about what it protects
+
+The app takes at most one automatic copy a day (3 s after start, only when there is data and it changed since the previous one), keeps the newest seven, and lists them in «بياناتي» beside the pre-upgrade copies, restorable with the same merge. They live in the same origin as the data, so they protect against a bad import, a bug or a wrong delete — **not** against the browser clearing the whole site; backup files (and the 14-day nudge, D-038 era) cover that. `daily` copies are pruned separately so they never push out `upgrade` copies. Cloud backup (phase G) stays deferred by decision.
