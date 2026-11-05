@@ -23,6 +23,7 @@ import { loadSort, saveSort } from './prefs';
 import { takeLaunch } from './launch';
 import { requestPersistence, type StorageState } from './storage';
 import { updateSignal } from './updateSignal';
+import { useDay } from './useDay';
 import { useExportLog } from './useExportLog';
 
 interface Props {
@@ -50,6 +51,7 @@ export function App({ repositories, db, now = systemClock, today = systemToday }
   const [chosen, setChosen] = useState<Selection>('main');
   const [storage, setStorage] = useState<StorageState | 'unknown'>('unknown');
   const [openId, setOpenId] = useState<string | null>(null);
+  useDay(today, now); // re-renders at midnight, so every `today()` below is the new day
   const exportLog = useExportLog(now);
   const [nudgeLater, setNudgeLater] = useState(false);
   const [dueLater, setDueLater] = useState(false);
