@@ -85,6 +85,7 @@ export function App({ repositories, db, now = systemClock, today = systemToday }
       selection={selection}
       ready={tasks.ready}
       failed={tasks.failed}
+      writeFailed={tasks.writeFailed || lists.writeFailed}
       editing={editing}
       removed={removed}
       sort={sort}

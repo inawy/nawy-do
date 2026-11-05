@@ -43,6 +43,26 @@ describe('Sheet', () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
+  it('with two sheets open, Back closes only the top one', () => {
+    const lower = vi.fn();
+    const upper = vi.fn();
+    render(
+      <>
+        <Sheet label="أولى" onClose={lower}>
+          <p>١</p>
+        </Sheet>
+        <Sheet label="ثانية" onClose={upper}>
+          <p>٢</p>
+        </Sheet>
+      </>,
+    );
+    act(() => {
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+    expect(upper).toHaveBeenCalledTimes(1);
+    expect(lower).not.toHaveBeenCalled();
+  });
+
   it('does not push another history entry when the parent re-renders', () => {
     const onClose = vi.fn();
     const { rerender } = render(

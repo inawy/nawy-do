@@ -10,6 +10,8 @@ import type { ListRepository } from '@/core/ports';
 
 export interface ListsApi {
   lists: TaskList[];
+  /** The last write did not go through. */
+  writeFailed: boolean;
   /** The lists deleted lately, newest last; each undo takes the newest back. */
   removedStack: TaskList[];
   lastRemoved: TaskList | null;
@@ -27,6 +29,17 @@ export interface ListsApi {
 export function useLists(repo: ListRepository, now: () => number, newId: () => string): ListsApi {
   const [lists, setLists] = useState<TaskList[]>([]);
   const [removedStack, setRemovedStack] = useState<TaskList[]>([]);
+  const [writeFailed, setWriteFailed] = useState(false);
+  const attempt = useCallback(async <T>(run: () => Promise<T>): Promise<T | undefined> => {
+    try {
+      const result = await run();
+      setWriteFailed(false);
+      return result;
+    } catch {
+      setWriteFailed(true);
+      return undefined;
+    }
+  }, []);
 
   useEffect(() => repo.watch(setLists, () => undefined), [repo]);
 
@@ -44,37 +57,38 @@ export function useLists(repo: ListRepository, now: () => number, newId: () => s
 
   const edit = useCallback(
     async (list: TaskList, patch: ListPatch) => {
-      await repo.edit(list.id, patch, now()).catch(() => undefined);
+      await attempt(() => repo.edit(list.id, patch, now()));
     },
-    [repo, now],
+    [repo, now, attempt],
   );
 
   const remove = useCallback(
     async (list: TaskList) => {
-      const done = await repo.remove(list.id, now()).catch(() => undefined);
+      const done = await attempt(() => repo.remove(list.id, now()));
       if (done) setRemovedStack((s) => [...s, list].slice(-MAX_UNDO));
     },
-    [repo, now],
+    [repo, now, attempt],
   );
 
   const move = useCallback(
     async (list: TaskList, delta: -1 | 1) => {
-      await repo.saveOrder(planListMove(lists, list.id, delta), now()).catch(() => undefined);
+      await attempt(() => repo.saveOrder(planListMove(lists, list.id, delta), now()));
     },
-    [repo, now, lists],
+    [repo, now, lists, attempt],
   );
 
   const undoRemove = useCallback(async () => {
     const list = removedStack[removedStack.length - 1];
     if (!list) return;
     setRemovedStack((s) => s.slice(0, -1));
-    await repo.restore(list, now()).catch(() => undefined);
-  }, [repo, now, removedStack]);
+    await attempt(() => repo.restore(list, now()));
+  }, [repo, now, removedStack, attempt]);
 
   const dismissUndo = useCallback(() => setRemovedStack([]), []);
 
   return {
     lists,
+    writeFailed,
     removedStack,
     lastRemoved: removedStack[removedStack.length - 1] ?? null,
     add,

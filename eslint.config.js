@@ -34,6 +34,23 @@ const noHardDelete = [
   },
 ];
 
+// Below `ui` nothing reads the environment: ids, time and randomness come in as parameters, and
+// there is no `window` (review #2, D-005).
+const noAmbient = [
+  {
+    selector: "MemberExpression[object.name='Math'][property.name='random']",
+    message: 'Randomness and ids are injected, not read here (D-005).',
+  },
+  {
+    selector: "MemberExpression[object.name='crypto']",
+    message: 'Ids are injected (`newId`), not made here (D-005).',
+  },
+  {
+    selector: "MemberExpression[object.name='window']",
+    message: 'No `window` below the ui layer.',
+  },
+];
+
 // A module (src/ui/tasks, src/features/tasks, ...) is used only through its index.ts. Inside a
 // module, files import each other with relative paths, which this rule does not touch.
 const deepImport = {
@@ -84,6 +101,13 @@ export default tseslint.config(
   {
     files: ['src/data/purge.ts', 'src/data/snapshot.ts'],
     rules: { 'no-restricted-syntax': ['error', noInnerHtml, ...noRawDate] },
+  },
+  {
+    files: ['src/core/**/*.{ts,tsx}', 'src/data/**/*.{ts,tsx}', 'src/features/**/*.{ts,tsx}'],
+    ignores: ['src/data/purge.ts', 'src/data/snapshot.ts'],
+    rules: {
+      'no-restricted-syntax': ['error', noInnerHtml, ...noRawDate, ...noHardDelete, ...noAmbient],
+    },
   },
   // One screen or module that grows past this is doing several jobs: split it (ROADMAP §2.5).
   {

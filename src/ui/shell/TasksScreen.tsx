@@ -85,6 +85,11 @@ export function TasksScreen(p: TasksScreenProps) {
           onCompleteMany={p.onCompleteMany}
           onDone={ui.stopSelecting}
         />
+        {p.writeFailed && (
+          <p className="status" role="alert">
+            مقدرتش أحفظ التغيير الأخير. جرّب تاني.
+          </p>
+        )}
         {p.failed ? (
           <p className="status" role="alert">
             مش قادر أفتح التخزين على الجهاز. لو فاتح تصفح خاص جرّب نافذة عادية.

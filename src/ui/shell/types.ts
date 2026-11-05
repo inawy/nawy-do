@@ -30,6 +30,8 @@ export interface TasksScreenProps {
   selection: Selection;
   ready: boolean;
   failed: boolean;
+  /** A save did not go through: say so, the data on screen is unchanged. */
+  writeFailed: boolean;
   editing: Task | undefined;
   /** The task or list just deleted (at most one is offered for undo). */
   /** The newest deletion; `more` = how many older ones can be undone after it. */
