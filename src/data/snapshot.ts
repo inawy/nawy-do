@@ -15,12 +15,35 @@ export interface Snapshot {
   fromVersion: number;
   /** A backup file in the format of that version, restorable with `importBackup`. */
   json: string;
+  /** Why it was taken; copies from before this field existed are `upgrade`. */
+  kind?: SnapshotKind;
 }
+
+export type SnapshotKind = 'upgrade' | 'daily';
+export const KEEP_DAILY = 7;
+export const snapshotKind = (s: Snapshot): SnapshotKind => s.kind ?? 'upgrade';
 
 function snapshotDb(name: string) {
   const db = new Dexie(name) as Dexie & { snapshots: Dexie.Table<Snapshot, number> };
   db.version(1).stores({ snapshots: '++id, createdAt' });
   return db;
+}
+
+/** Stores a copy and keeps only the newest few of its own kind (daily copies never push out upgrade ones). */
+export async function addSnapshot(snapshotName: string, entry: Snapshot): Promise<void> {
+  const store = snapshotDb(snapshotName);
+  try {
+    await store.snapshots.add(entry);
+    const kind = snapshotKind(entry);
+    const keep = kind === 'daily' ? KEEP_DAILY : KEEP_SNAPSHOTS;
+    const same = (await store.snapshots.orderBy('createdAt').toArray()).filter(
+      (s) => snapshotKind(s) === kind,
+    );
+    const extra = same.slice(0, Math.max(0, same.length - keep));
+    await store.snapshots.bulkDelete(extra.map((s) => s.id as number));
+  } finally {
+    store.close();
+  }
 }
 
 export type SnapshotOutcome = 'none' | 'saved' | 'failed';
@@ -44,18 +67,13 @@ export async function snapshotBeforeUpgrade(
     for (const table of old.tables) tables[table.name] = await table.toArray();
     old.close();
 
-    const store = snapshotDb(snapshotName);
     const json = JSON.stringify({
       ...tables,
       app: 'nawy-do',
       schemaVersion: fromVersion,
       exportedAt: now,
     });
-    await store.snapshots.add({ createdAt: now, fromVersion, json });
-    const all = await store.snapshots.orderBy('createdAt').toArray();
-    const extra = all.slice(0, Math.max(0, all.length - KEEP_SNAPSHOTS));
-    await store.snapshots.bulkDelete(extra.map((s) => s.id as number));
-    store.close();
+    await addSnapshot(snapshotName, { createdAt: now, fromVersion, json, kind: 'upgrade' });
     return 'saved';
   } catch {
     return 'failed';

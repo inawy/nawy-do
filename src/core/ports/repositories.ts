@@ -69,6 +69,8 @@ export interface SafetyCopy {
   createdAt: number;
   fromVersion: number;
   json: string;
+  /** `daily`: the rolling automatic copy; `upgrade`: taken before a schema change. */
+  kind: 'upgrade' | 'daily';
 }
 
 export interface BackupRepository {
@@ -77,6 +79,8 @@ export interface BackupRepository {
   /** Parse first, write after, all or nothing; existing data is merged, not replaced (D-006). */
   import(text: string, options?: EnvelopeOptions): Promise<ImportResult>;
   safetyCopies(): Promise<SafetyCopy[]>;
+  /** Takes the rolling daily copy if one is due. Never throws. */
+  autoSnapshot(now: number): Promise<'saved' | 'skipped' | 'failed'>;
 }
 
 /** Everything the app gets from storage. */

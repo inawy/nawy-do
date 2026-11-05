@@ -102,7 +102,7 @@ describe('بياناتي', () => {
     store.close();
     await addTask(db, 'now', 'حالية', 1);
     await open();
-    await screen.findByText('نسخ أمان قبل التحديثات');
+    await screen.findByText('نسخ أمان على الجهاز');
     fireEvent.click(screen.getByRole('button', { name: /استرجاع/ }));
     await screen.findByText(/رجّعت 1 عنصر/);
     await waitFor(async () =>

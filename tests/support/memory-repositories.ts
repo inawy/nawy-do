@@ -36,7 +36,13 @@ export function createMemoryRepositories(): Repositories & {
   const lists = new Map<string, TaskList>();
   const taskSubs = new Set<() => void>();
   const listSubs = new Set<() => void>();
-  const copies: { id: number; createdAt: number; fromVersion: number; json: string }[] = [];
+  const copies: {
+    id: number;
+    createdAt: number;
+    fromVersion: number;
+    json: string;
+    kind: 'upgrade' | 'daily';
+  }[] = [];
 
   const liveTasks = () =>
     [...tasks.values()]
@@ -202,6 +208,7 @@ export function createMemoryRepositories(): Repositories & {
         };
       },
       safetyCopies: async () => [...copies],
+      autoSnapshot: async () => 'skipped' as const,
     },
   };
 }
