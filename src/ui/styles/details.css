@@ -170,3 +170,8 @@
 .flip svg {
   transform: scaleY(-1);
 }
+
+.step-count {
+  color: var(--muted);
+  font-size: 0.8125rem;
+}
