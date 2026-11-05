@@ -1,0 +1,58 @@
+import AxeBuilder from '@axe-core/playwright';
+import { chooseFromMenu } from './menu';
+import { expect, test, type Page } from '@playwright/test';
+
+// Automated accessibility checks (axe) on the main screen and the sheets, in both colour schemes.
+// axe finds the mechanical problems (names, roles, contrast, focus); it cannot judge the reading
+// order or how it sounds in a screen reader, which still needs a person with one.
+const prompt = 'ناوي تعمل إيه؟';
+
+async function add(page: Page, title: string) {
+  await page.getByLabel(prompt).fill(title);
+  await page.getByRole('button', { name: 'إضافة' }).click();
+  await expect(page.getByText(title, { exact: true })).toBeVisible();
+}
+
+async function violations(page: Page): Promise<string[]> {
+  const result = await new AxeBuilder({ page })
+    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+    .analyze();
+  return result.violations
+    .filter((v) => v.impact === 'serious' || v.impact === 'critical')
+    .map(
+      (v) =>
+        `${v.id} (${v.impact}): ${v.help} — ${v.nodes
+          .slice(0, 3)
+          .map((n) => n.target.join(' '))
+          .join(' | ')}`,
+    );
+}
+
+for (const scheme of ['light', 'dark'] as const) {
+  test.describe(scheme, () => {
+    test.use({ colorScheme: scheme });
+
+    test.beforeEach(async ({ page }) => {
+      await page.goto('/');
+      await expect(page.getByLabel(prompt)).toBeVisible();
+      await add(page, 'اشتري خبز');
+      await add(page, 'اتصل بالطبيب');
+    });
+
+    test('main screen', async ({ page }) => {
+      expect(await violations(page)).toEqual([]);
+    });
+
+    test('details sheet', async ({ page }) => {
+      await page.getByRole('button', { name: 'تفاصيل: اشتري خبز' }).click();
+      await expect(page.getByRole('dialog')).toBeVisible();
+      expect(await violations(page)).toEqual([]);
+    });
+
+    test('data sheet', async ({ page }) => {
+      await chooseFromMenu(page, 'بياناتي', 'menuitem');
+      await expect(page.getByRole('dialog')).toBeVisible();
+      expect(await violations(page)).toEqual([]);
+    });
+  });
+}
