@@ -58,6 +58,13 @@
 .row {
   position: relative;
   border-block-end: 1px solid var(--line);
+  /* Rows far off screen are not laid out or painted: thousands of tasks stay smooth. */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 3.5rem;
+}
+.row.dragging,
+.row[data-swipe] {
+  content-visibility: visible;
 }
 .row-slide {
   display: flex;
