@@ -199,27 +199,7 @@ describe('real upgrade from schema v1', () => {
     }
     expect((await listSnapshots(snaps)).map((s) => s.createdAt)).toEqual([5, 4, 3]);
   });
-});
 
-describe('saveListOrder', () => {
-  it('reorders live lists and bumps their updatedAt', async () => {
-    await addList(db, 'A', 'أ', 1000);
-    await addList(db, 'B', 'ب', 2000);
-    const before = await listLists(db);
-    await saveListOrder(db, planListMove(before, 'B', -1), 3000);
-    const after = await listLists(db);
-    expect(after.map((l) => l.id)).toEqual(['B', 'A']);
-    expect(after.every((l) => l.updatedAt >= 3000)).toBe(true);
-  });
-
-  it('skips a list that was deleted meanwhile', async () => {
-    await addList(db, 'A', 'أ', 1000);
-    await removeList(db, 'A', 2000);
-    expect(await saveListOrder(db, [{ id: 'A', sortOrder: 5 }], 3000)).toBe(0);
-  });
-});
-
-describe('rolling daily copy', () => {
   it('saves one a day only when data exists and changed, keeps seven, never pushes out upgrade copies', async () => {
     const local = createDb(`daily-${n++}`);
     const snaps = `snaps-${n++}`;
@@ -240,5 +220,23 @@ describe('rolling daily copy', () => {
     await snapshotBeforeUpgrade(old, 1, snaps);
     expect((await listSnapshots(snaps)).filter((s) => s.kind === 'upgrade')).toHaveLength(1);
     local.close();
+  });
+});
+
+describe('saveListOrder', () => {
+  it('reorders live lists and bumps their updatedAt', async () => {
+    await addList(db, 'A', 'أ', 1000);
+    await addList(db, 'B', 'ب', 2000);
+    const before = await listLists(db);
+    await saveListOrder(db, planListMove(before, 'B', -1), 3000);
+    const after = await listLists(db);
+    expect(after.map((l) => l.id)).toEqual(['B', 'A']);
+    expect(after.every((l) => l.updatedAt >= 3000)).toBe(true);
+  });
+
+  it('skips a list that was deleted meanwhile', async () => {
+    await addList(db, 'A', 'أ', 1000);
+    await removeList(db, 'A', 2000);
+    expect(await saveListOrder(db, [{ id: 'A', sortOrder: 5 }], 3000)).toBe(0);
   });
 });
