@@ -1,4 +1,4 @@
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { Sheet } from '@/ui/sheet';
 
@@ -75,7 +75,7 @@ describe('Sheet', () => {
     );
     const dialog = screen.getByRole('dialog');
     expect(document.activeElement).toBe(dialog);
-    const [first, last] = screen.getAllByRole('button');
+    const [first, last] = within(dialog).getAllByRole('button');
     last?.focus();
     fireEvent.keyDown(last as HTMLElement, { key: 'Tab' });
     expect(document.activeElement).toBe(first);
