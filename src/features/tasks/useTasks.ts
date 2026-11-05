@@ -8,6 +8,8 @@ export interface TasksApi {
   ready: boolean;
   /** The database could not be opened or read. */
   failed: boolean;
+  /** The last write did not go through; the tasks on screen are still the stored ones. */
+  writeFailed: boolean;
   /** The tasks deleted lately, newest last; each undo takes the newest back. */
   removedStack: Task[];
   /** The newest of them (or null). */
@@ -38,6 +40,7 @@ export function useTasks(
   const [tasks, setTasks] = useState<Task[]>([]);
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [writeFailed, setWriteFailed] = useState(false);
   const [removedStack, setRemovedStack] = useState<Task[]>([]);
 
   useEffect(
@@ -55,8 +58,9 @@ export function useTasks(
   const guard = useCallback(async (run: () => Promise<unknown>) => {
     try {
       await run();
+      setWriteFailed(false);
     } catch {
-      setFailed(true);
+      setWriteFailed(true);
     }
   }, []);
 
@@ -123,7 +127,8 @@ export function useTasks(
   const remove = useCallback(
     async (task: Task) => {
       await guard(async () => {
-        await repo.remove(task.id, now());
+        // Nothing was deleted (already gone): nothing to undo either.
+        if (!(await repo.remove(task.id, now()))) return;
         setRemovedStack((s) => [...s, task].slice(-MAX_UNDO));
       });
     },
@@ -143,6 +148,7 @@ export function useTasks(
     tasks,
     ready,
     failed,
+    writeFailed,
     removedStack,
     lastRemoved: removedStack[removedStack.length - 1] ?? null,
     add,
