@@ -1,5 +1,6 @@
 import { useEffect, type FormEvent, type ReactNode } from 'react';
 import { useBackClose } from './useBackClose';
+import { useFocusTrap } from './useFocusTrap';
 import { useSwipeClose } from './useSwipeClose';
 
 interface Props {
@@ -18,6 +19,7 @@ interface Props {
 export function Sheet({ label, onClose, onSubmit, children }: Props) {
   useBackClose(onClose);
   const { sheet, grab } = useSwipeClose(onClose);
+  const trap = useFocusTrap<HTMLDivElement>();
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -44,8 +46,13 @@ export function Sheet({ label, onClose, onSubmit, children }: Props) {
   return (
     <div className="backdrop" onClick={onClose}>
       <div
-        ref={sheet}
+        ref={(node) => {
+          sheet.current = node;
+          trap.ref.current = node;
+        }}
         className="sheet"
+        tabIndex={-1}
+        onKeyDown={trap.onKeyDown}
         role="dialog"
         aria-modal="true"
         aria-label={label}
