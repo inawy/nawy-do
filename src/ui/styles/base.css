@@ -20,7 +20,13 @@ body {
     font: inherit;
     color: inherit;
   }
+  label,
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
   button {
     cursor: pointer;
+    /* No grey square flash on tap (Android); each control draws its own pressed state. */
+    -webkit-tap-highlight-color: transparent;
   }
 }

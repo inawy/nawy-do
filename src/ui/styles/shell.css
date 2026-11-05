@@ -55,6 +55,26 @@ h2 {
 .nav-item.on {
   color: var(--brand);
 }
+/* Phone: the active item sits on a soft pill behind its icon, pressing shows the same pill; no
+   square flash (the browser's tap highlight is switched off in base.css). */
+.nav-icon {
+  display: grid;
+  place-items: center;
+  inline-size: 4rem;
+  block-size: 2rem;
+  border-radius: 999px;
+  transition: background-color 0.15s;
+}
+.nav-item.on .nav-icon {
+  background: var(--brand-soft);
+}
+.nav-item:active .nav-icon {
+  background: var(--hover);
+}
+.nav-item:focus-visible {
+  outline-offset: -6px;
+  border-radius: 1.25rem;
+}
 .nav-label {
   font-size: 0.75rem;
 }
@@ -100,6 +120,14 @@ h2 {
     padding-inline: 1rem;
     border-radius: 999px;
     font-size: 0.9375rem;
+  }
+  /* Wide: the whole row is the pill, so the icon carries no background of its own. */
+  .nav-item .nav-icon,
+  .nav-item.on .nav-icon,
+  .nav-item:active .nav-icon {
+    inline-size: auto;
+    block-size: auto;
+    background: none;
   }
   .nav-item:hover {
     background: var(--hover);
@@ -300,4 +328,5 @@ html {
   background: var(--brand-soft);
   outline: 2px solid var(--brand);
   outline-offset: -2px;
+  border-radius: 1.25rem;
 }
