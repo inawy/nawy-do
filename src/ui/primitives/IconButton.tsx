@@ -11,7 +11,7 @@ export function IconButton({ label, type = 'button', className = '', ...rest }: 
     <button
       type={type}
       aria-label={label}
-      className={`grid size-12 flex-none place-items-center rounded-full border-0 bg-transparent text-muted hover:bg-hover ${className}`}
+      className={`grid size-12 flex-none place-items-center rounded-full border-0 bg-transparent text-muted hover:bg-hover disabled:pointer-events-none disabled:opacity-40 ${className}`}
       {...rest}
     />
   );

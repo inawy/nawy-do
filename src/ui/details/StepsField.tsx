@@ -1,5 +1,12 @@
-import { canIndent, MAX_STEPS, MAX_STEP_TITLE, setStepLevel, type Step } from '@/core/model';
-import { Button, CloseIcon, IconButton, TextInput } from '../primitives';
+import {
+  canIndent,
+  MAX_STEPS,
+  MAX_STEP_TITLE,
+  moveStep,
+  setStepLevel,
+  type Step,
+} from '@/core/model';
+import { Button, ChevronIcon, CloseIcon, IconButton, TextInput } from '../primitives';
 
 interface Props {
   steps: Step[];
@@ -43,6 +50,20 @@ export function StepsField({ steps, onChange, draft, onDraft, onAdd }: Props) {
                 {st.level === 1 ? 'رفع' : 'فرعية'}
               </Button>
             )}
+            {([-1, 1] as const).map((delta) => {
+              const moved = moveStep(steps, st.id, delta);
+              return (
+                <IconButton
+                  key={delta}
+                  label={`${delta === -1 ? 'قدّم' : 'أخّر'} الخطوة: ${st.title}`}
+                  className={delta === -1 ? 'flip' : undefined}
+                  disabled={moved === undefined}
+                  onClick={() => moved && onChange(moved)}
+                >
+                  <ChevronIcon />
+                </IconButton>
+              );
+            })}
             <IconButton
               label={`حذف الخطوة: ${st.title}`}
               onClick={() => onChange(steps.filter((x) => x.id !== st.id))}
