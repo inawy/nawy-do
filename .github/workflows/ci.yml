@@ -63,8 +63,14 @@ jobs:
       - name: Bundle budget (gzip size of what a first visit downloads)
         run: pnpm run budget
       - name: Install Playwright browser
-        timeout-minutes: 5
-        run: pnpm exec playwright install --with-deps chromium
+        timeout-minutes: 12
+        # Runner mirrors are sometimes slow: retry before calling it a failure.
+        run: |
+          for attempt in 1 2 3; do
+            timeout 240 pnpm exec playwright install --with-deps chromium && exit 0
+            echo "attempt $attempt failed"
+          done
+          exit 1
       - name: End-to-end (production build in a real browser)
         run: pnpm run e2e
       - name: Upload e2e traces on failure

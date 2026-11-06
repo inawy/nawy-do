@@ -240,3 +240,7 @@ The app takes at most one automatic copy a day (3 s after start, only when there
 ## D-039 — Budgets the build enforces
 
 CI fails when (a) the gzip size of the first-visit download passes its budget — JS 160 kB, CSS 8 kB, total 180 kB (today about 136 / 5.4 / 142; the 75 kB Cairo font is cached separately and not counted) — or (b) coverage of `core`, `data` and `features` falls below 93 % lines, 93 % functions, 87 % branches, 92 % statements (today 98 / 98 / 92 / 95). The UI layer is left out of coverage on purpose: the end-to-end tests exercise it. Limits are raised only with a written reason in this file, never to turn a red build green.
+
+## D-040 — TypeScript 7 trial: it passes; we stay on 6 for now
+
+TypeScript 7.0 (the native compiler; package `typescript`) type-checks this project with **0 errors, in about 0.55 s against 2.7 s** for 6.0.3 on the CI runner. We do not switch yet because 7.0 has no programmatic API (expected in 7.1), and typescript-eslint, which enforces our layer rules, needs one. Until then CI runs both: 6 gates the build, 7 runs as a non-blocking trial (`pnpm --package=typescript@7 dlx tsc`) so a regression on the native compiler shows early. Switching `typecheck` to 7 while keeping 6 for ESLint is the likely first step once it is worth the two-compiler setup; revisit with 7.1.
