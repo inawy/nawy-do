@@ -26,8 +26,10 @@ async function seed(page: Page) {
 }
 
 test('screens', async ({ page }, info) => {
-  const shot = (name: string) =>
-    page.screenshot({ path: `screenshots/${info.project.name}-${name}.png` });
+  const shot = async (name: string) => {
+    await page.waitForTimeout(400); // let any style transition settle before the picture
+    await page.screenshot({ path: `screenshots/${info.project.name}-${name}.png` });
+  };
   await seed(page);
   await shot('1-main');
   await page.getByRole('button', { name: 'تفاصيل: احجز تذكرة السفر' }).click();
