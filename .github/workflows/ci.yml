@@ -40,6 +40,14 @@ jobs:
       - name: Type check (errors as annotations)
         run: |
           pnpm exec tsc --noEmit --pretty false | sed -E 's/^([^()]+)\(([0-9]+),([0-9]+)\): (.*)$/::error file=\1,line=\2,col=\3::\4/' ; test "${PIPESTATUS[0]}" -eq 0
+      - name: Type check with TypeScript 7 (trial, never fails the build)
+        continue-on-error: true
+        run: |
+          # The native compiler runs next to TS 6 (which typescript-eslint still needs: TS 7 has no
+          # programmatic API yet). Both are timed so the gain is on record.
+          echo "TypeScript 6:"; ( time pnpm exec tsc --noEmit --pretty false ) 2>&1 | tail -4
+          pnpm --package=typescript@7 dlx tsc --version
+          echo "TypeScript 7:"; ( time pnpm --package=typescript@7 dlx tsc --noEmit --pretty false; echo "exit code $?" ) 2>&1 | tail -40
       - run: pnpm run lint
       - run: pnpm run format:check
       - run: pnpm run test:coverage
@@ -55,8 +63,14 @@ jobs:
       - name: Bundle budget (gzip size of what a first visit downloads)
         run: pnpm run budget
       - name: Install Playwright browser
-        timeout-minutes: 5
-        run: pnpm exec playwright install --with-deps chromium
+        timeout-minutes: 12
+        # Runner mirrors are sometimes slow: retry before calling it a failure.
+        run: |
+          for attempt in 1 2 3; do
+            timeout 240 pnpm exec playwright install --with-deps chromium && exit 0
+            echo "attempt $attempt failed"
+          done
+          exit 1
       - name: End-to-end (production build in a real browser)
         run: pnpm run e2e
       - name: Upload e2e traces on failure
