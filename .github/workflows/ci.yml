@@ -40,6 +40,13 @@ jobs:
       - name: Type check (errors as annotations)
         run: |
           pnpm exec tsc --noEmit --pretty false | sed -E 's/^([^()]+)\(([0-9]+),([0-9]+)\): (.*)$/::error file=\1,line=\2,col=\3::\4/' ; test "${PIPESTATUS[0]}" -eq 0
+      - name: Type check with TypeScript 7 (trial, never fails the build)
+        continue-on-error: true
+        run: |
+          # The native compiler runs next to TS 6 (which typescript-eslint still needs: TS 7 has no
+          # programmatic API yet). Both are timed so the gain is on record.
+          echo "TypeScript 6:"; ( time pnpm exec tsc --noEmit --pretty false ) 2>&1 | tail -4
+          echo "TypeScript 7:"; ( time pnpm --package=typescript@7 dlx tsc --noEmit --pretty false ) 2>&1 | tail -40
       - run: pnpm run lint
       - run: pnpm run format:check
       - run: pnpm run test:coverage
