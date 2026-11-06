@@ -46,7 +46,8 @@ jobs:
           # The native compiler runs next to TS 6 (which typescript-eslint still needs: TS 7 has no
           # programmatic API yet). Both are timed so the gain is on record.
           echo "TypeScript 6:"; ( time pnpm exec tsc --noEmit --pretty false ) 2>&1 | tail -4
-          echo "TypeScript 7:"; ( time pnpm --package=typescript@7 dlx tsc --noEmit --pretty false ) 2>&1 | tail -40
+          pnpm --package=typescript@7 dlx tsc --version
+          echo "TypeScript 7:"; ( time pnpm --package=typescript@7 dlx tsc --noEmit --pretty false; echo "exit code $?" ) 2>&1 | tail -40
       - run: pnpm run lint
       - run: pnpm run format:check
       - run: pnpm run test:coverage
