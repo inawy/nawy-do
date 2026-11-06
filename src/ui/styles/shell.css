@@ -162,8 +162,25 @@ h2 {
   display: none;
 }
 .nav-item {
-  min-inline-size: 76px;
+  min-inline-size: 60px;
   white-space: nowrap;
+}
+/* Six items must fit a phone without scrolling: «new list» is a plain + (its name stays for
+   screen readers) and the pill is a little narrower. */
+.nav-new {
+  flex: 0 0 52px;
+  min-inline-size: 0;
+}
+.nav-new-label {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+.nav-icon {
+  inline-size: 3.5rem;
 }
 .nav-sep {
   display: none;
@@ -182,6 +199,16 @@ h2 {
   overflow-wrap: anywhere;
 }
 @media (min-width: 880px) {
+  .nav-new {
+    flex: none;
+  }
+  .nav-new-label {
+    position: static;
+    inline-size: auto;
+    block-size: auto;
+    margin: 0;
+    clip-path: none;
+  }
   .nav {
     overflow: visible;
   }

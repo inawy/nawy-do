@@ -81,7 +81,7 @@ export function Nav({ selection, counts, lists, onSelect, onNewList }: Props) {
         <span className="nav-icon">
           <PlusIcon />
         </span>
-        <span className="nav-label">قائمة جديدة</span>
+        <span className="nav-label nav-new-label">قائمة جديدة</span>
       </button>
     </nav>
   );
