@@ -102,6 +102,11 @@ export default tseslint.config(
     files: ['src/data/purge.ts', 'src/data/snapshot.ts'],
     rules: { 'no-restricted-syntax': ['error', noInnerHtml, ...noRawDate] },
   },
+  // Build scripts run in Node.
+  {
+    files: ['scripts/**/*.mjs'],
+    languageOptions: { globals: { console: 'readonly', process: 'readonly' } },
+  },
   {
     files: ['src/core/**/*.{ts,tsx}', 'src/data/**/*.{ts,tsx}', 'src/features/**/*.{ts,tsx}'],
     ignores: ['src/data/purge.ts', 'src/data/snapshot.ts'],

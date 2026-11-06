@@ -111,5 +111,13 @@ export default defineConfig({
     environment: 'jsdom',
     include: ['tests/**/*.test.{ts,tsx}'],
     setupFiles: ['tests/setup.ts'],
+    coverage: {
+      provider: 'v8',
+      // The layers whose logic matters most; the UI is covered by the end-to-end tests.
+      include: ['src/core/**', 'src/data/**', 'src/features/**'],
+      reporter: ['text-summary', 'text'],
+      // A little under today's 97 / 98 / 92 / 95 %: a drop fails CI, raise them as coverage grows.
+      thresholds: { lines: 93, functions: 93, branches: 87, statements: 92 },
+    },
   },
 });
