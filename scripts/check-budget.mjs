@@ -5,7 +5,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
 import { join } from 'node:path';
 
-const BUDGET_KB = { js: 160, css: 8, total: 180 }; // today: ~141 / ~5.6 / ~148 (D-039)
+const BUDGET_KB = { js: 160, css: 8, total: 180 }; // today: ~136 / ~5.4 / ~142 (D-039)
 const dir = 'dist/assets';
 const sizes = { js: 0, css: 0 };
 for (const file of readdirSync(dir)) {

@@ -236,3 +236,7 @@ A step may carry `level: 1` and then shows under the step before it (indent/lift
 ## D-037 — A rolling local copy, honest about what it protects
 
 The app takes at most one automatic copy a day (3 s after start, only when there is data and it changed since the previous one), keeps the newest seven, and lists them in «بياناتي» beside the pre-upgrade copies, restorable with the same merge. They live in the same origin as the data, so they protect against a bad import, a bug or a wrong delete — **not** against the browser clearing the whole site; backup files (and the 14-day nudge) cover that. `daily` copies are pruned separately so they never push out `upgrade` copies. Cloud backup (phase G) stays deferred by decision.
+
+## D-039 — Budgets the build enforces
+
+CI fails when (a) the gzip size of the first-visit download passes its budget — JS 160 kB, CSS 8 kB, total 180 kB (today about 136 / 5.4 / 142; the 75 kB Cairo font is cached separately and not counted) — or (b) coverage of `core`, `data` and `features` falls below 93 % lines, 93 % functions, 87 % branches, 92 % statements (today 98 / 98 / 92 / 95). The UI layer is left out of coverage on purpose: the end-to-end tests exercise it. Limits are raised only with a written reason in this file, never to turn a red build green.

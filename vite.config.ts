@@ -116,7 +116,8 @@ export default defineConfig({
       // The layers whose logic matters most; the UI is covered by the end-to-end tests.
       include: ['src/core/**', 'src/data/**', 'src/features/**'],
       reporter: ['text-summary', 'text'],
-      thresholds: { lines: 0, functions: 0, branches: 0, statements: 0 },
+      // A little under today's 97 / 98 / 92 / 95 %: a drop fails CI, raise them as coverage grows.
+      thresholds: { lines: 93, functions: 93, branches: 87, statements: 92 },
     },
   },
 });
