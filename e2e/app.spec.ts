@@ -148,10 +148,23 @@ test('serves a web app manifest that names the product', async ({ page, request 
   const href = await page.locator('link[rel="manifest"]').getAttribute('href');
   expect(href).toBeTruthy();
   const res = await request.get(new URL(href ?? '', page.url()).toString());
-  const manifest = (await res.json()) as { name: string; dir: string; icons: unknown[] };
+  const manifest = (await res.json()) as {
+    name: string;
+    dir: string;
+    icons: unknown[];
+    screenshots: { src: string; form_factor: string }[];
+  };
   expect(manifest.name).toBe('ناوي دو');
   expect(manifest.dir).toBe('rtl');
   expect(manifest.icons.length).toBeGreaterThanOrEqual(3);
+  // The install dialog's pictures: both form factors, and every file is really served.
+  expect(new Set(manifest.screenshots.map((x) => x.form_factor))).toEqual(
+    new Set(['narrow', 'wide']),
+  );
+  for (const shot of manifest.screenshots) {
+    const img = await request.get(new URL(shot.src, page.url()).toString());
+    expect(img.ok(), shot.src).toBe(true);
+  }
 });
 
 test('keeps working offline once the service worker has cached the app', async ({
