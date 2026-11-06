@@ -340,6 +340,7 @@ test('sorting alphabetically orders the list, hides dragging, and is remembered'
   expect(await titles()).toEqual(['ألف', 'باء', 'تاء']);
   await expect(page.locator('.grip')).toHaveCount(0);
   await page.reload();
+  await expect(page.locator('.row .title')).toHaveCount(3); // loaded: allTextContents does not wait
   expect(await titles()).toEqual(['ألف', 'باء', 'تاء']);
   await chooseFromMenu(page, 'ترتيب يدوي', 'menuitemradio');
   expect(await titles()).toEqual(['تاء', 'ألف', 'باء']);
