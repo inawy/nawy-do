@@ -42,7 +42,7 @@ jobs:
           pnpm exec tsc --noEmit --pretty false | sed -E 's/^([^()]+)\(([0-9]+),([0-9]+)\): (.*)$/::error file=\1,line=\2,col=\3::\4/' ; test "${PIPESTATUS[0]}" -eq 0
       - run: pnpm run lint
       - run: pnpm run format:check
-      - run: pnpm test
+      - run: pnpm run test:coverage
       - name: Build (the log tail becomes an annotation when it fails)
         run: |
           set +e
@@ -52,6 +52,8 @@ jobs:
             echo "::error title=build failed::$(tail -n 25 build.log | sed 's/%/%25/g' | sed ':a;N;$!ba;s/\n/%0A/g')"
           fi
           exit "$code"
+      - name: Bundle budget (gzip size of what a first visit downloads)
+        run: pnpm run budget
       - name: Install Playwright browser
         timeout-minutes: 5
         run: pnpm exec playwright install --with-deps chromium
