@@ -44,7 +44,7 @@ src/
 3. **features/<ميزة>/:** hook + `index.ts`.
 4. **ui/<ميزة>/:** مكوّنات بخصائص فقط + `index.ts`، وملف CSS في `ui/styles/` يُضاف إلى `index.css`.
 5. **app:** اربطها في `App.tsx` (التركيب الوحيد).
-6. اختبار تكامل (jsdom) + سيناريو e2e، وقرار في `DECISIONS.md`.
+6. اختبار تكامل (jsdom) + سيناريو e2e، وقرار في `docs/decisions/`.
 
 ## مبادئ
 
