@@ -14,7 +14,7 @@
 
 1. اقرأ `docs/DECISIONS.md` و`docs/ROADMAP.md` و`docs/DESIGN-SYSTEM-CONFORMANCE.md` و`docs/KNOWN-LIMITATIONS.md`.
 2. اعمل على **مرحلة واحدة** فقط.
-3. لا تضف مكتبة أو تغيّر المعمارية دون قرار جديد في `DECISIONS.md`.
+3. لا تضف مكتبة أو تغيّر المعمارية دون قرار جديد: ملف في `docs/decisions/` بالقالب الرسمي (السجل القديم `DECISIONS.md` مغلق عند D-040).
 
 ## قواعد صارمة
 
@@ -24,7 +24,7 @@
 - لا حذف فعلي؛ tombstones (D-006).
 - لا `dangerouslySetInnerHTML`، لا CDN.
 - الأيقونات: Google Material Symbols **ملفات SVG فعلية** Outlined (لا Emoji ولا مسارات مرسومة بيدي ولا مكتبة أخرى) — مطابقتها قيد التنفيذ (B0).
-- أي تبعية جديدة: سبب + فحص ترخيص وتوافق + سطر في `DECISIONS.md`.
+- أي تبعية جديدة: سبب + فحص ترخيص وتوافق + قرار في `docs/decisions/`.
 - CSS بوحدات منطقية (`margin-inline-start`…)، لمس ≥ 44px، مدخلات 16px.
 - TypeScript `strict` + `noUncheckedIndexedAccess`.
 - كل تغيير سلوك = اختبار، وكل خطأ يُصلَح = اختبار يفشل قبل الإصلاح.
