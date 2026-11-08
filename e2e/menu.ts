@@ -6,6 +6,6 @@ export async function chooseFromMenu(
   name: string,
   role: 'menuitem' | 'menuitemradio' = 'menuitem',
 ) {
-  await page.getByRole('button', { name: 'المزيد' }).click();
+  await page.getByRole('button', { name: /^(المزيد|More)$/ }).click();
   await page.getByRole(role, { name }).click();
 }

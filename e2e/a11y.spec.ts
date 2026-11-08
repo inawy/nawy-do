@@ -56,3 +56,25 @@ for (const scheme of ['light', 'dark'] as const) {
     });
   });
 }
+
+// The English interface (LTR) gets the same mechanical checks.
+test.describe('english', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/?lang=en');
+    await expect(page.locator('html')).toHaveAttribute('dir', 'ltr');
+    const input = page.getByLabel('What do you intend to do?');
+    await input.fill('Buy bread');
+    await page.getByRole('button', { name: 'Add' }).click();
+    await expect(page.getByText('Buy bread', { exact: true })).toBeVisible();
+  });
+
+  test('main screen', async ({ page }) => {
+    expect(await violations(page)).toEqual([]);
+  });
+
+  test('data sheet', async ({ page }) => {
+    await chooseFromMenu(page, 'My data', 'menuitem');
+    await expect(page.getByRole('dialog')).toBeVisible();
+    expect(await violations(page)).toEqual([]);
+  });
+});
