@@ -2,7 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { useT } from '../i18n';
 import { PlusIcon } from '../primitives';
 
-/** The "add" row at the top of the list: one line, Enter or the plus button adds. */
+/** The "add" row at the top of the list: one line, Enter or the round plus button adds. */
 export function Composer({
   onAdd,
   autoFocus = false,
@@ -21,9 +21,6 @@ export function Composer({
   };
   return (
     <form className="composer" onSubmit={submit}>
-      <span className="composer-plus" aria-hidden="true">
-        <PlusIcon />
-      </span>
       <input
         type="text"
         value={text}
@@ -41,7 +38,7 @@ export function Composer({
         aria-label={t('composer.add')}
         disabled={empty}
       >
-        {t('composer.add')}
+        <PlusIcon />
       </button>
     </form>
   );

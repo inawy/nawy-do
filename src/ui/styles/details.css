@@ -15,7 +15,10 @@
   overflow: auto;
   background: var(--card);
   border-radius: 20px 20px 0 0;
-  padding: 0 1rem calc(1rem + env(safe-area-inset-bottom));
+  padding: 0 1rem 0;
+}
+.sheet:not(:has(.sticky-actions)) {
+  padding-block-end: calc(1rem + env(safe-area-inset-bottom));
 }
 .sheet:focus {
   outline: none; /* focus lands here when the sheet opens; the fields show their own ring */
@@ -91,6 +94,21 @@
   align-items: center;
   gap: 0.5rem;
   margin-block-start: 0.5rem;
+}
+.sticky-actions {
+  position: sticky;
+  inset-block-end: 0;
+  z-index: 1;
+  margin-inline: -1rem;
+  margin-block-end: 0;
+  padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom));
+  background: var(--card);
+  border-block-start: 1px solid var(--line);
+}
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
 }
 .spacer {
   flex: 1;
