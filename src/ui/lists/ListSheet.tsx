@@ -80,7 +80,7 @@ export function ListSheet({
         </p>
       )}
       {confirming && <p className="form-warn">{t('list.deleteWarn')}</p>}
-      <div className="actions">
+      <div className="actions sticky-actions">
         {mode === 'edit' && onDelete && !confirming && (
           <Button variant="danger" onClick={() => setConfirming(true)}>
             <TrashIcon />

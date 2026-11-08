@@ -152,30 +152,32 @@ export function DetailsSheet({ task, lists, today, onSave, newId, onRemove, onCl
         </span>
       </Field>
 
-      <Field label={t('details.time')}>
-        <TextInput
-          type="time"
-          value={due === '' ? '' : dueTime}
-          disabled={due === ''}
-          onChange={(e) => setDueTime(e.target.value)}
-        />
-      </Field>
+      <div className="field-row">
+        <Field label={t('details.time')}>
+          <TextInput
+            type="time"
+            value={due === '' ? '' : dueTime}
+            disabled={due === ''}
+            onChange={(e) => setDueTime(e.target.value)}
+          />
+        </Field>
 
-      <Field label={t('details.repeat')}>
-        <Select
-          aria-label={t('details.repeat')}
-          value={due === '' ? '' : repeat}
-          disabled={due === ''}
-          onChange={(e) => setRepeat(REPEATS.find((r) => r === e.target.value) ?? '')}
-        >
-          <option value="">{t('details.noRepeat')}</option>
-          {REPEATS.map((r) => (
-            <option key={r} value={r}>
-              {t(`repeat.${r}`)}
-            </option>
-          ))}
-        </Select>
-      </Field>
+        <Field label={t('details.repeat')}>
+          <Select
+            aria-label={t('details.repeat')}
+            value={due === '' ? '' : repeat}
+            disabled={due === ''}
+            onChange={(e) => setRepeat(REPEATS.find((r) => r === e.target.value) ?? '')}
+          >
+            <option value="">{t('details.noRepeat')}</option>
+            {REPEATS.map((r) => (
+              <option key={r} value={r}>
+                {t(`repeat.${r}`)}
+              </option>
+            ))}
+          </Select>
+        </Field>
+      </div>
 
       <StepsField
         steps={steps}
@@ -185,7 +187,7 @@ export function DetailsSheet({ task, lists, today, onSave, newId, onRemove, onCl
         onAdd={addStep}
       />
 
-      <div className="actions">
+      <div className="actions sticky-actions">
         <Button variant="danger" onClick={onRemove}>
           <TrashIcon />
           {t('details.delete')}

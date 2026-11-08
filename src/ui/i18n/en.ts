@@ -79,12 +79,12 @@ export const en: Record<MessageKey, string> = {
   'lists.limit': "You've reached the maximum number of lists.",
   'lists.failed': "Couldn't save the list. Try again.",
 
-  'empty.main': 'No tasks yet. Write your first one above.',
-  'empty.list': 'This list is empty. Write its first task above.',
+  'empty.main': 'No tasks yet. Write your first one in the add field.',
+  'empty.list': 'This list is empty. Write its first task in the add field.',
   'empty.starred': 'No starred tasks. Tap the star next to any task.',
   'empty.search': 'No results. Try another word.',
   'empty.scheduled': 'No tasks with a date. Open one and pick a day.',
-  'empty.today': 'Nothing due today. Write a task above and it will be set for today.',
+  'empty.today': 'Nothing due today. Write a task in the add field and it will be set for today.',
 
   'group.overdue': 'Overdue',
   'group.today': 'Today',
