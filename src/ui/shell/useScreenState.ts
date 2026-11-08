@@ -8,9 +8,10 @@ export type ListSheetState = { mode: 'create' } | { mode: 'edit'; id: string } |
  * Search and selection are mutually exclusive, and both are cleared when the view changes
  * (a pick never crosses views).
  */
-export function useScreenState() {
+export function useScreenState(startAdding = false) {
   const [sheet, setSheet] = useState<ListSheetState>(null);
   const [dataOpen, setDataOpen] = useState(false);
+  const [adding, setAdding] = useState(startAdding);
   // `null` is off. While on, results come from ALL tasks, not just the current view.
   const [query, setQuery] = useState<string | null>(null);
   const [picked, setPicked] = useState<ReadonlySet<string> | null>(null);
@@ -20,6 +21,8 @@ export function useScreenState() {
     setSheet,
     dataOpen,
     setDataOpen,
+    adding,
+    setAdding,
     query,
     searching: query !== null && query.trim() !== '',
     picked,

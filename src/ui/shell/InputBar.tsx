@@ -1,24 +1,20 @@
 import type { TaskList } from '@/core/model';
 import { useT } from '../i18n';
-import { Composer } from '../tasks';
 import { SelectBar } from './SelectBar';
 
 interface Props {
   lists: TaskList[];
-  /** Focus the add field on mount (the «new intention» shortcut). */
-  focusAdd?: boolean;
   /** `null` when not selecting. */
   picked: ReadonlySet<string> | null;
   /** `null` when not searching. */
   query: string | null;
-  onAdd: (title: string) => void;
   onQuery: (q: string) => void;
   onMoveMany: (ids: string[], listId: string | undefined) => void;
   onCompleteMany: (ids: string[]) => void;
   onDone: () => void;
 }
 
-/** The one input area: the composer, or the search field, or the selection actions. */
+/** The bottom bar while searching or selecting (adding is the floating button). */
 function Bar(p: Props) {
   const t = useT();
   if (p.picked) {
@@ -53,11 +49,12 @@ function Bar(p: Props) {
       </div>
     );
   }
-  return <Composer onAdd={p.onAdd} autoFocus={p.focusAdd === true} />;
+  return null;
 }
 
-/** Docked at the bottom on phones (thumb reach), inline on wide screens. */
+/** Docked at the bottom on phones (thumb reach), inline on wide screens; empty when idle. */
 export function InputBar(p: Props) {
+  if (p.picked === null && p.query === null) return null;
   return (
     <div className="input-dock">
       <Bar {...p} />

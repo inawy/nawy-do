@@ -100,6 +100,7 @@ export const en: Record<MessageKey, string> = {
   'row.move': 'Move: {title}',
   'row.steps': 'Steps {done}/{total}',
   'composer.add': 'Add',
+  'composer.new': 'New task',
 
   'drag.help':
     'To move: press Space to pick up the task, use the arrow keys to change its place, Space to drop, or Esc to cancel.',

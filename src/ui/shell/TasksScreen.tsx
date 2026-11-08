@@ -9,7 +9,7 @@ import {
 import { BackupSheet } from '../backup';
 import { useI18n } from '../i18n';
 import { DetailsSheet } from '../details';
-import { TaskList as Tasks, UndoToast } from '../tasks';
+import { AddButton, AddSheet, TaskList as Tasks, UndoToast } from '../tasks';
 import '../styles/index.css';
 import { InputBar } from './InputBar';
 import { ListSheets } from './ListSheets';
@@ -23,7 +23,7 @@ export type { DataProps, TasksScreenProps } from './types';
 /** The whole screen as a function of its props: easy to test and to preview without a database. */
 export function TasksScreen(p: TasksScreenProps) {
   const { t, num } = useI18n();
-  const ui = useScreenState();
+  const ui = useScreenState(p.focusAdd === true);
   const selection = resolveSelection(p.selection, p.lists);
   const list = p.lists.find((l) => l.id === selectedListId(selection));
   const visible =
@@ -115,10 +115,8 @@ export function TasksScreen(p: TasksScreenProps) {
         />
         <InputBar
           lists={p.lists}
-          focusAdd={p.focusAdd}
           picked={ui.picked}
           query={ui.query}
-          onAdd={p.onAdd}
           onQuery={ui.setQuery}
           onMoveMany={p.onMoveMany}
           onCompleteMany={p.onCompleteMany}
@@ -155,6 +153,8 @@ export function TasksScreen(p: TasksScreenProps) {
           />
         )}
       </main>
+      {ui.picked === null && ui.query === null && <AddButton onClick={() => ui.setAdding(true)} />}
+      {ui.adding && <AddSheet onAdd={p.onAdd} onClose={() => ui.setAdding(false)} />}
       {editing && (
         <DetailsSheet
           key={editing.id}
