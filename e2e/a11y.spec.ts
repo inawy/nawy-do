@@ -60,7 +60,8 @@ for (const scheme of ['light', 'dark'] as const) {
 // The English interface (LTR) gets the same mechanical checks.
 test.describe('english', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/?lang=en');
+    await page.goto('/');
+    await chooseFromMenu(page, 'English');
     await expect(page.locator('html')).toHaveAttribute('dir', 'ltr');
     const input = page.getByLabel('What do you intend to do?');
     await input.fill('Buy bread');
