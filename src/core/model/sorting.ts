@@ -5,12 +5,6 @@ export type SortMode = 'manual' | 'date' | 'title';
 export const SORT_MODES: readonly SortMode[] = ['manual', 'date', 'title'];
 export const DEFAULT_SORT: SortMode = 'manual';
 
-export const SORT_LABEL: Record<SortMode, string> = {
-  manual: 'ترتيب يدوي',
-  date: 'ترتيب بالتاريخ',
-  title: 'ترتيب أبجدي',
-};
-
 export const isSortMode = (v: unknown): v is SortMode => SORT_MODES.some((m) => m === v);
 
 /**

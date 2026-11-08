@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
   createTask,
-  formatTime,
   groupScheduled,
   isCivilTime,
   parseTask,
@@ -22,13 +21,6 @@ describe('time of day', () => {
     for (const bad of ['24:00', '9:05', '12:60', '12:5', '', 'ab:cd', '12:00:00']) {
       expect(isCivilTime(bad)).toBe(false);
     }
-  });
-  it('shows a 12 h time with ص / م', () => {
-    expect(formatTime('00:15')).toBe('12:15 ص');
-    expect(formatTime('09:30')).toBe('9:30 ص');
-    expect(formatTime('12:00')).toBe('12:00 م');
-    expect(formatTime('21:30')).toBe('9:30 م');
-    expect(formatTime('nope')).toBe('nope');
   });
 });
 

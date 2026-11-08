@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react';
+import { useT } from '../i18n';
 import { PlusIcon } from '../primitives';
 
 /** The "add" row at the top of the list: one line, Enter or the plus button adds. */
@@ -9,6 +10,7 @@ export function Composer({
   onAdd: (title: string) => void;
   autoFocus?: boolean;
 }) {
+  const t = useT();
   const [text, setText] = useState('');
   const empty = text.trim() === '';
   const submit = (e: FormEvent) => {
@@ -26,15 +28,20 @@ export function Composer({
         type="text"
         value={text}
         onChange={(e) => setText(e.target.value)}
-        placeholder="ناوي تعمل إيه؟"
-        aria-label="ناوي تعمل إيه؟"
+        placeholder={t('app.prompt')}
+        aria-label={t('app.prompt')}
         autoFocus={autoFocus}
         enterKeyHint="done"
         autoComplete="off"
         maxLength={1000}
       />
-      <button type="submit" className="composer-add" aria-label="إضافة" disabled={empty}>
-        إضافة
+      <button
+        type="submit"
+        className="composer-add"
+        aria-label={t('composer.add')}
+        disabled={empty}
+      >
+        {t('composer.add')}
       </button>
     </form>
   );

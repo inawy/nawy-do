@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useI18n } from '../i18n';
 import {
   canIndent,
   MAX_STEPS,
@@ -20,6 +21,7 @@ interface Props {
 
 /** The checklist of a task: tick, remove, and add steps. */
 export function StepsField({ steps, onChange, draft, onDraft, onAdd }: Props) {
+  const { t, num } = useI18n();
   // Parents whose nested steps are folded away (a view detail: never saved).
   const [folded, setFolded] = useState<ReadonlySet<string>>(new Set());
   const toggleFold = (id: string) =>
@@ -38,8 +40,8 @@ export function StepsField({ steps, onChange, draft, onDraft, onAdd }: Props) {
   const childCount = (id: string) => steps.filter((s) => parentOf.get(s.id) === id).length;
   return (
     <fieldset className="steps">
-      <legend>الخطوات</legend>
-      <ul className="list" aria-label="الخطوات">
+      <legend>{t('steps.title')}</legend>
+      <ul className="list" aria-label={t('steps.title')}>
         {steps.map((st) => {
           if (st.level === 1 && folded.has(parentOf.get(st.id) ?? '')) return null;
           const kids = st.level === 1 ? 0 : childCount(st.id);
@@ -47,7 +49,7 @@ export function StepsField({ steps, onChange, draft, onDraft, onAdd }: Props) {
             <li key={st.id} className="step" data-level={st.level}>
               {kids > 0 && (
                 <IconButton
-                  label={`${folded.has(st.id) ? 'افتح' : 'اطوِ'} الخطوات الفرعية: ${st.title}`}
+                  label={t(folded.has(st.id) ? 'steps.unfold' : 'steps.fold', { title: st.title })}
                   aria-expanded={!folded.has(st.id)}
                   className={folded.has(st.id) ? undefined : 'flip'}
                   onClick={() => toggleFold(st.id)}
@@ -72,14 +74,14 @@ export function StepsField({ steps, onChange, draft, onDraft, onAdd }: Props) {
                   variant="text"
                   aria-label={
                     st.level === 1
-                      ? `ارفع الخطوة للمستوى الأول: ${st.title}`
-                      : `اجعل الخطوة فرعية: ${st.title}`
+                      ? t('steps.lift', { title: st.title })
+                      : t('steps.nest', { title: st.title })
                   }
                   onClick={() =>
                     onChange(setStepLevel(steps, st.id, st.level === 1 ? undefined : 1))
                   }
                 >
-                  {st.level === 1 ? 'رفع' : 'فرعية'}
+                  {st.level === 1 ? t('steps.liftShort') : t('steps.nestShort')}
                 </Button>
               )}
               {([-1, 1] as const).map((delta) => {
@@ -87,7 +89,7 @@ export function StepsField({ steps, onChange, draft, onDraft, onAdd }: Props) {
                 return (
                   <IconButton
                     key={delta}
-                    label={`${delta === -1 ? 'قدّم' : 'أخّر'} الخطوة: ${st.title}`}
+                    label={t(delta === -1 ? 'steps.earlier' : 'steps.later', { title: st.title })}
                     className={delta === -1 ? 'flip' : undefined}
                     disabled={moved === undefined}
                     onClick={() => moved && onChange(moved)}
@@ -97,14 +99,12 @@ export function StepsField({ steps, onChange, draft, onDraft, onAdd }: Props) {
                 );
               })}
               <IconButton
-                label={`حذف الخطوة: ${st.title}`}
+                label={t('steps.remove', { title: st.title })}
                 onClick={() => onChange(steps.filter((x) => x.id !== st.id))}
               >
                 <CloseIcon />
               </IconButton>
-              {kids > 0 && folded.has(st.id) && (
-                <span className="step-count">{kids.toLocaleString('ar-EG')}</span>
-              )}
+              {kids > 0 && folded.has(st.id) && <span className="step-count">{num(kids)}</span>}
             </li>
           );
         })}
@@ -120,13 +120,13 @@ export function StepsField({ steps, onChange, draft, onDraft, onAdd }: Props) {
               onAdd();
             }
           }}
-          placeholder="خطوة جديدة"
-          aria-label="خطوة جديدة"
+          placeholder={t('steps.new')}
+          aria-label={t('steps.new')}
           maxLength={MAX_STEP_TITLE}
           disabled={steps.length >= MAX_STEPS}
         />
         <Button onClick={onAdd} disabled={draft.trim() === ''}>
-          أضف خطوة
+          {t('steps.add')}
         </Button>
       </div>
     </fieldset>

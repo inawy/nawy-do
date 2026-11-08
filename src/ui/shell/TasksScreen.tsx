@@ -7,6 +7,7 @@ import {
   tasksIn,
 } from '@/core/model';
 import { BackupSheet } from '../backup';
+import { useI18n } from '../i18n';
 import { DetailsSheet } from '../details';
 import { TaskList as Tasks, UndoToast } from '../tasks';
 import '../styles/index.css';
@@ -19,10 +20,9 @@ import { useScreenState } from './useScreenState';
 
 export type { DataProps, TasksScreenProps } from './types';
 
-const TITLES = { main: 'نواياي', today: 'اليوم', starred: 'المفضلة', scheduled: 'مجدولة' } as const;
-
 /** The whole screen as a function of its props: easy to test and to preview without a database. */
 export function TasksScreen(p: TasksScreenProps) {
+  const { t, num } = useI18n();
   const ui = useScreenState();
   const selection = resolveSelection(p.selection, p.lists);
   const list = p.lists.find((l) => l.id === selectedListId(selection));
@@ -31,11 +31,14 @@ export function TasksScreen(p: TasksScreenProps) {
       ? searchTasks(p.tasks, ui.query)
       : tasksIn(p.tasks, p.lists, selection, p.today);
   const { editing } = p;
+  const viewTitle = list
+    ? list.name
+    : t(`view.${selection as 'main' | 'today' | 'starred' | 'scheduled'}`);
 
   return (
     <div className="shell">
       <header className="side-head">
-        <p className="brand">ناوي دو</p>
+        <p className="brand">{t('app.name')}</p>
       </header>
       <Nav
         selection={selection}
@@ -51,25 +54,25 @@ export function TasksScreen(p: TasksScreenProps) {
         {p.dueNotice && (
           <div className="update" role="status">
             <span>
-              محتاج انتباهك:{' '}
+              {t('notice.attention')}{' '}
               {[
-                p.dueNotice.overdue > 0 && `${p.dueNotice.overdue.toLocaleString('ar-EG')} متأخرة`,
-                p.dueNotice.today > 0 && `${p.dueNotice.today.toLocaleString('ar-EG')} النهارده`,
+                p.dueNotice.overdue > 0 && t('notice.overdue', { count: num(p.dueNotice.overdue) }),
+                p.dueNotice.today > 0 && t('notice.today', { count: num(p.dueNotice.today) }),
               ]
                 .filter(Boolean)
                 .join('، ')}
             </span>
             <button type="button" onClick={p.dueNotice.onShow}>
-              اعرضها
+              {t('notice.show')}
             </button>
             <button type="button" className="later" onClick={p.dueNotice.onLater}>
-              بعدين
+              {t('notice.later')}
             </button>
           </div>
         )}
         {p.backupNudge && !p.dueNotice && (
           <div className="update" role="status">
-            <span>عدّى وقت من آخر نسخة احتياطية. خُد نسخة تحفظها بره الجهاز.</span>
+            <span>{t('notice.backup')}</span>
             <button
               type="button"
               onClick={() => {
@@ -77,23 +80,23 @@ export function TasksScreen(p: TasksScreenProps) {
                 ui.setDataOpen(true);
               }}
             >
-              خُد نسخة
+              {t('notice.backupDo')}
             </button>
             <button type="button" className="later" onClick={p.backupNudge.onLater}>
-              بعدين
+              {t('notice.later')}
             </button>
           </div>
         )}
         {p.applyUpdate && (
           <div className="update" role="status">
-            <span>في نسخة جديدة من ناوي دو.</span>
+            <span>{t('notice.update')}</span>
             <button type="button" onClick={p.applyUpdate}>
-              حدّث
+              {t('notice.updateDo')}
             </button>
           </div>
         )}
         <TitleBar
-          title={list ? list.name : TITLES[selection as keyof typeof TITLES]}
+          title={viewTitle}
           searchOn={ui.query !== null}
           selecting={ui.picked !== null}
           onSearch={ui.toggleSearch}
@@ -123,15 +126,15 @@ export function TasksScreen(p: TasksScreenProps) {
         />
         {p.writeFailed && (
           <p className="status" role="alert">
-            مقدرتش أحفظ التغيير الأخير. جرّب تاني.
+            {t('notice.writeFailed')}
           </p>
         )}
         {p.failed ? (
           <p className="status" role="alert">
-            مش قادر أفتح التخزين على الجهاز. لو فاتح تصفح خاص جرّب نافذة عادية.
+            {t('notice.storageFailed')}
           </p>
         ) : !p.ready ? (
-          <p className="status">جاري التحميل…</p>
+          <p className="status">{t('notice.loading')}</p>
         ) : (
           <Tasks
             tasks={visible}
@@ -193,9 +196,9 @@ export function TasksScreen(p: TasksScreenProps) {
       {p.removed && (
         <UndoToast
           message={
-            (p.removed.kind === 'list'
-              ? `اتحذفت القائمة: ${p.removed.label}`
-              : `اتحذفت: ${p.removed.label}`) + (p.removed.more > 0 ? ` (+${p.removed.more})` : '')
+            t(p.removed.kind === 'list' ? 'toast.removedList' : 'toast.removed', {
+              name: p.removed.label,
+            }) + (p.removed.more > 0 ? ` (+${p.removed.more})` : '')
           }
           onUndo={p.onUndo}
           onDismiss={p.onDismissUndo}

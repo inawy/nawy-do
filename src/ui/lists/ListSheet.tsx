@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { MAX_LIST_NAME, type ListColor } from '@/core/model';
 import { ColorPicker } from './ColorPicker';
 import { Button, CloseIcon, Field, IconButton, TextInput, TrashIcon } from '../primitives';
+import { useT } from '../i18n';
 import { Sheet } from '../sheet';
 
 interface Props {
@@ -33,6 +34,7 @@ export function ListSheet({
   onDelete,
   onClose,
 }: Props) {
+  const t = useT();
   const [name, setName] = useState(initialName);
   const [color, setColor] = useState<ListColor | ''>(initialColor ?? '');
   const [confirming, setConfirming] = useState(false);
@@ -40,19 +42,19 @@ export function ListSheet({
   const empty = name.trim() === '';
   return (
     <Sheet
-      label={mode === 'create' ? 'قائمة جديدة' : 'خيارات القائمة'}
+      label={mode === 'create' ? t('list.new') : t('list.options')}
       onClose={onClose}
       onSubmit={() => {
         if (!empty) onSave(name, color);
       }}
     >
       <div className="sheet-head">
-        <h2 className="sheet-heading">{mode === 'create' ? 'قائمة جديدة' : 'خيارات القائمة'}</h2>
-        <IconButton label="إغلاق" onClick={onClose}>
+        <h2 className="sheet-heading">{mode === 'create' ? t('list.new') : t('list.options')}</h2>
+        <IconButton label={t('common.close')} onClick={onClose}>
           <CloseIcon />
         </IconButton>
       </div>
-      <Field label="اسم القائمة">
+      <Field label={t('list.name')}>
         <TextInput
           value={name}
           onChange={(e) => setName(e.target.value)}
@@ -63,12 +65,12 @@ export function ListSheet({
       </Field>
       <ColorPicker value={color} onChange={setColor} />
       {mode === 'edit' && onMove && (
-        <div className="move-row" role="group" aria-label="ترتيب القائمة">
+        <div className="move-row" role="group" aria-label={t('list.order')}>
           <Button disabled={!canMoveEarlier} onClick={() => onMove(-1)}>
-            قدّم القائمة
+            {t('list.earlier')}
           </Button>
           <Button disabled={!canMoveLater} onClick={() => onMove(1)}>
-            أخّر القائمة
+            {t('list.later')}
           </Button>
         </div>
       )}
@@ -77,27 +79,23 @@ export function ListSheet({
           {error}
         </p>
       )}
-      {confirming && (
-        <p className="form-warn">
-          هتتحذف القائمة، ونواياها هترجع لـ«نواياي». تقدر تتراجع بعدها مباشرة.
-        </p>
-      )}
+      {confirming && <p className="form-warn">{t('list.deleteWarn')}</p>}
       <div className="actions">
         {mode === 'edit' && onDelete && !confirming && (
           <Button variant="danger" onClick={() => setConfirming(true)}>
             <TrashIcon />
-            حذف القائمة
+            {t('list.delete')}
           </Button>
         )}
         {confirming && onDelete && (
           <Button variant="dangerSolid" onClick={onDelete}>
-            تأكيد الحذف
+            {t('list.confirmDelete')}
           </Button>
         )}
         <span className="spacer" />
-        <Button onClick={onClose}>إلغاء</Button>
+        <Button onClick={onClose}>{t('common.cancel')}</Button>
         <Button type="submit" variant="primary" disabled={empty}>
-          حفظ
+          {t('common.save')}
         </Button>
       </div>
     </Sheet>

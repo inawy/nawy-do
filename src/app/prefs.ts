@@ -40,3 +40,29 @@ export function saveLastExport(at: number): void {
     // Not saved: the reminder may come back sooner than needed, which is the safe side.
   }
 }
+
+const LANG_KEY = 'nawy-do:lang';
+
+/** The interface language chosen on this device; Arabic until the person picks another. */
+export function loadLang(): 'ar' | 'en' {
+  try {
+    // `?lang=en` picks (and remembers) a language: the way to try one before the switch exists.
+    const asked = new URLSearchParams(window.location.search).get('lang');
+    if (asked === 'en' || asked === 'ar') {
+      window.localStorage.setItem(LANG_KEY, asked);
+      return asked;
+    }
+    const v = window.localStorage.getItem(LANG_KEY);
+    return v === 'en' ? 'en' : 'ar';
+  } catch {
+    return 'ar';
+  }
+}
+
+export function saveLang(lang: 'ar' | 'en'): void {
+  try {
+    window.localStorage.setItem(LANG_KEY, lang);
+  } catch {
+    // Not remembered: the next visit starts in Arabic.
+  }
+}

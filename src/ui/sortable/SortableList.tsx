@@ -7,7 +7,6 @@ import {
   useSensors,
   type Announcements,
   type DragEndEvent,
-  type ScreenReaderInstructions,
 } from '@dnd-kit/core';
 import { restrictToParentElement, restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import {
@@ -17,6 +16,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useT } from '../i18n';
 import { useDropTargets } from './useDropTargets';
 
 interface Props {
@@ -38,11 +38,6 @@ interface Props {
   children: (orderedIds: string[]) => ReactNode;
 }
 
-const INSTRUCTIONS: ScreenReaderInstructions = {
-  draggable:
-    'للتحريك: اضغط مسافة لالتقاط النية، ثم استخدم الأسهم لتغيير مكانها، ومسافة للإفلات، أو Esc للإلغاء.',
-};
-
 /**
  * A vertical sortable list on dnd-kit: pointer and touch drag by a handle, keyboard (Space, arrows,
  * Space), auto-scroll and screen-reader announcements come from the library (D-018). This component
@@ -58,6 +53,7 @@ export function SortableList({
   currentTarget,
   children,
 }: Props) {
+  const t = useT();
   const [preview, setPreview] = useState<string[] | null>(null);
   const idsKey = ids.join('\u0000');
   const timer = useRef(0);
@@ -76,20 +72,30 @@ export function SortableList({
   );
 
   const position = (id: string, list: readonly string[]) =>
-    `المكان ${list.indexOf(id) + 1} من ${list.length}`;
+    t('drag.position', { index: list.indexOf(id) + 1, total: list.length });
 
   const announcements: Announcements = {
     onDragStart: ({ active }) =>
-      `التقطت «${describe(String(active.id))}». ${position(String(active.id), ids)}.`,
+      t('drag.pickup', {
+        name: describe(String(active.id)),
+        position: position(String(active.id), ids),
+      }),
     onDragOver: ({ active, over }) =>
       over
-        ? `«${describe(String(active.id))}» فوق «${describe(String(over.id))}». ${position(String(over.id), ids)}.`
+        ? t('drag.over', {
+            name: describe(String(active.id)),
+            other: describe(String(over.id)),
+            position: position(String(over.id), ids),
+          })
         : undefined,
     onDragEnd: ({ active, over }) =>
       over
-        ? `أفلتّ «${describe(String(active.id))}» في ${position(String(over.id), ids)}.`
-        : `أفلتّ «${describe(String(active.id))}» في مكانها.`,
-    onDragCancel: ({ active }) => `اتلغى تحريك «${describe(String(active.id))}».`,
+        ? t('drag.dropAt', {
+            name: describe(String(active.id)),
+            position: position(String(over.id), ids),
+          })
+        : t('drag.dropHome', { name: describe(String(active.id)) }),
+    onDragCancel: ({ active }) => t('drag.cancel', { name: describe(String(active.id)) }),
   };
 
   const onDragStart = () => {
@@ -122,7 +128,7 @@ export function SortableList({
       onDragStart={onDragStart}
       onDragCancel={onDragCancel}
       onDragEnd={onDragEnd}
-      accessibility={{ announcements, screenReaderInstructions: INSTRUCTIONS }}
+      accessibility={{ announcements, screenReaderInstructions: { draggable: t('drag.help') } }}
     >
       <SortableContext items={shown} strategy={verticalListSortingStrategy}>
         <ul className="list" aria-label={ariaLabel}>

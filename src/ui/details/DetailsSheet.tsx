@@ -3,7 +3,6 @@ import {
   listOf,
   MAX_STEPS,
   quickDueOptions,
-  REPEAT_LABEL,
   REPEATS,
   type Repeat,
   type Step,
@@ -23,6 +22,7 @@ import {
   TextInput,
   TrashIcon,
 } from '../primitives';
+import { useT } from '../i18n';
 import { Sheet } from '../sheet';
 import { changedFields, formOf } from './formPatch';
 import { StepsField } from './StepsField';
@@ -42,6 +42,7 @@ interface Props {
  * empty title keeps the old one; clearing the date or notes removes them.
  */
 export function DetailsSheet({ task, lists, today, onSave, newId, onRemove, onClose }: Props) {
+  const t = useT();
   const [title, setTitle] = useState(task.title);
   const [notes, setNotes] = useState(task.notes ?? '');
   const [due, setDue] = useState(task.due ?? '');
@@ -64,7 +65,7 @@ export function DetailsSheet({ task, lists, today, onSave, newId, onRemove, onCl
 
   return (
     <Sheet
-      label="تفاصيل النية"
+      label={t('details.title')}
       onClose={onClose}
       onSubmit={() => {
         // A step typed but not added yet is added on save, so it is never silently lost.
@@ -88,13 +89,13 @@ export function DetailsSheet({ task, lists, today, onSave, newId, onRemove, onCl
       }}
     >
       <div className="sheet-head">
-        <IconButton label="إغلاق" onClick={onClose}>
+        <IconButton label={t('common.close')} onClick={onClose}>
           <CloseIcon />
         </IconButton>
         <button
           type="button"
           className={starred ? 'star on' : 'star'}
-          aria-label="مميزة"
+          aria-label={t('details.starred')}
           aria-pressed={starred}
           onClick={() => setStarred(!starred)}
         >
@@ -104,14 +105,14 @@ export function DetailsSheet({ task, lists, today, onSave, newId, onRemove, onCl
 
       <input
         className="sheet-title"
-        aria-label="النية"
+        aria-label={t('details.task')}
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         maxLength={1000}
         autoFocus
       />
 
-      <Field label="ملاحظات">
+      <Field label={t('details.notes')}>
         <TextArea
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
@@ -121,9 +122,13 @@ export function DetailsSheet({ task, lists, today, onSave, newId, onRemove, onCl
       </Field>
 
       {lists.length > 0 && (
-        <Field label="القائمة">
-          <Select aria-label="القائمة" value={listId} onChange={(e) => setListId(e.target.value)}>
-            <option value="">نواياي</option>
+        <Field label={t('details.list')}>
+          <Select
+            aria-label={t('details.list')}
+            value={listId}
+            onChange={(e) => setListId(e.target.value)}
+          >
+            <option value="">{t('view.main')}</option>
             {lists.map((l) => (
               <option key={l.id} value={l.id}>
                 {l.name}
@@ -133,21 +138,21 @@ export function DetailsSheet({ task, lists, today, onSave, newId, onRemove, onCl
         </Field>
       )}
 
-      <Field label="تاريخ الاستحقاق">
+      <Field label={t('details.due')}>
         <TextInput type="date" value={due} onChange={(e) => setDue(e.target.value)} />
-        <span className="chips" role="group" aria-label="اختيارات سريعة للتاريخ">
+        <span className="chips" role="group" aria-label={t('details.quickDue')}>
           {quickDueOptions(today).map((o) => (
             <Chip key={o.value} pressed={due === o.value} onClick={() => setDue(o.value)}>
-              {o.label}
+              {t(`date.${o.key}`)}
             </Chip>
           ))}
           <Chip disabled={due === ''} onClick={() => setDue('')}>
-            بدون تاريخ
+            {t('details.noDate')}
           </Chip>
         </span>
       </Field>
 
-      <Field label="الساعة">
+      <Field label={t('details.time')}>
         <TextInput
           type="time"
           value={due === '' ? '' : dueTime}
@@ -156,17 +161,17 @@ export function DetailsSheet({ task, lists, today, onSave, newId, onRemove, onCl
         />
       </Field>
 
-      <Field label="تكرار">
+      <Field label={t('details.repeat')}>
         <Select
-          aria-label="تكرار"
+          aria-label={t('details.repeat')}
           value={due === '' ? '' : repeat}
           disabled={due === ''}
           onChange={(e) => setRepeat(REPEATS.find((r) => r === e.target.value) ?? '')}
         >
-          <option value="">بدون تكرار</option>
+          <option value="">{t('details.noRepeat')}</option>
           {REPEATS.map((r) => (
             <option key={r} value={r}>
-              {REPEAT_LABEL[r]}
+              {t(`repeat.${r}`)}
             </option>
           ))}
         </Select>
@@ -183,12 +188,12 @@ export function DetailsSheet({ task, lists, today, onSave, newId, onRemove, onCl
       <div className="actions">
         <Button variant="danger" onClick={onRemove}>
           <TrashIcon />
-          حذف النية
+          {t('details.delete')}
         </Button>
         <span className="spacer" />
-        <Button onClick={onClose}>إلغاء</Button>
+        <Button onClick={onClose}>{t('common.cancel')}</Button>
         <Button type="submit" variant="primary">
-          حفظ
+          {t('common.save')}
         </Button>
       </div>
     </Sheet>

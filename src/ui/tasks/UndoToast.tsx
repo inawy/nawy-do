@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useT } from '../i18n';
 
 const VISIBLE_MS = 7000;
 
@@ -11,6 +12,7 @@ export function UndoToast({
   onUndo: () => void;
   onDismiss: () => void;
 }) {
+  const t = useT();
   useEffect(() => {
     const id = setTimeout(onDismiss, VISIBLE_MS);
     return () => clearTimeout(id);
@@ -19,7 +21,7 @@ export function UndoToast({
     <div className="toast" role="status">
       <span>{message}</span>
       <button type="button" onClick={onUndo}>
-        تراجع
+        {t('toast.undo')}
       </button>
     </div>
   );

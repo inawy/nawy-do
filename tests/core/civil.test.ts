@@ -3,7 +3,6 @@ import {
   createTask,
   daysFromCivil,
   dueState,
-  formatDue,
   groupScheduled,
   isCivilDate,
   updateTask,
@@ -24,17 +23,11 @@ describe('civil dates', () => {
     expect(daysFromCivil('2027-01-01')! - daysFromCivil('2026-12-31')!).toBe(1);
     expect(daysFromCivil('2026-03-01')! - daysFromCivil('2026-02-28')!).toBe(1);
   });
-  it('classifies and labels due dates', () => {
+  it('classifies due dates', () => {
     const today = '2026-10-27';
     expect(dueState('2026-10-26', today)).toBe('overdue');
     expect(dueState('2026-10-27', today)).toBe('today');
     expect(dueState('2026-10-28', today)).toBe('upcoming');
-    expect(formatDue('2026-10-27', today)).toBe('النهارده');
-    expect(formatDue('2026-10-28', today)).toBe('بكرة');
-    expect(formatDue('2026-10-26', today)).toBe('امبارح');
-    expect(formatDue('2026-11-05', today)).toBe('5 نوفمبر');
-    expect(formatDue('2027-01-05', today)).toBe('5 يناير 2027');
-    expect(formatDue('2026-12-31', '2027-01-01')).toBe('امبارح');
   });
 });
 
