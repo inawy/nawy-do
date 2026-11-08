@@ -76,8 +76,6 @@ test.describe('english', () => {
   test('data sheet', async ({ page }) => {
     await chooseFromMenu(page, 'My data', 'menuitem');
     await expect(page.getByRole('dialog')).toBeVisible();
-    // Let the sheet's opening and the buttons' colour transitions settle before measuring contrast.
-    await page.waitForTimeout(500);
     expect(await violations(page)).toEqual([]);
   });
 });
