@@ -26,6 +26,7 @@ import { requestPersistence, type StorageState } from './storage';
 import { updateSignal } from './updateSignal';
 import { useDay } from './useDay';
 import { useExportLog } from './useExportLog';
+import { useUndoTrail } from './useUndoTrail';
 
 interface Props {
   /** Storage: the repositories to use, or a Dexie database to wrap, or (by default) the app's own. */
@@ -87,12 +88,14 @@ export function App({ repositories, db, now = systemClock, today = systemToday }
   // The sheet shows the task as it is now; if it was deleted elsewhere it simply closes.
   const editing = tasks.tasks.find((t) => t.id === openId);
 
+  const undo = useUndoTrail(tasks.lastRemoved, lists.lastRemoved);
   const more = lists.removedStack.length + tasks.removedStack.length - 1;
-  const removed = lists.lastRemoved
-    ? { kind: 'list' as const, label: lists.lastRemoved.name, more }
-    : tasks.lastRemoved
-      ? { kind: 'task' as const, label: tasks.lastRemoved.title, more }
-      : null;
+  const removed =
+    undo.newest === 'list' && lists.lastRemoved
+      ? { kind: 'list' as const, label: lists.lastRemoved.name, more }
+      : undo.newest === 'task' && tasks.lastRemoved
+        ? { kind: 'task' as const, label: tasks.lastRemoved.title, more }
+        : null;
 
   return (
     <I18nProvider lang={lang} onLang={setLang}>
@@ -179,11 +182,11 @@ export function App({ repositories, db, now = systemClock, today = systemToday }
         onEditList={(l, patch) => void lists.edit(l, patch)}
         onDeleteList={(l) => void lists.remove(l)}
         onMoveList={(l, delta) => void lists.move(l, delta)}
-        onUndo={() => void (lists.lastRemoved ? lists.undoRemove() : tasks.undoRemove())}
-        onDismissUndo={() => {
-          lists.dismissUndo();
-          tasks.dismissUndo();
+        onUndo={() => {
+          undo.popped();
+          void (undo.newest === 'list' ? lists.undoRemove() : tasks.undoRemove());
         }}
+        onDismissUndo={undo.hide}
       />
     </I18nProvider>
   );
