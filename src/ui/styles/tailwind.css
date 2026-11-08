@@ -5,7 +5,7 @@
 @import 'tailwindcss/utilities.css' layer(utilities);
 
 @theme inline {
-  --color-brand: var(--nawy-color-brand);
+  --color-brand: var(--brand);
   --color-page: var(--page);
   --color-soft: var(--brand-soft);
   --color-surface: var(--nawy-color-surface);
