@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useT } from '../i18n';
 import { IconButton, MoreIcon } from '../primitives';
 
 export interface MenuAction {
@@ -10,6 +11,7 @@ export interface MenuAction {
 
 /** The "more" menu: secondary actions behind one 48dp button. Closes on pick, Escape or outside tap. */
 export function MoreMenu({ actions }: { actions: MenuAction[] }) {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const root = useRef<HTMLSpanElement>(null);
 
@@ -30,7 +32,7 @@ export function MoreMenu({ actions }: { actions: MenuAction[] }) {
   return (
     <span className="more" ref={root}>
       <IconButton
-        label="المزيد"
+        label={t('menu.more')}
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}

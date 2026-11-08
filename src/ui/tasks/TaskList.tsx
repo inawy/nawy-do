@@ -9,6 +9,7 @@ import {
   type Selection,
   type Task,
 } from '@/core/model';
+import { useI18n } from '../i18n';
 import { ChevronIcon } from '../primitives';
 import { SortableItem, SortableList, type SortState } from '../sortable';
 import { TaskRow } from './TaskRow';
@@ -31,15 +32,6 @@ interface Props {
   onPick?: (id: string) => void;
 }
 
-const EMPTY = {
-  main: 'مفيش نوايا لسه. اكتب أول نية فوق.',
-  list: 'القائمة فاضية. اكتب أول نية فيها فوق.',
-  starred: 'مفيش نوايا مميزة. دوس على النجمة جنب أي نية.',
-  search: 'مفيش نتايج. جرّب كلمة تانية.',
-  scheduled: 'مفيش نوايا بتاريخ. افتح نية وحدد لها يوم.',
-  today: 'مفيش حاجة مستحقة النهارده. اكتب نية فوق وهتتحدد لها النهارده.',
-} as const;
-
 export function TaskList({
   tasks,
   today,
@@ -55,6 +47,7 @@ export function TaskList({
   picked,
   onPick,
 }: Props) {
+  const { t, num } = useI18n();
   const grouped = groupTasks(view === 'starred' ? tasks.filter((t) => t.starred) : tasks);
   const openSorted = isSortable(view) ? sortOpen(grouped.open, sort) : grouped.open;
   const canSort = !picked && canReorder(view, grouped.open.length, sort);
@@ -114,26 +107,26 @@ export function TaskList({
   if (view === 'scheduled' || view === 'today') {
     const g = groupScheduled(tasks, today);
     if (g.overdue.length + g.today.length + g.upcoming.length === 0) {
-      return <Empty text={EMPTY[view]} />;
+      return <Empty text={t(`empty.${view}`)} />;
     }
     return (
       <>
         {g.overdue.length > 0 && (
           <section>
-            <h2>متأخرة</h2>
-            {rows(g.overdue, 'متأخرة')}
+            <h2>{t('group.overdue')}</h2>
+            {rows(g.overdue, t('group.overdue'))}
           </section>
         )}
         {g.today.length > 0 && (
           <section>
-            <h2>النهارده</h2>
-            {rows(g.today, 'النهارده')}
+            <h2>{t('group.today')}</h2>
+            {rows(g.today, t('group.today'))}
           </section>
         )}
         {g.upcoming.length > 0 && (
           <section>
-            <h2>قادمة</h2>
-            {rows(g.upcoming, 'قادمة')}
+            <h2>{t('group.upcoming')}</h2>
+            {rows(g.upcoming, t('group.upcoming'))}
           </section>
         )}
       </>
@@ -146,14 +139,13 @@ export function TaskList({
     <>
       {open.length === 0 && done.length === 0 ? (
         <Empty
-          text={
-            EMPTY[
-              selectedListId(view) !== undefined ? 'list' : (view as 'main' | 'starred' | 'search')
-            ]
-          }
+          text={t(
+            `empty.${selectedListId(view) !== undefined ? 'list' : (view as 'main' | 'starred' | 'search')}`,
+          )}
         />
       ) : (
-        open.length > 0 && (canSort ? sortableRows(open, 'النوايا') : rows(open, 'النوايا'))
+        open.length > 0 &&
+        (canSort ? sortableRows(open, t('group.tasks')) : rows(open, t('group.tasks')))
       )}
       {done.length > 0 && (
         <details className="done-section">
@@ -161,9 +153,9 @@ export function TaskList({
             <span className="chev">
               <ChevronIcon />
             </span>
-            المنجزة ({done.length})
+            {t('group.doneCount', { count: num(done.length) })}
           </summary>
-          {rows(done, 'المنجزة')}
+          {rows(done, t('group.done'))}
         </details>
       )}
     </>

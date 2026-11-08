@@ -1,11 +1,6 @@
-import {
-  dueState,
-  formatDue,
-  formatTime,
-  REPEAT_LABEL,
-  stepProgress,
-  type Task,
-} from '@/core/model';
+import { dueState, stepProgress, type Task } from '@/core/model';
+import { formatDue, formatTime } from '../i18n/format';
+import { useI18n } from '../i18n';
 import { AllIcon, GripIcon, StarIcon, TrashIcon } from '../primitives';
 import type { SortState } from '../sortable';
 import { useRowSwipe } from './useRowSwipe';
@@ -38,11 +33,13 @@ export function TaskRow({
   sort,
   pick,
 }: Props) {
+  const i18n = useI18n();
+  const { t } = i18n;
   const done = task.status === 'done';
   const state = task.due ? dueState(task.due, today) : undefined;
   const progress = stepProgress(task);
   const hasMeta = Boolean(task.due) || progress !== undefined;
-  const repeatText = task.repeat ? REPEAT_LABEL[task.repeat] : undefined;
+  const repeatText = task.repeat ? t(`repeat.${task.repeat}`) : undefined;
   const swipe = useRowSwipe({
     enabled: !pick && !sort?.dragging,
     onComplete: () => onToggle(task),
@@ -69,7 +66,7 @@ export function TaskRow({
               className="circle pick"
               checked={pick.on}
               onChange={pick.onToggle}
-              aria-label={`تحديد: ${task.title}`}
+              aria-label={t('row.select', { title: task.title })}
             />
           </label>
         ) : (
@@ -79,14 +76,14 @@ export function TaskRow({
               className="circle"
               checked={done}
               onChange={() => onToggle(task)}
-              aria-label={`${done ? 'إلغاء إنجاز' : 'إنجاز'}: ${task.title}`}
+              aria-label={t(done ? 'row.reopen' : 'row.complete', { title: task.title })}
             />
           </label>
         )}
         <button
           type="button"
           className="body"
-          aria-label={`تفاصيل: ${task.title}`}
+          aria-label={t('row.details', { title: task.title })}
           onClick={() => (pick ? pick.onToggle() : onOpen(task))}
         >
           <span className="title">{task.title}</span>
@@ -95,14 +92,14 @@ export function TaskRow({
             <span className="meta">
               {task.due && (
                 <span className={done ? 'chip' : `chip ${state ?? ''}`}>
-                  {formatDue(task.due, today)}
-                  {task.dueTime && ` · ${formatTime(task.dueTime)}`}
+                  {formatDue(task.due, today, i18n)}
+                  {task.dueTime && ` · ${formatTime(task.dueTime, i18n)}`}
                 </span>
               )}
               {repeatText && !done && <span className="chip">{repeatText}</span>}
               {progress && (
                 <span className="chip">
-                  خطوات {progress.done}/{progress.total}
+                  {t('row.steps', { done: progress.done, total: progress.total })}
                 </span>
               )}
             </span>
@@ -112,7 +109,7 @@ export function TaskRow({
           <button
             type="button"
             className={task.starred ? 'star on' : 'star'}
-            aria-label={`تمييز: ${task.title}`}
+            aria-label={t('row.star', { title: task.title })}
             aria-pressed={task.starred}
             onClick={() => onStar(task)}
           >
@@ -124,7 +121,7 @@ export function TaskRow({
             type="button"
             className="grip"
             data-no-swipe
-            aria-label={`تحريك: ${task.title}`}
+            aria-label={t('row.move', { title: task.title })}
             {...sort.handle}
           >
             <GripIcon />

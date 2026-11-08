@@ -50,12 +50,3 @@ export function nextDue(due: string, repeat: Repeat, today: string): string {
 /** Does completing this task bring it back instead of finishing it? */
 export const isRepeating = (task: Task): task is Task & { due: string; repeat: Repeat } =>
   task.status === 'open' && task.repeat !== undefined && task.due !== undefined;
-
-/** How a repetition is shown to the user. */
-export const REPEAT_LABEL: Record<Repeat, string> = {
-  daily: 'كل يوم',
-  workdays: 'أيام العمل (الأحد–الخميس)',
-  weekly: 'كل أسبوع',
-  monthly: 'كل شهر',
-  yearly: 'كل سنة',
-};

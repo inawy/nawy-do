@@ -13,13 +13,14 @@ import { createDexieRepositories, type NawyDoDb } from '@/data';
 import { useBackup } from '@/features/backup';
 import { useLists } from '@/features/lists';
 import { useTasks } from '@/features/tasks';
+import { I18nProvider, makeI18n, type Lang } from '@/ui/i18n';
 import { TasksScreen } from '@/ui/shell';
 import { formatWhen, systemClock, systemToday } from './clock';
 import { getDb } from './db';
 import { canShareFile, downloadText, shareText } from './files';
 import { installSignal } from './install';
 import { newId } from './ids';
-import { loadSort, saveSort } from './prefs';
+import { loadLang, loadSort, saveLang, saveSort } from './prefs';
 import { takeLaunch } from './launch';
 import { requestPersistence, type StorageState } from './storage';
 import { updateSignal } from './updateSignal';
@@ -52,6 +53,12 @@ export function App({ repositories, db, now = systemClock, today = systemToday }
   const [storage, setStorage] = useState<StorageState | 'unknown'>('unknown');
   const [openId, setOpenId] = useState<string | null>(null);
   useDay(today, now); // re-renders at midnight, so every `today()` below is the new day
+  const [lang, setLangState] = useState(loadLang);
+  const setLang = (l: Lang) => {
+    saveLang(l);
+    setLangState(l);
+  };
+  const i18n = makeI18n(lang);
   const exportLog = useExportLog(now);
   const [nudgeLater, setNudgeLater] = useState(false);
   const [dueLater, setDueLater] = useState(false);
@@ -88,94 +95,96 @@ export function App({ repositories, db, now = systemClock, today = systemToday }
       : null;
 
   return (
-    <TasksScreen
-      data={{
-        storage,
-        snapshots: backup.snapshots.map((s) => ({
-          id: s.id,
-          label: `${s.kind === 'daily' ? 'تلقائية' : 'قبل تحديث'} · ${formatWhen(s.createdAt)}`,
-        })),
-        outcome: backup.outcome,
-        onOpen: () => void backup.refresh(),
-        onExport: () =>
-          void backup.exportJson().then((text) => {
-            downloadText(`nawy-do-${today()}.json`, text);
-            exportLog.mark();
-          }),
-        onShare: canShareFile()
-          ? () =>
-              void backup
-                .exportJson()
-                .then((text) => shareText(`nawy-do-${today()}.json`, text))
-                .then((shared) => shared && exportLog.mark())
-          : undefined,
-        lastExport: exportLog.last === undefined ? undefined : formatWhen(exportLog.last),
-        onImport: (file) => void file.text().then(backup.importText),
-        onRestore: (id) => void backup.restore(id),
-      }}
-      dueNotice={
-        due !== undefined &&
-        !tasks.failed &&
-        !dueLater &&
-        selection !== 'today' &&
-        due.overdue + due.today > 0
-          ? {
-              overdue: due.overdue,
-              today: due.today,
-              onShow: () => {
-                setChosen('today');
-                setDueLater(true);
-              },
-              onLater: () => setDueLater(true),
-            }
-          : undefined
-      }
-      backupNudge={
-        tasks.ready &&
-        !tasks.failed &&
-        !nudgeLater &&
-        needsBackupNudge(exportLog.last, now(), tasks.tasks.length)
-          ? { onLater: () => setNudgeLater(true) }
-          : undefined
-      }
-      tasks={tasks.tasks}
-      lists={lists.lists}
-      today={today()}
-      newId={newId}
-      selection={selection}
-      ready={tasks.ready}
-      failed={tasks.failed}
-      writeFailed={tasks.writeFailed || lists.writeFailed}
-      editing={editing}
-      removed={removed}
-      sort={sort}
-      onSort={(mode) => {
-        setSort(mode);
-        saveSort(mode);
-      }}
-      applyUpdate={applyUpdate}
-      onInstall={onInstall}
-      focusAdd={launch.newTask}
-      onSelect={setChosen}
-      onAdd={(title) => void tasks.add(title, newTaskDefaults(selection, today()))}
-      onToggle={(t) => void tasks.toggle(t)}
-      onStar={(t) => void tasks.edit(t, { starred: !t.starred })}
-      onOpen={(t) => setOpenId(t.id)}
-      onMove={(id, to, shown) => void tasks.move(id, to, shown)}
-      onMoveMany={(ids, listId) => void tasks.moveMany(ids, listId)}
-      onCompleteMany={(ids) => void tasks.completeMany(ids)}
-      onClose={() => setOpenId(null)}
-      onSave={(t, patch) => void tasks.edit(t, patch)}
-      onRemove={(t) => void tasks.remove(t)}
-      onAddList={lists.add}
-      onEditList={(l, patch) => void lists.edit(l, patch)}
-      onDeleteList={(l) => void lists.remove(l)}
-      onMoveList={(l, delta) => void lists.move(l, delta)}
-      onUndo={() => void (lists.lastRemoved ? lists.undoRemove() : tasks.undoRemove())}
-      onDismissUndo={() => {
-        lists.dismissUndo();
-        tasks.dismissUndo();
-      }}
-    />
+    <I18nProvider lang={lang} onLang={setLang}>
+      <TasksScreen
+        data={{
+          storage,
+          snapshots: backup.snapshots.map((s) => ({
+            id: s.id,
+            label: `${i18n.t(s.kind === 'daily' ? 'backup.kindDaily' : 'backup.kindUpgrade')} · ${formatWhen(s.createdAt, lang)}`,
+          })),
+          outcome: backup.outcome,
+          onOpen: () => void backup.refresh(),
+          onExport: () =>
+            void backup.exportJson().then((text) => {
+              downloadText(`nawy-do-${today()}.json`, text);
+              exportLog.mark();
+            }),
+          onShare: canShareFile()
+            ? () =>
+                void backup
+                  .exportJson()
+                  .then((text) => shareText(`nawy-do-${today()}.json`, text))
+                  .then((shared) => shared && exportLog.mark())
+            : undefined,
+          lastExport: exportLog.last === undefined ? undefined : formatWhen(exportLog.last, lang),
+          onImport: (file) => void file.text().then(backup.importText),
+          onRestore: (id) => void backup.restore(id),
+        }}
+        dueNotice={
+          due !== undefined &&
+          !tasks.failed &&
+          !dueLater &&
+          selection !== 'today' &&
+          due.overdue + due.today > 0
+            ? {
+                overdue: due.overdue,
+                today: due.today,
+                onShow: () => {
+                  setChosen('today');
+                  setDueLater(true);
+                },
+                onLater: () => setDueLater(true),
+              }
+            : undefined
+        }
+        backupNudge={
+          tasks.ready &&
+          !tasks.failed &&
+          !nudgeLater &&
+          needsBackupNudge(exportLog.last, now(), tasks.tasks.length)
+            ? { onLater: () => setNudgeLater(true) }
+            : undefined
+        }
+        tasks={tasks.tasks}
+        lists={lists.lists}
+        today={today()}
+        newId={newId}
+        selection={selection}
+        ready={tasks.ready}
+        failed={tasks.failed}
+        writeFailed={tasks.writeFailed || lists.writeFailed}
+        editing={editing}
+        removed={removed}
+        sort={sort}
+        onSort={(mode) => {
+          setSort(mode);
+          saveSort(mode);
+        }}
+        applyUpdate={applyUpdate}
+        onInstall={onInstall}
+        focusAdd={launch.newTask}
+        onSelect={setChosen}
+        onAdd={(title) => void tasks.add(title, newTaskDefaults(selection, today()))}
+        onToggle={(t) => void tasks.toggle(t)}
+        onStar={(t) => void tasks.edit(t, { starred: !t.starred })}
+        onOpen={(t) => setOpenId(t.id)}
+        onMove={(id, to, shown) => void tasks.move(id, to, shown)}
+        onMoveMany={(ids, listId) => void tasks.moveMany(ids, listId)}
+        onCompleteMany={(ids) => void tasks.completeMany(ids)}
+        onClose={() => setOpenId(null)}
+        onSave={(t, patch) => void tasks.edit(t, patch)}
+        onRemove={(t) => void tasks.remove(t)}
+        onAddList={lists.add}
+        onEditList={(l, patch) => void lists.edit(l, patch)}
+        onDeleteList={(l) => void lists.remove(l)}
+        onMoveList={(l, delta) => void lists.move(l, delta)}
+        onUndo={() => void (lists.lastRemoved ? lists.undoRemove() : tasks.undoRemove())}
+        onDismissUndo={() => {
+          lists.dismissUndo();
+          tasks.dismissUndo();
+        }}
+      />
+    </I18nProvider>
   );
 }

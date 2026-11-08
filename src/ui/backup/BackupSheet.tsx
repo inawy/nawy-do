@@ -1,5 +1,6 @@
 import { useRef } from 'react';
 import { Button, CloseIcon, IconButton } from '../primitives';
+import { useI18n, type MessageKey, type Params } from '../i18n';
 import { Sheet } from '../sheet';
 
 export type Outcome =
@@ -28,30 +29,32 @@ interface Props {
   onClose: () => void;
 }
 
-const ERRORS: Record<string, string> = {
-  'not-json': 'الملف مش ملف نسخة احتياطية سليم.',
-  'not-an-envelope': 'الملف مش ملف نسخة احتياطية سليم.',
-  'wrong-app': 'الملف ده مش من ناوي دو.',
-  'newer-version': 'الملف من نسخة أحدث من التطبيق. حدّث التطبيق وجرّب تاني.',
-  'too-many-records': 'الملف كبير أكتر من اللازم.',
-  'too-big': 'الملف كبير أكتر من اللازم.',
-  failed: 'حصلت مشكلة وماحفظتش حاجة. جرّب تاني.',
+const ERRORS: Record<string, MessageKey> = {
+  'not-json': 'backup.err.badFile',
+  'not-an-envelope': 'backup.err.badFile',
+  'wrong-app': 'backup.err.wrongApp',
+  'newer-version': 'backup.err.newer',
+  'too-many-records': 'backup.err.big',
+  'too-big': 'backup.err.big',
+  failed: 'backup.err.failed',
 };
 
-export function describeOutcome(o: Outcome): string {
+type Translate = (key: MessageKey, params?: Params) => string;
+
+export function describeOutcome(o: Outcome, t: Translate, num: (n: number) => string): string {
   switch (o.kind) {
     case 'exported':
-      return 'نزّلت النسخة الاحتياطية.';
+      return t('backup.exported');
     case 'imported':
       return o.changed === 0
-        ? 'كل اللي في الملف موجود عندك بالفعل.'
-        : `استوردت ${o.changed} من ${o.total}. بياناتك الحالية اتدمجت معاها ومتمسحش منها حاجة.`;
+        ? t('backup.importedNone')
+        : t('backup.imported', { changed: num(o.changed), total: num(o.total) });
     case 'restored':
       return o.changed === 0
-        ? 'النسخة دي موجودة عندك بالفعل.'
-        : `رجّعت ${o.changed} عنصر من النسخة. بياناتك الحالية اتدمجت معاها.`;
+        ? t('backup.restoredNone')
+        : t('backup.restored', { changed: num(o.changed) });
     case 'error':
-      return ERRORS[o.code] ?? 'الملف ده مش سليم، ومحصلش أي تغيير.';
+      return t(ERRORS[o.code] ?? 'backup.err.unknown');
   }
 }
 
@@ -68,39 +71,37 @@ export function BackupSheet({
   onClose,
 }: Props) {
   const file = useRef<HTMLInputElement>(null);
+  const { t, num } = useI18n();
 
   return (
-    <Sheet label="بياناتي" onClose={onClose}>
+    <Sheet label={t('backup.title')} onClose={onClose}>
       <div className="sheet-head">
-        <h2 className="sheet-heading">بياناتي</h2>
-        <IconButton label="إغلاق" onClick={onClose}>
+        <h2 className="sheet-heading">{t('backup.title')}</h2>
+        <IconButton label={t('common.close')} onClick={onClose}>
           <CloseIcon />
         </IconButton>
       </div>
-      <p className="hint">كل نواياك محفوظة على جهازك بس. خُد نسخة احتياطية تحفظها عندك.</p>
+      <p className="hint">{t('backup.intro')}</p>
       {storage === 'persisted' ? (
-        <p className="form-ok">التخزين محمي من المسح التلقائي.</p>
+        <p className="form-ok">{t('backup.persisted')}</p>
       ) : storage === 'best-effort' || storage === 'unsupported' ? (
-        <p className="form-warn">
-          المتصفح ممكن يمسح بيانات الموقع لو الجهاز ضاق. ثبّت التطبيق على الشاشة الرئيسية وخُد نسخة
-          احتياطية بانتظام.
-        </p>
+        <p className="form-warn">{t('backup.bestEffort')}</p>
       ) : null}
       <p className="hint">
-        {lastExport ? `آخر نسخة احتياطية: ${lastExport}` : 'لسه ماخدتش نسخة احتياطية.'}
+        {lastExport ? t('backup.last', { when: lastExport }) : t('backup.never')}
       </p>
       <div className="actions data-actions">
         <Button variant="primary" onClick={onExport}>
-          تنزيل نسخة احتياطية
+          {t('backup.export')}
         </Button>
-        {onShare && <Button onClick={onShare}>مشاركة النسخة (Drive وغيره)</Button>}
-        <Button onClick={() => file.current?.click()}>استيراد من ملف</Button>
+        {onShare && <Button onClick={onShare}>{t('backup.share')}</Button>}
+        <Button onClick={() => file.current?.click()}>{t('backup.import')}</Button>
         <input
           ref={file}
           type="file"
           accept="application/json,.json"
           hidden
-          aria-label="ملف النسخة الاحتياطية"
+          aria-label={t('backup.fileLabel')}
           onChange={(e) => {
             const picked = e.target.files?.[0];
             e.target.value = '';
@@ -113,23 +114,20 @@ export function BackupSheet({
           className={outcome.kind === 'error' ? 'form-error' : 'form-ok'}
           role={outcome.kind === 'error' ? 'alert' : 'status'}
         >
-          {describeOutcome(outcome)}
+          {describeOutcome(outcome, t, num)}
         </p>
       )}
       {snapshots.length > 0 && (
         <section className="snapshots">
-          <h3>نسخ أمان على الجهاز</h3>
-          <p className="hint">
-            التطبيق بياخد نسخة تلقائية كل يوم (آخر ٧) وقبل ما يغيّر شكل التخزين. الاسترجاع بيدمجها
-            مع بياناتك الحالية. النسخ دي جوه المتصفح نفسه، فمش بديل عن ملف تحفظه بره الجهاز.
-          </p>
+          <h3>{t('backup.snapshots')}</h3>
+          <p className="hint">{t('backup.snapshotsHint')}</p>
           <ul>
             {snapshots.map((s) => (
               <li key={s.id}>
                 <span>{s.label}</span>
                 <Button onClick={() => onRestore(s.id)}>
-                  استرجاع
-                  <span className="sr-only"> نسخة {s.label}</span>
+                  {t('backup.restore')}
+                  <span className="sr-only"> {t('backup.restoreSr', { label: s.label })}</span>
                 </Button>
               </li>
             ))}

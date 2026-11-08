@@ -1,4 +1,5 @@
 import type { TaskList } from '@/core/model';
+import { useT } from '../i18n';
 import { Composer } from '../tasks';
 import { SelectBar } from './SelectBar';
 
@@ -19,6 +20,7 @@ interface Props {
 
 /** The one input area: the composer, or the search field, or the selection actions. */
 function Bar(p: Props) {
+  const t = useT();
   if (p.picked) {
     const ids = [...p.picked];
     return (
@@ -43,8 +45,8 @@ function Bar(p: Props) {
           type="search"
           value={p.query}
           onChange={(e) => p.onQuery(e.target.value)}
-          placeholder="ابحث في كل نواياك"
-          aria-label="كلمة البحث"
+          placeholder={t('search.placeholder')}
+          aria-label={t('search.label')}
           autoFocus
           autoComplete="off"
         />

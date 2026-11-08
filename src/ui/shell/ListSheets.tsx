@@ -7,12 +7,10 @@ import {
   type TaskList,
 } from '@/core/model';
 import { ListSheet } from '../lists';
+import { useT } from '../i18n';
 import type { ListSheetState } from './useScreenState';
 
-const LIST_ERRORS = {
-  limit: 'وصلت للحد الأقصى من القوائم.',
-  failed: 'مقدرتش أحفظ القائمة. جرّب تاني.',
-} as const;
+const LIST_ERRORS = { limit: 'lists.limit', failed: 'lists.failed' } as const;
 
 interface Props {
   sheet: ListSheetState;
@@ -36,6 +34,7 @@ export function ListSheets({
   onDelete,
   onMove,
 }: Props) {
+  const t = useT();
   const [error, setError] = useState<string | undefined>();
   const close = () => {
     setError(undefined);
@@ -57,7 +56,7 @@ export function ListSheets({
               onSelect(listSelection(result.id));
               close();
             } else if (result !== 'empty') {
-              setError(LIST_ERRORS[result]);
+              setError(t(LIST_ERRORS[result]));
             }
           });
         }}

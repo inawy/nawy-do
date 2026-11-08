@@ -10,8 +10,8 @@ export function systemToday(): string {
 }
 
 /** A readable local date and time for a stored timestamp (this file is the only one that reads `Date`). */
-export const formatWhen = (ms: number): string =>
-  new Date(ms).toLocaleString('ar', { dateStyle: 'medium', timeStyle: 'short' });
+export const formatWhen = (ms: number, lang = 'ar'): string =>
+  new Date(ms).toLocaleString(lang, { dateStyle: 'medium', timeStyle: 'short' });
 
 /** Milliseconds from `now` to the next local midnight (+1 s so the new day has surely begun). */
 export function msUntilLocalMidnight(now: number): number {

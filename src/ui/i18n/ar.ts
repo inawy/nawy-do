@@ -1,0 +1,208 @@
+/**
+ * The source of truth for every word the interface shows. Arabic (Egyptian) is the product
+ * language; `en.ts` must have exactly the same keys (the type enforces it). `{name}` marks a value
+ * filled in by `t(key, { name })`.
+ */
+export const ar = {
+  // Navigation and views
+  'nav.label': 'العرض',
+  'view.main': 'نواياي',
+  'view.today': 'اليوم',
+  'view.starred': 'المفضلة',
+  'view.scheduled': 'مجدولة',
+  'nav.newList': 'قائمة جديدة',
+  'app.name': 'ناوي دو',
+  'app.prompt': 'ناوي تعمل إيه؟',
+
+  // Title bar and menu
+  'menu.more': 'المزيد',
+  'menu.select': 'تحديد',
+  'menu.data': 'بياناتي',
+  'menu.install': 'تثبيت التطبيق',
+  'menu.listOptions': 'خيارات القائمة',
+  'menu.search': 'بحث',
+  'menu.lang.en': 'English',
+  'menu.lang.ar': 'العربية',
+  'menu.done': 'تم',
+  'search.placeholder': 'ابحث في كل نواياك',
+  'search.label': 'كلمة البحث',
+
+  // Sorting
+  'sort.manual': 'ترتيب يدوي',
+  'sort.date': 'ترتيب بالتاريخ',
+  'sort.title': 'ترتيب أبجدي',
+
+  // Repeating
+  'repeat.daily': 'كل يوم',
+  'repeat.workdays': 'أيام العمل (الأحد–الخميس)',
+  'repeat.weekly': 'كل أسبوع',
+  'repeat.monthly': 'كل شهر',
+  'repeat.yearly': 'كل سنة',
+
+  // Dates
+  'date.today': 'النهارده',
+  'date.tomorrow': 'بكرة',
+  'date.yesterday': 'امبارح',
+  'date.nextWeek': 'الأسبوع الجاي',
+  'time.am': 'ص',
+  'time.pm': 'م',
+  'month.1': 'يناير',
+  'month.2': 'فبراير',
+  'month.3': 'مارس',
+  'month.4': 'أبريل',
+  'month.5': 'مايو',
+  'month.6': 'يونيو',
+  'month.7': 'يوليو',
+  'month.8': 'أغسطس',
+  'month.9': 'سبتمبر',
+  'month.10': 'أكتوبر',
+  'month.11': 'نوفمبر',
+  'month.12': 'ديسمبر',
+
+  // Selection bar
+  'select.label': 'إجراءات على المحدد',
+  'select.none': 'اختار نوايا',
+  'select.count': '{count} محدد',
+  'select.moveLabel': 'نقل المحدد إلى',
+  'select.move': 'نقل إلى…',
+  'select.complete': 'إنجاز المحدد',
+
+  // Notices
+  'notice.attention': 'محتاج انتباهك:',
+  'notice.overdue': '{count} متأخرة',
+  'notice.today': '{count} النهارده',
+  'notice.show': 'اعرضها',
+  'notice.later': 'بعدين',
+  'notice.backup': 'عدّى وقت من آخر نسخة احتياطية. خُد نسخة تحفظها بره الجهاز.',
+  'notice.backupDo': 'خُد نسخة',
+  'notice.update': 'في نسخة جديدة من ناوي دو.',
+  'notice.updateDo': 'حدّث',
+  'notice.writeFailed': 'مقدرتش أحفظ التغيير الأخير. جرّب تاني.',
+  'notice.storageFailed': 'مش قادر أفتح التخزين على الجهاز. لو فاتح تصفح خاص جرّب نافذة عادية.',
+  'notice.loading': 'جاري التحميل…',
+  'toast.removed': 'اتحذفت: {name}',
+  'toast.removedList': 'اتحذفت القائمة: {name}',
+  'toast.undo': 'تراجع',
+  'lists.limit': 'وصلت للحد الأقصى من القوائم.',
+  'lists.failed': 'مقدرتش أحفظ القائمة. جرّب تاني.',
+
+  // Empty states
+  'empty.main': 'مفيش نوايا لسه. اكتب أول نية فوق.',
+  'empty.list': 'القائمة فاضية. اكتب أول نية فيها فوق.',
+  'empty.starred': 'مفيش نوايا مميزة. دوس على النجمة جنب أي نية.',
+  'empty.search': 'مفيش نتايج. جرّب كلمة تانية.',
+  'empty.scheduled': 'مفيش نوايا بتاريخ. افتح نية وحدد لها يوم.',
+  'empty.today': 'مفيش حاجة مستحقة النهارده. اكتب نية فوق وهتتحدد لها النهارده.',
+
+  // Task list and rows
+  'group.overdue': 'متأخرة',
+  'group.today': 'النهارده',
+  'group.upcoming': 'قادمة',
+  'group.tasks': 'النوايا',
+  'group.done': 'المنجزة',
+  'group.doneCount': 'المنجزة ({count})',
+  'row.select': 'تحديد: {title}',
+  'row.complete': 'إنجاز: {title}',
+  'row.reopen': 'إلغاء إنجاز: {title}',
+  'row.details': 'تفاصيل: {title}',
+  'row.star': 'تمييز: {title}',
+  'row.move': 'تحريك: {title}',
+  'row.steps': 'خطوات {done}/{total}',
+  'composer.add': 'إضافة',
+
+  // Drag and drop announcements
+  'drag.help':
+    'للتحريك: اضغط مسافة لالتقاط النية، ثم استخدم الأسهم لتغيير مكانها، ومسافة للإفلات، أو Esc للإلغاء.',
+  'drag.position': 'المكان {index} من {total}',
+  'drag.pickup': 'التقطت «{name}». {position}.',
+  'drag.over': '«{name}» فوق «{other}». {position}.',
+  'drag.dropAt': 'أفلتّ «{name}» في {position}.',
+  'drag.dropHome': 'أفلتّ «{name}» في مكانها.',
+  'drag.cancel': 'اتلغى تحريك «{name}».',
+
+  // Generic
+  'common.close': 'إغلاق',
+  'common.cancel': 'إلغاء',
+  'common.save': 'حفظ',
+
+  // Task details
+  'details.title': 'تفاصيل النية',
+  'details.starred': 'مميزة',
+  'details.task': 'النية',
+  'details.notes': 'ملاحظات',
+  'details.list': 'القائمة',
+  'details.due': 'تاريخ الاستحقاق',
+  'details.quickDue': 'اختيارات سريعة للتاريخ',
+  'details.noDate': 'بدون تاريخ',
+  'details.time': 'الساعة',
+  'details.repeat': 'تكرار',
+  'details.noRepeat': 'بدون تكرار',
+  'details.delete': 'حذف النية',
+
+  // Steps
+  'steps.title': 'الخطوات',
+  'steps.fold': 'اطوِ الخطوات الفرعية: {title}',
+  'steps.unfold': 'افتح الخطوات الفرعية: {title}',
+  'steps.lift': 'ارفع الخطوة للمستوى الأول: {title}',
+  'steps.nest': 'اجعل الخطوة فرعية: {title}',
+  'steps.liftShort': 'رفع',
+  'steps.nestShort': 'فرعية',
+  'steps.earlier': 'قدّم الخطوة: {title}',
+  'steps.later': 'أخّر الخطوة: {title}',
+  'steps.remove': 'حذف الخطوة: {title}',
+  'steps.new': 'خطوة جديدة',
+  'steps.add': 'أضف خطوة',
+
+  // Lists
+  'list.new': 'قائمة جديدة',
+  'list.options': 'خيارات القائمة',
+  'list.name': 'اسم القائمة',
+  'list.order': 'ترتيب القائمة',
+  'list.earlier': 'قدّم القائمة',
+  'list.later': 'أخّر القائمة',
+  'list.deleteWarn': 'هتتحذف القائمة، ونواياها هترجع لـ«نواياي». تقدر تتراجع بعدها مباشرة.',
+  'list.delete': 'حذف القائمة',
+  'list.confirmDelete': 'تأكيد الحذف',
+  'color.legend': 'اللون',
+  'color.group': 'لون القائمة',
+  'color.blue': 'أزرق',
+  'color.green': 'أخضر',
+  'color.amber': 'برتقالي',
+  'color.red': 'أحمر',
+  'color.purple': 'بنفسجي',
+  'color.teal': 'فيروزي',
+  'color.pink': 'وردي',
+  'color.gray': 'رمادي',
+  'backup.title': 'بياناتي',
+  'backup.intro': 'كل نواياك محفوظة على جهازك بس. خُد نسخة احتياطية تحفظها عندك.',
+  'backup.persisted': 'التخزين محمي من المسح التلقائي.',
+  'backup.bestEffort':
+    'المتصفح ممكن يمسح بيانات الموقع لو الجهاز ضاق. ثبّت التطبيق على الشاشة الرئيسية وخُد نسخة احتياطية بانتظام.',
+  'backup.last': 'آخر نسخة احتياطية: {when}',
+  'backup.never': 'لسه ماخدتش نسخة احتياطية.',
+  'backup.export': 'تنزيل نسخة احتياطية',
+  'backup.share': 'مشاركة النسخة (Drive وغيره)',
+  'backup.import': 'استيراد من ملف',
+  'backup.fileLabel': 'ملف النسخة الاحتياطية',
+  'backup.snapshots': 'نسخ أمان على الجهاز',
+  'backup.snapshotsHint':
+    'التطبيق بياخد نسخة تلقائية كل يوم (آخر ٧) وقبل ما يغيّر شكل التخزين. الاسترجاع بيدمجها مع بياناتك الحالية. النسخ دي جوه المتصفح نفسه، فمش بديل عن ملف تحفظه بره الجهاز.',
+  'backup.restore': 'استرجاع',
+  'backup.restoreSr': 'نسخة {label}',
+  'backup.kindDaily': 'تلقائية',
+  'backup.kindUpgrade': 'قبل تحديث',
+  'backup.exported': 'نزّلت النسخة الاحتياطية.',
+  'backup.importedNone': 'كل اللي في الملف موجود عندك بالفعل.',
+  'backup.imported':
+    'استوردت {changed} من {total}. بياناتك الحالية اتدمجت معاها ومتمسحش منها حاجة.',
+  'backup.restoredNone': 'النسخة دي موجودة عندك بالفعل.',
+  'backup.restored': 'رجّعت {changed} عنصر من النسخة. بياناتك الحالية اتدمجت معاها.',
+  'backup.err.badFile': 'الملف مش ملف نسخة احتياطية سليم.',
+  'backup.err.wrongApp': 'الملف ده مش من ناوي دو.',
+  'backup.err.newer': 'الملف من نسخة أحدث من التطبيق. حدّث التطبيق وجرّب تاني.',
+  'backup.err.big': 'الملف كبير أكتر من اللازم.',
+  'backup.err.failed': 'حصلت مشكلة وماحفظتش حاجة. جرّب تاني.',
+  'backup.err.unknown': 'الملف ده مش سليم، ومحصلش أي تغيير.',
+} as const;
+
+export type MessageKey = keyof typeof ar;

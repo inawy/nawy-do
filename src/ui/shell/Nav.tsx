@@ -7,17 +7,18 @@ import {
   StarredNavIcon,
   TodayIcon,
 } from '../primitives';
+import { useT, type MessageKey } from '../i18n';
 
 const SMART: {
   id: Selection;
-  label: string;
+  label: MessageKey;
   icon: () => React.JSX.Element;
   count: keyof Counts;
 }[] = [
-  { id: 'main', label: 'نواياي', icon: AllIcon, count: 'main' },
-  { id: 'today', label: 'اليوم', icon: TodayIcon, count: 'today' },
-  { id: 'starred', label: 'المفضلة', icon: StarredNavIcon, count: 'starred' },
-  { id: 'scheduled', label: 'مجدولة', icon: CalendarIcon, count: 'scheduled' },
+  { id: 'main', label: 'view.main', icon: AllIcon, count: 'main' },
+  { id: 'today', label: 'view.today', icon: TodayIcon, count: 'today' },
+  { id: 'starred', label: 'view.starred', icon: StarredNavIcon, count: 'starred' },
+  { id: 'scheduled', label: 'view.scheduled', icon: CalendarIcon, count: 'scheduled' },
 ];
 
 interface Props {
@@ -30,6 +31,7 @@ interface Props {
 
 /** Side list on wide screens, a scrolling bottom bar on phones (the same element; CSS moves it). */
 export function Nav({ selection, counts, lists, onSelect, onNewList }: Props) {
+  const t = useT();
   const item = (
     id: Selection,
     label: string,
@@ -61,11 +63,11 @@ export function Nav({ selection, counts, lists, onSelect, onNewList }: Props) {
   );
 
   return (
-    <nav className="nav" aria-label="العرض">
+    <nav className="nav" aria-label={t('nav.label')}>
       {SMART.map(({ id, label, icon, count }) =>
         item(
           id,
-          label,
+          t(label),
           icon,
           counts[count] as number,
           '',
@@ -81,7 +83,7 @@ export function Nav({ selection, counts, lists, onSelect, onNewList }: Props) {
         <span className="nav-icon">
           <PlusIcon />
         </span>
-        <span className="nav-label nav-new-label">قائمة جديدة</span>
+        <span className="nav-label nav-new-label">{t('nav.newList')}</span>
       </button>
     </nav>
   );

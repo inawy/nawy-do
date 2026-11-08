@@ -20,15 +20,6 @@ const TIME_SHAPE = /^([01]\d|2[0-3]):[0-5]\d$/;
 /** A time of day, `HH:MM`, 24 h. */
 export const isCivilTime = (s: string): boolean => TIME_SHAPE.test(s);
 
-/** `21:30` → «9:30 م». Anything that is not a time is returned as it is. */
-export function formatTime(time: string): string {
-  if (!isCivilTime(time)) return time;
-  const h = Number(time.slice(0, 2));
-  const minutes = time.slice(3);
-  const hour12 = h % 12 === 0 ? 12 : h % 12;
-  return `${hour12}:${minutes} ${h < 12 ? 'ص' : 'م'}`;
-}
-
 export const isCivilDate = (s: string): boolean => parseCivil(s) !== undefined;
 
 /** Days since 1970-01-01 (Hinnant's algorithm). */
@@ -50,34 +41,11 @@ export function dueState(due: string, today: string): DueState {
   return due === today ? 'today' : 'upcoming';
 }
 
-const MONTHS = [
-  'يناير',
-  'فبراير',
-  'مارس',
-  'أبريل',
-  'مايو',
-  'يونيو',
-  'يوليو',
-  'أغسطس',
-  'سبتمبر',
-  'أكتوبر',
-  'نوفمبر',
-  'ديسمبر',
-];
-
-/** «النهارده» / «بكرة» / «امبارح» near today, otherwise «27 أكتوبر» (+ the year if it differs). */
-export function formatDue(due: string, today: string): string {
+/** Whole days from `today` to `due` (negative: in the past); `undefined` if either is not a date. */
+export function dayDiff(due: string, today: string): number | undefined {
   const a = daysFromCivil(due);
   const b = daysFromCivil(today);
-  const c = parseCivil(due);
-  if (a === undefined || b === undefined || !c) return due;
-  const diff = a - b;
-  if (diff === 0) return 'النهارده';
-  if (diff === 1) return 'بكرة';
-  if (diff === -1) return 'امبارح';
-  const month = MONTHS[c.m - 1] ?? '';
-  const sameYear = parseCivil(today)?.y === c.y;
-  return sameYear ? `${c.d} ${month}` : `${c.d} ${month} ${c.y}`;
+  return a === undefined || b === undefined ? undefined : a - b;
 }
 
 /** Inverse of `daysFromCivil` (Hinnant's algorithm). */
@@ -107,15 +75,16 @@ export function addDays(date: string, n: number): string {
 }
 
 export interface QuickDue {
-  label: string;
+  /** Which choice it is; the words for it belong to the interface. */
+  key: 'today' | 'tomorrow' | 'nextWeek';
   value: string;
 }
 
 /** The one-tap choices of the due-date picker. */
 export function quickDueOptions(today: string): QuickDue[] {
   return [
-    { label: 'النهارده', value: today },
-    { label: 'بكرة', value: addDays(today, 1) },
-    { label: 'الأسبوع الجاي', value: addDays(today, 7) },
+    { key: 'today', value: today },
+    { key: 'tomorrow', value: addDays(today, 1) },
+    { key: 'nextWeek', value: addDays(today, 7) },
   ];
 }
