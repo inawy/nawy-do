@@ -1,4 +1,4 @@
-/* ---------- shell: phone first (top brand, bottom nav) ---------- */
+/* ---------- shell: phone first (top brand, tabs along the top, floating add button) ---------- */
 .shell {
   min-block-size: 100dvh;
 }
@@ -14,7 +14,7 @@
 .main {
   max-inline-size: 44rem;
   margin-inline: auto;
-  padding: 0.5rem 1rem calc(var(--nav-h) + 6rem);
+  padding: 0.5rem 1rem calc(5rem + env(safe-area-inset-bottom));
 }
 h1 {
   font-size: 1.625rem;
@@ -29,57 +29,99 @@ h2 {
 }
 
 .nav {
-  position: fixed;
-  inset-inline: 0;
-  inset-block-end: 0;
+  position: sticky;
+  inset-block-start: 0;
   z-index: 5;
   display: flex;
-  block-size: calc(var(--nav-h) + env(safe-area-inset-bottom));
-  padding-block-end: env(safe-area-inset-bottom);
-  background: var(--card);
-  border-block-start: 1px solid var(--line);
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--page);
+  border-block-end: 1px solid var(--line);
+  overflow-x: auto;
+  scrollbar-width: none;
 }
+.nav::-webkit-scrollbar {
+  display: none;
+}
+/* Phone: the views are tabs along the top (no icons), the open one filled. */
 .nav-item {
-  flex: 1;
+  flex: none;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 2px;
-  border: 0;
-  background: none;
-  color: var(--muted);
+  gap: 0.375rem;
+  min-block-size: 44px;
+  padding-inline: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--card);
+  color: var(--ink);
+  font-size: 0.9375rem;
+  white-space: nowrap;
   position: relative;
-  min-inline-size: 44px;
+  transition:
+    background-color 0.15s,
+    color 0.15s,
+    border-color 0.15s;
 }
 .nav-item.on {
-  color: var(--brand);
-}
-/* Phone: the active item sits on a soft pill behind its icon, pressing shows the same pill; no
-   square flash (the browser's tap highlight is switched off in base.css). */
-.nav-icon {
-  display: grid;
-  place-items: center;
-  inline-size: 4rem;
-  block-size: 2rem;
-  border-radius: 999px;
-  transition: background-color 0.15s;
-}
-.nav-item.on .nav-icon {
   background: var(--brand-soft);
+  border-color: var(--brand);
+  color: var(--brand);
+  font-weight: 600;
 }
-.nav-item:active .nav-icon {
+.nav-item:active {
   background: var(--hover);
 }
 .nav-item:focus-visible {
-  outline-offset: -6px;
-  border-radius: 1.25rem;
+  outline-offset: 2px;
+}
+.nav-icon {
+  display: none;
 }
 .nav-label {
-  font-size: 0.75rem;
+  font-size: inherit;
 }
 .nav-count {
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+.nav-item.on .nav-count {
+  color: inherit;
+}
+.nav-new {
+  color: var(--brand);
+  border-style: dashed;
+}
+.nav-new .nav-icon {
+  display: grid;
+}
+.nav-sep {
   display: none;
+}
+
+/* The round add button, floating at the end corner (like Google Tasks). */
+.fab {
+  position: fixed;
+  inset-inline-end: 1rem;
+  inset-block-end: calc(1rem + env(safe-area-inset-bottom));
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  inline-size: 56px;
+  block-size: 56px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--brand);
+  color: var(--on-brand);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.25);
+  transition: transform 0.1s;
+}
+.fab:active {
+  transform: scale(0.94);
+}
+.fab svg {
+  inline-size: 28px;
+  block-size: 28px;
 }
 
 @media (min-width: 880px) {
@@ -97,53 +139,54 @@ h2 {
     font-size: 1.375rem;
   }
   .nav {
-    position: sticky;
-    inset-block-start: 0;
     grid-column: 1;
     grid-row: 2;
     z-index: auto;
     flex-direction: column;
-    block-size: auto;
     align-self: start;
     padding: 0.5rem 0.75rem;
     background: transparent;
     border: 0;
     gap: 2px;
+    overflow: visible;
   }
   .nav-item {
     flex: none;
-    flex-direction: row;
     justify-content: flex-start;
     gap: 0.875rem;
     text-align: start;
     min-block-size: 48px;
     padding-inline: 1rem;
+    border: 0;
     border-radius: 999px;
-    font-size: 0.9375rem;
-  }
-  /* Wide: the whole row is the pill, so the icon carries no background of its own. */
-  .nav-item .nav-icon,
-  .nav-item.on .nav-icon,
-  .nav-item:active .nav-icon {
-    inline-size: auto;
-    block-size: auto;
     background: none;
+    color: var(--muted);
+    white-space: normal;
+  }
+  .nav-new {
+    border: 0;
+    color: var(--brand);
+  }
+  .nav-icon {
+    display: grid;
+    place-items: center;
   }
   .nav-item:hover {
     background: var(--hover);
   }
   .nav-item.on {
     background: var(--brand-soft);
-    font-weight: 600;
+    color: var(--brand);
   }
   .nav-label {
-    font-size: inherit;
     flex: 1;
   }
-  .nav-count {
-    display: inline;
-    font-size: 0.8125rem;
-    color: var(--muted);
+  .nav-sep {
+    display: block;
+    inline-size: 100%;
+    margin: 0.5rem 0;
+    border: 0;
+    border-block-start: 1px solid var(--line);
   }
   .main {
     grid-column: 2;
@@ -153,41 +196,7 @@ h2 {
   }
 }
 
-/* ---------- lists in the navigation ---------- */
-.nav {
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-.nav::-webkit-scrollbar {
-  display: none;
-}
-.nav-item {
-  min-inline-size: 60px;
-  white-space: nowrap;
-}
-/* Six items must fit a phone without scrolling: «new list» is a plain + (its name stays for
-   screen readers) and the pill is a little narrower. */
-.nav-new {
-  flex: 0 0 52px;
-  min-inline-size: 0;
-}
-.nav-new-label {
-  position: absolute;
-  inline-size: 1px;
-  block-size: 1px;
-  margin: -1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-}
-.nav-icon {
-  inline-size: 3.5rem;
-}
-.nav-sep {
-  display: none;
-}
-.nav-new {
-  color: var(--brand);
-}
+/* ---------- title row ---------- */
 .title-row {
   display: flex;
   align-items: center;
@@ -198,33 +207,6 @@ h2 {
   min-inline-size: 0;
   overflow-wrap: anywhere;
 }
-@media (min-width: 880px) {
-  .nav-new {
-    flex: none;
-  }
-  .nav-new-label {
-    position: static;
-    inline-size: auto;
-    block-size: auto;
-    margin: 0;
-    clip-path: none;
-  }
-  .nav {
-    overflow: visible;
-  }
-  .nav-item {
-    min-inline-size: 0;
-    white-space: normal;
-  }
-  .nav-sep {
-    display: block;
-    inline-size: 100%;
-    margin: 0.5rem 0;
-    border: 0;
-    border-block-start: 1px solid var(--line);
-  }
-}
-
 .title-actions {
   display: flex;
   align-items: center;
@@ -262,7 +244,7 @@ h2 {
   background: var(--hover);
 }
 
-/* ---------- phone: input dock above the nav, no pull-to-refresh bounce ---------- */
+/* ---------- phone: the search / selection bar at the bottom, no pull-to-refresh bounce ---------- */
 html {
   overscroll-behavior-y: contain;
 }
@@ -270,13 +252,12 @@ html {
   .input-dock {
     position: fixed;
     inset-inline: 0;
-    inset-block-end: calc(var(--nav-h) + env(safe-area-inset-bottom));
-    z-index: 4;
-    padding: 0.5rem 1rem;
+    inset-block-end: 0;
+    z-index: 6;
+    padding: 0.5rem 1rem calc(0.5rem + env(safe-area-inset-bottom));
     background: var(--page);
     border-block-start: 1px solid var(--line);
   }
-  .input-dock .composer,
   .input-dock .search-bar {
     max-inline-size: 44rem;
     margin-inline: auto;
@@ -311,6 +292,16 @@ html {
 }
 .nav-item[data-list-color] .nav-icon {
   color: var(--list-color);
+}
+/* Phone tabs have no icon: a list shows its colour as a dot. */
+@media (max-width: 879.98px) {
+  .nav-item[data-list-color]::before {
+    content: '';
+    inline-size: 10px;
+    block-size: 10px;
+    border-radius: 50%;
+    background: var(--list-color);
+  }
 }
 .colors {
   border: 0;

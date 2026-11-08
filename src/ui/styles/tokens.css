@@ -15,7 +15,6 @@
   --brand-soft: #e4edff;
   --on-brand: #ffffff;
   --radius: var(--nawy-radius-lg);
-  --nav-h: 64px;
 }
 /* The design system switches dark via [data-theme="dark"]; the product also follows the OS. */
 @media (prefers-color-scheme: dark) {

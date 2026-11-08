@@ -17,6 +17,7 @@ beforeEach(() => {
 afterEach(cleanup);
 
 async function addIntention(title: string) {
+  fireEvent.click(screen.getByRole('button', { name: 'نية جديدة' }));
   fireEvent.change(screen.getByLabelText('ناوي تعمل إيه؟'), { target: { value: title } });
   fireEvent.click(screen.getByRole('button', { name: 'إضافة' }));
   await screen.findByText(title);
@@ -26,13 +27,14 @@ describe('App', () => {
   it('shows the name, the prompt and an honest empty state', async () => {
     render(<App db={db} now={now} today={today} />);
     expect(screen.getByText('ناوي دو')).toBeTruthy();
-    expect(screen.getByPlaceholderText('ناوي تعمل إيه؟')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'نية جديدة' })).toBeTruthy();
     await screen.findByText(/مفيش نوايا/);
   });
 
   it('does not add an empty intention', async () => {
     render(<App db={db} now={now} today={today} />);
     await screen.findByText(/مفيش نوايا/);
+    fireEvent.click(screen.getByRole('button', { name: 'نية جديدة' }));
     const button = screen.getByRole('button', { name: 'إضافة' }) as HTMLButtonElement;
     expect(button.disabled).toBe(true);
   });

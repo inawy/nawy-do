@@ -7,6 +7,7 @@ import { expect, test, type Page } from '@playwright/test';
 const prompt = 'ناوي تعمل إيه؟';
 
 async function add(page: Page, title: string) {
+  await page.getByRole('button', { name: 'نية جديدة' }).click();
   await page.getByLabel(prompt).fill(title);
   await page.getByRole('button', { name: 'إضافة' }).click();
   await expect(page.getByText(title, { exact: true })).toBeVisible();
@@ -14,7 +15,7 @@ async function add(page: Page, title: string) {
 
 async function seed(page: Page) {
   await page.goto('/');
-  await expect(page.getByLabel(prompt)).toBeVisible();
+  await expect(page.getByRole('button', { name: 'نية جديدة' })).toBeVisible();
   await page.getByRole('button', { name: 'قائمة جديدة' }).click();
   await page.getByLabel('اسم القائمة').fill('العمل');
   await page.getByRole('button', { name: 'حفظ' }).click();

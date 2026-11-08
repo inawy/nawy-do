@@ -4,6 +4,7 @@ import { expect, test, type Page } from '@playwright/test';
 const prompt = 'ناوي تعمل إيه؟';
 
 async function add(page: Page, title: string) {
+  await page.getByRole('button', { name: 'نية جديدة' }).click();
   await page.getByLabel(prompt).fill(title);
   await page.getByRole('button', { name: 'إضافة' }).click();
   await expect(page.getByText(title, { exact: true })).toBeVisible();
@@ -11,7 +12,7 @@ async function add(page: Page, title: string) {
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByLabel(prompt)).toBeVisible();
+  await expect(page.getByRole('button', { name: 'نية جديدة' })).toBeVisible();
 });
 
 test('adds an intention and it survives a reload', async ({ page }) => {
@@ -177,7 +178,7 @@ test('keeps working offline once the service worker has cached the app', async (
 
   await context.setOffline(true);
   await page.reload();
-  await expect(page.getByLabel(prompt)).toBeVisible();
+  await expect(page.getByRole('button', { name: 'نية جديدة' })).toBeVisible();
   await add(page, 'اتكتبت بلا إنترنت');
   await context.setOffline(false);
 });
@@ -284,7 +285,9 @@ test('text shared from another app becomes an intention, once', async ({ page })
   await expect(page.getByText('اتصل بالسباك', { exact: true })).toHaveCount(1);
 });
 
-test('the «new intention» shortcut focuses the add field', async ({ page }) => {
+test('the «new intention» shortcut opens the add sheet with its field focused', async ({
+  page,
+}) => {
   await page.goto('/?new=1');
   await expect(page.getByLabel(prompt)).toBeFocused();
 });

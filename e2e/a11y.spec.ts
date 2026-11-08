@@ -8,6 +8,7 @@ import { expect, test, type Page } from '@playwright/test';
 const prompt = 'ناوي تعمل إيه؟';
 
 async function add(page: Page, title: string) {
+  await page.getByRole('button', { name: 'نية جديدة' }).click();
   await page.getByLabel(prompt).fill(title);
   await page.getByRole('button', { name: 'إضافة' }).click();
   await expect(page.getByText(title, { exact: true })).toBeVisible();
@@ -34,7 +35,7 @@ for (const scheme of ['light', 'dark'] as const) {
 
     test.beforeEach(async ({ page }) => {
       await page.goto('/');
-      await expect(page.getByLabel(prompt)).toBeVisible();
+      await expect(page.getByRole('button', { name: 'نية جديدة' })).toBeVisible();
       await add(page, 'اشتري خبز');
       await add(page, 'اتصل بالطبيب');
     });
@@ -63,6 +64,7 @@ test.describe('english', () => {
     await page.goto('/');
     await chooseFromMenu(page, 'English');
     await expect(page.locator('html')).toHaveAttribute('dir', 'ltr');
+    await page.getByRole('button', { name: 'New task' }).click();
     const input = page.getByLabel('What do you intend to do?');
     await input.fill('Buy bread');
     await page.getByRole('button', { name: 'Add' }).click();

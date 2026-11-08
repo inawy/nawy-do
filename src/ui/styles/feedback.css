@@ -3,7 +3,7 @@
   position: fixed;
   inset-inline: 1rem;
   z-index: 8;
-  inset-block-end: calc(var(--nav-h) + 0.75rem + env(safe-area-inset-bottom));
+  inset-block-end: calc(5.5rem + env(safe-area-inset-bottom));
   max-inline-size: 36rem;
   margin-inline: auto;
   display: flex;

@@ -11,6 +11,7 @@ test('switches to English, flips the direction, and remembers the choice', async
   await expect(page.locator('html')).toHaveAttribute('dir', 'ltr');
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
 
+  await page.getByRole('button', { name: 'New task' }).click();
   await page.getByLabel('What do you intend to do?').fill('Call the plumber');
   await page.getByRole('button', { name: 'Add' }).click();
   await expect(page.getByText('Call the plumber', { exact: true })).toBeVisible();

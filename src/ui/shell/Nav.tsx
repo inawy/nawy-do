@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { listSelection, type Counts, type Selection, type TaskList } from '@/core/model';
 import {
   AllIcon,
@@ -29,9 +30,16 @@ interface Props {
   onNewList: () => void;
 }
 
-/** Side list on wide screens, a scrolling bottom bar on phones (the same element; CSS moves it). */
+/** Side list on wide screens, a scrolling tab strip along the top on phones (CSS moves it). */
 export function Nav({ selection, counts, lists, onSelect, onNewList }: Props) {
   const t = useT();
+  const root = useRef<HTMLElement>(null);
+  // On the phone the tabs scroll: keep the open one in view.
+  useEffect(() => {
+    root.current
+      ?.querySelector('[aria-current="page"]')
+      ?.scrollIntoView?.({ inline: 'center', block: 'nearest' });
+  }, [selection]);
   const item = (
     id: Selection,
     label: string,
@@ -63,7 +71,7 @@ export function Nav({ selection, counts, lists, onSelect, onNewList }: Props) {
   );
 
   return (
-    <nav className="nav" aria-label={t('nav.label')}>
+    <nav className="nav" ref={root} aria-label={t('nav.label')}>
       {SMART.map(({ id, label, icon, count }) =>
         item(
           id,
@@ -83,7 +91,7 @@ export function Nav({ selection, counts, lists, onSelect, onNewList }: Props) {
         <span className="nav-icon">
           <PlusIcon />
         </span>
-        <span className="nav-label nav-new-label">{t('nav.newList')}</span>
+        <span className="nav-label">{t('nav.newList')}</span>
       </button>
     </nav>
   );

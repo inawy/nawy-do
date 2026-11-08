@@ -109,6 +109,7 @@ export const ar = {
   'row.move': 'تحريك: {title}',
   'row.steps': 'خطوات {done}/{total}',
   'composer.add': 'إضافة',
+  'composer.new': 'نية جديدة',
 
   // Drag and drop announcements
   'drag.help':
