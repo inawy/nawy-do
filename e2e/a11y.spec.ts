@@ -23,7 +23,7 @@ async function violations(page: Page): Promise<string[]> {
       (v) =>
         `${v.id} (${v.impact}): ${v.help} — ${v.nodes
           .slice(0, 3)
-          .map((n) => n.target.join(' '))
+          .map((n) => `${n.target.join(' ')} [${n.any.map((c) => c.message).join('; ')}]`)
           .join(' | ')}`,
     );
 }
