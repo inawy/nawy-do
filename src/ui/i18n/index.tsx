@@ -23,7 +23,7 @@ export interface I18n {
   lang: Lang;
   dir: 'rtl' | 'ltr';
   t: (key: MessageKey, params?: Params) => string;
-  /** A count in the digits of the current language («٣» / «3»). */
+  /** A count, in Western digits in both languages (as the interface always showed them). */
   num: (n: number) => string;
   /** Switches the interface language; absent where nothing can persist the choice. */
   setLang?: ((lang: Lang) => void) | undefined;
@@ -35,7 +35,7 @@ export function makeI18n(lang: Lang): I18n {
     lang,
     dir: DIRECTION[lang],
     t: (key, params) => format(words[key], params),
-    num: (n) => n.toLocaleString(lang === 'ar' ? 'ar-EG' : 'en-US'),
+    num: (n) => n.toLocaleString('en-US'),
   };
 }
 
