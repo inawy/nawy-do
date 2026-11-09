@@ -35,6 +35,36 @@ export function TasksScreen(p: TasksScreenProps) {
     ? list.name
     : t(`view.${selection as 'main' | 'today' | 'starred' | 'scheduled'}`);
 
+  const header = (
+    <>
+      <TitleBar
+        title={viewTitle}
+        searchOn={ui.query !== null}
+        selecting={ui.picked !== null}
+        onSearch={ui.toggleSearch}
+        onSelect={ui.toggleSelecting}
+        onInstall={p.onInstall}
+        sort={
+          isSortable(selection) && !ui.searching ? { mode: p.sort, onChange: p.onSort } : undefined
+        }
+        onData={() => {
+          p.data.onOpen();
+          ui.setDataOpen(true);
+        }}
+        onListOptions={list ? () => ui.setSheet({ mode: 'edit', id: list.id }) : undefined}
+      />
+      <InputBar
+        lists={p.lists}
+        picked={ui.picked}
+        query={ui.query}
+        onQuery={ui.setQuery}
+        onMoveMany={p.onMoveMany}
+        onCompleteMany={p.onCompleteMany}
+        onDone={ui.stopSelecting}
+      />
+    </>
+  );
+
   return (
     <div className="shell">
       <header className="side-head">
@@ -95,44 +125,23 @@ export function TasksScreen(p: TasksScreenProps) {
             </button>
           </div>
         )}
-        <TitleBar
-          title={viewTitle}
-          searchOn={ui.query !== null}
-          selecting={ui.picked !== null}
-          onSearch={ui.toggleSearch}
-          onSelect={ui.toggleSelecting}
-          onInstall={p.onInstall}
-          sort={
-            isSortable(selection) && !ui.searching
-              ? { mode: p.sort, onChange: p.onSort }
-              : undefined
-          }
-          onData={() => {
-            p.data.onOpen();
-            ui.setDataOpen(true);
-          }}
-          onListOptions={list ? () => ui.setSheet({ mode: 'edit', id: list.id }) : undefined}
-        />
-        <InputBar
-          lists={p.lists}
-          picked={ui.picked}
-          query={ui.query}
-          onQuery={ui.setQuery}
-          onMoveMany={p.onMoveMany}
-          onCompleteMany={p.onCompleteMany}
-          onDone={ui.stopSelecting}
-        />
         {p.writeFailed && (
           <p className="status" role="alert">
             {t('notice.writeFailed')}
           </p>
         )}
         {p.failed ? (
-          <p className="status" role="alert">
-            {t('notice.storageFailed')}
-          </p>
+          <div className="card">
+            {header}
+            <p className="status" role="alert">
+              {t('notice.storageFailed')}
+            </p>
+          </div>
         ) : !p.ready ? (
-          <p className="status">{t('notice.loading')}</p>
+          <div className="card">
+            {header}
+            <p className="status">{t('notice.loading')}</p>
+          </div>
         ) : (
           <Tasks
             tasks={visible}
@@ -150,6 +159,7 @@ export function TasksScreen(p: TasksScreenProps) {
             }
             picked={ui.picked ?? undefined}
             onPick={ui.pick}
+            header={header}
           />
         )}
       </main>

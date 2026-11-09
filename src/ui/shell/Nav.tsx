@@ -52,7 +52,7 @@ export function Nav({ selection, counts, lists, onSelect, onNewList }: Props) {
     <button
       key={id}
       type="button"
-      className={`${selection === id ? 'nav-item on' : 'nav-item'}${extra}`}
+      className={`${selection === id ? 'nav-item on' : 'nav-item'}${extra}${id === 'starred' ? ' nav-star' : ''}`}
       aria-current={selection === id ? 'page' : undefined}
       data-list-color={color}
       data-drop-list={dropTarget}

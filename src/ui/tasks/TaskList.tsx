@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import {
   canReorder,
   groupScheduled,
@@ -30,6 +31,8 @@ interface Props {
   /** Selection mode when present. */
   picked?: ReadonlySet<string>;
   onPick?: (id: string) => void;
+  /** The title bar (and search field): drawn at the top of the first card. */
+  header?: ReactNode;
 }
 
 export function TaskList({
@@ -46,11 +49,19 @@ export function TaskList({
   onDropOnList,
   picked,
   onPick,
+  header,
 }: Props) {
   const { t, num } = useI18n();
   const grouped = groupTasks(view === 'starred' ? tasks.filter((t) => t.starred) : tasks);
   const openSorted = isSortable(view) ? sortOpen(grouped.open, sort) : grouped.open;
   const canSort = !picked && canReorder(view, grouped.open.length, sort);
+
+  const card = (children: ReactNode) => (
+    <div className="card">
+      {header}
+      {children}
+    </div>
+  );
 
   const row = (t: Task, sort?: SortState) => (
     <TaskRow
@@ -107,9 +118,9 @@ export function TaskList({
   if (view === 'scheduled' || view === 'today') {
     const g = groupScheduled(tasks, today);
     if (g.overdue.length + g.today.length + g.upcoming.length === 0) {
-      return <Empty text={t(`empty.${view}`)} />;
+      return card(<Empty text={t(`empty.${view}`)} />);
     }
-    return (
+    return card(
       <>
         {g.overdue.length > 0 && (
           <section>
@@ -129,7 +140,7 @@ export function TaskList({
             {rows(g.upcoming, t('group.upcoming'))}
           </section>
         )}
-      </>
+      </>,
     );
   }
 
@@ -137,15 +148,20 @@ export function TaskList({
   const open = openSorted;
   return (
     <>
-      {open.length === 0 && done.length === 0 ? (
-        <Empty
-          text={t(
-            `empty.${selectedListId(view) !== undefined ? 'list' : (view as 'main' | 'starred' | 'search')}`,
-          )}
-        />
-      ) : (
-        open.length > 0 &&
-        (canSort ? sortableRows(open, t('group.tasks')) : rows(open, t('group.tasks')))
+      {card(
+        open.length === 0 && done.length === 0 ? (
+          <Empty
+            text={t(
+              `empty.${selectedListId(view) !== undefined ? 'list' : (view as 'main' | 'starred' | 'search')}`,
+            )}
+          />
+        ) : open.length > 0 ? (
+          canSort ? (
+            sortableRows(open, t('group.tasks'))
+          ) : (
+            rows(open, t('group.tasks'))
+          )
+        ) : null,
       )}
       {done.length > 0 && (
         <details className="done-section">
