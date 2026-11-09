@@ -36,44 +36,57 @@ h2 {
   gap: 0.5rem;
   padding: 0.5rem 1rem;
   background: var(--page);
-  border-block-end: 1px solid var(--line);
   overflow-x: auto;
   scrollbar-width: none;
 }
 .nav::-webkit-scrollbar {
   display: none;
 }
-/* Phone: the views are tabs along the top (no icons), the open one filled. */
+/* Phone: the views are text tabs along the top, the open one in the brand colour with a bar
+   under it (the way Google Tasks does it). */
+.nav {
+  gap: 0.25rem;
+  padding-block: 0;
+  border-block-end: 0;
+}
 .nav-item {
   flex: none;
   display: flex;
   align-items: center;
-  gap: 0.375rem;
-  min-block-size: 44px;
-  padding-inline: 1rem;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: var(--card);
+  gap: 0.5rem;
+  min-block-size: 48px;
+  padding-inline: 0.875rem;
+  border: 0;
+  border-radius: 0;
+  background: none;
   color: var(--ink);
-  font-size: 0.9375rem;
+  font-size: 1rem;
   white-space: nowrap;
   position: relative;
-  transition:
-    background-color 0.15s,
-    color 0.15s,
-    border-color 0.15s;
+}
+.nav-item::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0.5rem;
+  inset-block-end: 0;
+  block-size: 3px;
+  border-radius: 3px 3px 0 0;
+  background: transparent;
+  transition: background-color 0.15s;
 }
 .nav-item.on {
-  background: var(--brand-soft);
-  border-color: var(--brand);
   color: var(--brand);
   font-weight: 600;
+}
+.nav-item.on::after {
+  background: var(--brand);
 }
 .nav-item:active {
   background: var(--hover);
 }
 .nav-item:focus-visible {
-  outline-offset: 2px;
+  outline-offset: -4px;
+  border-radius: 8px;
 }
 .nav-icon {
   display: none;
@@ -82,18 +95,38 @@ h2 {
   font-size: inherit;
 }
 .nav-count {
+  min-inline-size: 1.5rem;
+  padding: 0.125rem 0.375rem;
+  border-radius: 999px;
+  background: var(--hover);
+  color: var(--ink);
   font-size: 0.8125rem;
-  color: var(--muted);
+  font-weight: 500;
+  text-align: center;
 }
 .nav-item.on .nav-count {
-  color: inherit;
+  color: var(--brand);
+}
+.nav-star .nav-icon {
+  display: grid;
+}
+.nav-star .nav-label,
+.nav-star .nav-count {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
 }
 .nav-new {
   color: var(--brand);
-  border-style: dashed;
 }
 .nav-new .nav-icon {
   display: grid;
+}
+.nav-new::after {
+  display: none;
 }
 .nav-sep {
   display: none;
@@ -167,9 +200,28 @@ h2 {
     border: 0;
     color: var(--brand);
   }
+  .nav-item::after {
+    display: none;
+  }
   .nav-icon {
     display: grid;
     place-items: center;
+  }
+  .nav-count,
+  .nav-item.on .nav-count {
+    min-inline-size: 0;
+    padding: 0;
+    background: none;
+    color: var(--muted);
+    font-weight: 400;
+  }
+  .nav-star .nav-label,
+  .nav-star .nav-count {
+    position: static;
+    inline-size: auto;
+    block-size: auto;
+    margin: 0;
+    clip-path: none;
   }
   .nav-item:hover {
     background: var(--hover);

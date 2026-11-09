@@ -20,7 +20,7 @@
   align-items: flex-start;
   gap: 0.125rem;
   padding-inline-end: 0.25rem;
-  background: var(--page);
+  background: var(--card);
   touch-action: pan-y;
   -webkit-touch-callout: none;
   user-select: none;
@@ -32,10 +32,10 @@
   overflow: hidden;
 }
 .row[data-swipe='complete'] {
-  background: color-mix(in srgb, var(--nawy-color-success) 28%, var(--page));
+  background: color-mix(in srgb, var(--nawy-color-success) 28%, var(--card));
 }
 .row[data-swipe='delete'] {
-  background: color-mix(in srgb, var(--danger) 28%, var(--page));
+  background: color-mix(in srgb, var(--danger) 28%, var(--card));
 }
 .swipe-hint {
   position: absolute;
@@ -157,8 +157,25 @@
   color: #f5b301;
 }
 
+.card,
 .done-section {
-  margin-block-start: 1rem;
+  background: var(--card);
+  border-radius: 24px;
+  padding-inline: 1rem;
+}
+.card {
+  padding-block: 0.25rem 0.5rem;
+}
+.card .title-row h1 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0.5rem 0;
+}
+.card .row:last-child {
+  border-block-end: 0;
+}
+.done-section {
+  margin-block-start: 0.75rem;
 }
 .done-section summary {
   list-style: none;
