@@ -406,7 +406,7 @@ html {
 }
 
 /* ---------- side menu ---------- */
-.drawer-backdrop {
+.backdrop.drawer-backdrop {
   align-items: stretch;
   justify-content: flex-start;
 }
