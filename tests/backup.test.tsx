@@ -1,4 +1,4 @@
-import { chooseFromMenu } from './support/menu';
+import { chooseFromDrawer } from './support/menu';
 import 'fake-indexeddb/auto';
 import Dexie from 'dexie';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
@@ -18,7 +18,7 @@ afterEach(cleanup);
 const open = async () => {
   render(<App db={db} now={now} today={today} />);
   await screen.findByText(/مفيش نوايا لسه|جاري/);
-  chooseFromMenu('بياناتي');
+  chooseFromDrawer('بياناتي');
 };
 
 const file = (text: string) => new File([text], 'b.json', { type: 'application/json' });

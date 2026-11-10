@@ -20,8 +20,7 @@ body {
     font: inherit;
     color: inherit;
   }
-  label,
-  a {
+  * {
     -webkit-tap-highlight-color: transparent;
   }
   button {

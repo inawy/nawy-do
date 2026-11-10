@@ -11,8 +11,7 @@
   content-visibility: auto;
   contain-intrinsic-size: auto 3.5rem;
 }
-.row.dragging,
-.row[data-swipe] {
+.row.dragging {
   content-visibility: visible;
 }
 .row-slide {
@@ -27,34 +26,6 @@
 }
 .row:hover .row-slide {
   background: var(--hover);
-}
-.row[data-swipe] {
-  overflow: hidden;
-}
-.row[data-swipe='complete'] {
-  background: color-mix(in srgb, var(--nawy-color-success) 28%, var(--card));
-}
-.row[data-swipe='delete'] {
-  background: color-mix(in srgb, var(--danger) 28%, var(--card));
-}
-.swipe-hint {
-  position: absolute;
-  inset-block: 0;
-  display: none;
-  align-items: center;
-  padding-inline: 1.25rem;
-}
-.swipe-complete {
-  inset-inline-start: 0;
-  color: var(--nawy-color-success);
-}
-.swipe-delete {
-  inset-inline-end: 0;
-  color: var(--danger);
-}
-.row[data-swipe='complete'] .swipe-complete,
-.row[data-swipe='delete'] .swipe-delete {
-  display: flex;
 }
 .hit {
   display: grid;

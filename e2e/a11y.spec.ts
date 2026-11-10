@@ -1,5 +1,5 @@
 import AxeBuilder from '@axe-core/playwright';
-import { chooseFromMenu } from './menu';
+import { chooseFromDrawer } from './menu';
 import { expect, test, type Page } from '@playwright/test';
 
 // Automated accessibility checks (axe) on the main screen and the sheets, in both colour schemes.
@@ -51,7 +51,7 @@ for (const scheme of ['light', 'dark'] as const) {
     });
 
     test('data sheet', async ({ page }) => {
-      await chooseFromMenu(page, 'بياناتي', 'menuitem');
+      await chooseFromDrawer(page, 'بياناتي');
       await expect(page.getByRole('dialog')).toBeVisible();
       expect(await violations(page)).toEqual([]);
     });
@@ -62,7 +62,7 @@ for (const scheme of ['light', 'dark'] as const) {
 test.describe('english', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
-    await chooseFromMenu(page, 'English');
+    await chooseFromDrawer(page, 'English');
     await expect(page.locator('html')).toHaveAttribute('dir', 'ltr');
     await page.getByRole('button', { name: 'New task' }).click();
     const input = page.getByLabel('What do you intend to do?');
@@ -76,7 +76,7 @@ test.describe('english', () => {
   });
 
   test('data sheet', async ({ page }) => {
-    await chooseFromMenu(page, 'My data', 'menuitem');
+    await chooseFromDrawer(page, 'My data');
     await expect(page.getByRole('dialog')).toBeVisible();
     expect(await violations(page)).toEqual([]);
   });

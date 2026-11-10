@@ -12,6 +12,7 @@ export function useScreenState(startAdding = false) {
   const [sheet, setSheet] = useState<ListSheetState>(null);
   const [dataOpen, setDataOpen] = useState(false);
   const [adding, setAdding] = useState(startAdding);
+  const [menuOpen, setMenuOpen] = useState(false);
   // `null` is off. While on, results come from ALL tasks, not just the current view.
   const [query, setQuery] = useState<string | null>(null);
   const [picked, setPicked] = useState<ReadonlySet<string> | null>(null);
@@ -23,6 +24,8 @@ export function useScreenState(startAdding = false) {
     setDataOpen,
     adding,
     setAdding,
+    menuOpen,
+    setMenuOpen,
     query,
     searching: query !== null && query.trim() !== '',
     picked,

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   countsFor,
   isSortable,
@@ -9,13 +10,16 @@ import {
 import { BackupSheet } from '../backup';
 import { useI18n } from '../i18n';
 import { DetailsSheet } from '../details';
+import { IconButton, MenuIcon } from '../primitives';
 import { AddButton, AddSheet, TaskList as Tasks, UndoToast } from '../tasks';
 import '../styles/index.css';
+import { Drawer } from './Drawer';
 import { InputBar } from './InputBar';
 import { ListSheets } from './ListSheets';
-import { Nav } from './Nav';
+import { Nav, navOrder } from './Nav';
 import { TitleBar } from './TitleBar';
 import type { TasksScreenProps } from './types';
+import { usePageSwipe } from './usePageSwipe';
 import { useScreenState } from './useScreenState';
 
 export type { DataProps, TasksScreenProps } from './types';
@@ -35,6 +39,19 @@ export function TasksScreen(p: TasksScreenProps) {
     ? list.name
     : t(`view.${selection as 'main' | 'today' | 'starred' | 'scheduled'}`);
 
+  const order = navOrder(p.lists);
+  const [slide, setSlide] = useState<'next' | 'prev' | undefined>();
+  const pageSwipe = usePageSwipe(
+    (delta) => {
+      const target = order[order.indexOf(selection) + delta];
+      if (target === undefined) return;
+      ui.reset();
+      setSlide(delta > 0 ? 'next' : 'prev');
+      p.onSelect(target);
+    },
+    ui.picked === null && ui.query === null,
+  );
+
   const header = (
     <>
       <TitleBar
@@ -43,14 +60,9 @@ export function TasksScreen(p: TasksScreenProps) {
         selecting={ui.picked !== null}
         onSearch={ui.toggleSearch}
         onSelect={ui.toggleSelecting}
-        onInstall={p.onInstall}
         sort={
           isSortable(selection) && !ui.searching ? { mode: p.sort, onChange: p.onSort } : undefined
         }
-        onData={() => {
-          p.data.onOpen();
-          ui.setDataOpen(true);
-        }}
         onListOptions={list ? () => ui.setSheet({ mode: 'edit', id: list.id }) : undefined}
       />
       <InputBar
@@ -68,6 +80,13 @@ export function TasksScreen(p: TasksScreenProps) {
   return (
     <div className="shell">
       <header className="side-head">
+        <IconButton
+          label={t('menu.drawer')}
+          aria-haspopup="dialog"
+          onClick={() => ui.setMenuOpen(true)}
+        >
+          <MenuIcon />
+        </IconButton>
         <p className="brand">{t('app.name')}</p>
       </header>
       <Nav
@@ -80,7 +99,12 @@ export function TasksScreen(p: TasksScreenProps) {
         }}
         onNewList={() => ui.setSheet({ mode: 'create' })}
       />
-      <main className="main">
+      <main
+        className="main"
+        data-slide={slide}
+        onAnimationEnd={() => setSlide(undefined)}
+        {...pageSwipe}
+      >
         {p.dueNotice && (
           <div className="update" role="status">
             <span>
@@ -150,7 +174,6 @@ export function TasksScreen(p: TasksScreenProps) {
             onToggle={p.onToggle}
             onStar={p.onStar}
             onOpen={p.onOpen}
-            onRemove={p.onRemove}
             sort={p.sort}
             onLongPress={(t) => ui.startSelecting(t.id)}
             onMove={p.onMove}
@@ -164,6 +187,16 @@ export function TasksScreen(p: TasksScreenProps) {
         )}
       </main>
       {ui.picked === null && ui.query === null && <AddButton onClick={() => ui.setAdding(true)} />}
+      {ui.menuOpen && (
+        <Drawer
+          onClose={() => ui.setMenuOpen(false)}
+          onInstall={p.onInstall}
+          onData={() => {
+            p.data.onOpen();
+            ui.setDataOpen(true);
+          }}
+        />
+      )}
       {ui.adding && <AddSheet onAdd={p.onAdd} onClose={() => ui.setAdding(false)} />}
       {editing && (
         <DetailsSheet

@@ -15,6 +15,9 @@ export const ar = {
   'app.prompt': 'ناوي تعمل إيه؟',
 
   // Title bar and menu
+  'menu.drawer': 'القائمة الجانبية',
+  'menu.sort': 'ترتيب',
+  'drawer.language': 'اللغة',
   'menu.more': 'المزيد',
   'menu.select': 'تحديد',
   'menu.data': 'بياناتي',
