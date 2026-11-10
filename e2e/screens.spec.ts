@@ -18,6 +18,7 @@ async function seed(page: Page) {
   await expect(page.getByRole('button', { name: 'نية جديدة' })).toBeVisible();
   await page.getByRole('button', { name: 'قائمة جديدة' }).click();
   await page.getByLabel('اسم القائمة').fill('العمل');
+  await page.getByRole('radio', { name: 'برتقالي' }).click();
   await page.getByRole('button', { name: 'حفظ' }).click();
   await add(page, 'ابعت تقرير الأسبوع');
   await page.getByRole('button', { name: 'نواياي' }).click();
@@ -26,10 +27,10 @@ async function seed(page: Page) {
   await page.getByRole('checkbox', { name: 'إنجاز: اتصل بالدكتور' }).click();
 }
 
-test('screens', async ({ page }, info) => {
+async function record(page: Page, prefix: string, project: string) {
   const shot = async (name: string) => {
     await page.waitForTimeout(400); // let any style transition settle before the picture
-    await page.screenshot({ path: `screenshots/${info.project.name}-${name}.png` });
+    await page.screenshot({ path: `screenshots/${project}-${prefix}${name}.png` });
   };
   await seed(page);
   await shot('1-main');
@@ -42,4 +43,15 @@ test('screens', async ({ page }, info) => {
   await shot('4-list');
   await chooseFromDrawer(page, 'بياناتي');
   await shot('5-data');
+}
+
+test('screens', async ({ page }, info) => {
+  await record(page, '', info.project.name);
+});
+
+test.describe('dark', () => {
+  test.use({ colorScheme: 'dark' });
+  test('screens in the dark theme', async ({ page }, info) => {
+    await record(page, 'dark-', info.project.name);
+  });
 });
