@@ -43,6 +43,9 @@ async function record(page: Page, prefix: string, project: string) {
   await shot('4-list');
   await chooseFromDrawer(page, 'بياناتي');
   await shot('5-data');
+  await page.keyboard.press('Escape');
+  await page.getByRole('button', { name: 'القائمة الجانبية' }).click();
+  await shot('6-menu');
 }
 
 test('screens', async ({ page }, info) => {
