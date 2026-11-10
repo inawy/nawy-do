@@ -31,14 +31,40 @@ export function useBackClose(onClose: () => void): void {
     latest.current = onClose;
   });
   useEffect(() => {
-    const entry: Entry = { close: latest };
-    window.history.pushState({ nawySheet: true }, '');
-    stack.push(entry);
-    if (!listening) {
-      window.addEventListener('popstate', onPop);
-      listening = true;
+    let entry: Entry | undefined;
+    let cancelled = false;
+    let stopWaiting = (): void => {};
+    const open = () => {
+      if (cancelled) return;
+      entry = { close: latest };
+      window.history.pushState({ nawySheet: true }, '');
+      stack.push(entry);
+      if (!listening) {
+        window.addEventListener('popstate', onPop);
+        listening = true;
+      }
+    };
+    if (ownPops.length > 0) {
+      // Another sheet (or the side menu) just closed in the same moment and its pop of the history
+      // is still on its way. Pushing now would let that pop remove THIS sheet's entry, and its
+      // later close would then leave the app. Wait for the pop (the shared listener runs first).
+      const go = () => {
+        stopWaiting();
+        open();
+      };
+      const timer = window.setTimeout(go, 300);
+      window.addEventListener('popstate', go);
+      stopWaiting = () => {
+        window.clearTimeout(timer);
+        window.removeEventListener('popstate', go);
+      };
+    } else {
+      open();
     }
     return () => {
+      cancelled = true;
+      stopWaiting();
+      if (!entry) return; // never opened: no entry to give back
       const i = stack.indexOf(entry);
       if (i < 0) return; // closed by Back: its entry is already gone
       stack.splice(i, 1);

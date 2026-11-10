@@ -290,3 +290,38 @@
   background: var(--card);
   color: inherit;
 }
+
+/* Completing: the circle fills (see .circle), the row fades and folds away, then it moves. */
+.row.leaving {
+  animation: row-leave 0.26s ease-in forwards;
+  pointer-events: none;
+  max-block-size: 8rem;
+  overflow: hidden;
+}
+.row.leaving .title {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+@keyframes row-leave {
+  60% {
+    opacity: 0;
+  }
+  to {
+    opacity: 0;
+    transform: translateX(var(--leave, 24px));
+    max-block-size: 0;
+  }
+}
+[dir='rtl'] .row.leaving {
+  --leave: -24px;
+}
+.circle {
+  transition:
+    background-color 0.12s,
+    border-color 0.12s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .row.leaving {
+    animation: none;
+  }
+}

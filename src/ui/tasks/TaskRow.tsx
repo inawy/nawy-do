@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react';
 import { dueState, stepProgress, type Task } from '@/core/model';
 import { formatDue, formatTime } from '../i18n/format';
 import { useI18n } from '../i18n';
@@ -28,12 +29,24 @@ export function TaskRow({ task, today, onToggle, onStar, onOpen, onLongPress, so
   const progress = stepProgress(task);
   const hasMeta = Boolean(task.due) || progress !== undefined;
   const repeatText = task.repeat ? t(`repeat.${task.repeat}`) : undefined;
+  // Completing plays a short fade-and-collapse before the row moves to «Completed».
+  const [leaving, setLeaving] = useState(false);
+  const timer = useRef(0);
+  useEffect(() => () => window.clearTimeout(timer.current), []);
+  const complete = () => {
+    const calm = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? true;
+    if (done || calm) return onToggle(task);
+    setLeaving(true);
+    timer.current = window.setTimeout(() => onToggle(task), 260);
+  };
   const press = useLongPress(onLongPress && !pick ? () => onLongPress(task) : undefined);
   return (
     <li
       ref={sort?.rowRef}
       style={sort?.style}
-      className={['row', done && 'done', sort?.dragging && 'dragging'].filter(Boolean).join(' ')}
+      className={['row', done && 'done', leaving && 'leaving', sort?.dragging && 'dragging']
+        .filter(Boolean)
+        .join(' ')}
     >
       <div className="row-slide" {...press}>
         {pick ? (
@@ -51,8 +64,8 @@ export function TaskRow({ task, today, onToggle, onStar, onOpen, onLongPress, so
             <input
               type="checkbox"
               className="circle"
-              checked={done}
-              onChange={() => onToggle(task)}
+              checked={done || leaving}
+              onChange={complete}
               aria-label={t(done ? 'row.reopen' : 'row.complete', { title: task.title })}
             />
           </label>

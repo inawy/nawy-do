@@ -1,6 +1,7 @@
-import { useEffect } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { useI18n, LANGS, type Lang } from '../i18n';
 import { CloseIcon, DataIcon, IconButton, LanguageIcon, PlusIcon } from '../primitives';
+import { loadTheme, setTheme, THEMES } from '../theme';
 import { useBackClose } from '../sheet/useBackClose';
 import { useFocusTrap } from '../sheet/useFocusTrap';
 
@@ -11,11 +12,44 @@ interface Props {
   onInstall?: (() => void) | undefined;
 }
 
+/** One choice out of a few, as a row of buttons (a radio group). */
+function Segmented<V extends string>(p: {
+  label: string;
+  icon?: ReactNode;
+  value: V;
+  options: { value: V; text: string }[];
+  onChange: (value: V) => void;
+}) {
+  return (
+    <div className="setting">
+      <p className="setting-label">
+        {p.icon}
+        {p.label}
+      </p>
+      <div className="segmented" role="radiogroup" aria-label={p.label}>
+        {p.options.map((o) => (
+          <button
+            key={o.value}
+            type="button"
+            role="radio"
+            aria-checked={o.value === p.value}
+            className={o.value === p.value ? 'on' : undefined}
+            onClick={() => p.onChange(o.value)}
+          >
+            {o.text}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 const NAMES: Record<Lang, string> = { ar: 'العربية', en: 'English' };
 
 /** The side menu: settings and data (the lists themselves are the tabs). */
 export function Drawer({ onClose, onData, onInstall }: Props) {
   const { t, lang, setLang } = useI18n();
+  const [theme, setThemeState] = useState(loadTheme);
   useBackClose(onClose);
   const trap = useFocusTrap<HTMLDivElement>();
   useEffect(() => {
@@ -47,6 +81,29 @@ export function Drawer({ onClose, onData, onInstall }: Props) {
             <CloseIcon />
           </IconButton>
         </div>
+        <p className="drawer-section">{t('drawer.settings')}</p>
+        <Segmented
+          label={t('drawer.theme')}
+          value={theme}
+          options={THEMES.map((v) => ({ value: v, text: t(`theme.${v}`) }))}
+          onChange={(v) => {
+            setThemeState(v);
+            setTheme(v);
+          }}
+        />
+        {setLang && (
+          <Segmented
+            label={t('drawer.language')}
+            icon={<LanguageIcon />}
+            value={lang}
+            options={LANGS.map((l) => ({ value: l, text: NAMES[l] }))}
+            onChange={(l) => {
+              setLang(l);
+              onClose();
+            }}
+          />
+        )}
+        <p className="drawer-section">{t('drawer.data')}</p>
         <button type="button" className="drawer-item" onClick={pick(onData)}>
           <DataIcon />
           {t('menu.data')}
@@ -57,29 +114,7 @@ export function Drawer({ onClose, onData, onInstall }: Props) {
             {t('menu.install')}
           </button>
         )}
-        {setLang && (
-          <div className="drawer-group" role="radiogroup" aria-label={t('drawer.language')}>
-            <p className="drawer-label">
-              <LanguageIcon />
-              {t('drawer.language')}
-            </p>
-            {LANGS.map((l) => (
-              <button
-                key={l}
-                type="button"
-                role="radio"
-                aria-checked={l === lang}
-                className={l === lang ? 'drawer-lang on' : 'drawer-lang'}
-                onClick={() => {
-                  setLang(l);
-                  onClose();
-                }}
-              >
-                {NAMES[l]}
-              </button>
-            ))}
-          </div>
-        )}
+        <p className="drawer-foot">{t('drawer.footer')}</p>
       </div>
     </div>
   );

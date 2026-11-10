@@ -13,6 +13,13 @@ export const en: Record<MessageKey, string> = {
 
   'menu.drawer': 'Menu',
   'menu.sort': 'Sort',
+  'drawer.settings': 'Settings',
+  'drawer.theme': 'Appearance',
+  'theme.auto': 'Automatic',
+  'theme.light': 'Light',
+  'theme.dark': 'Dark',
+  'drawer.data': 'Your data',
+  'drawer.footer': 'All your data stays on this device.',
   'drawer.language': 'Language',
   'menu.more': 'More',
   'menu.select': 'Select',
