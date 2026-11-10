@@ -16,39 +16,40 @@
   --on-brand: #ffffff;
   --radius: var(--nawy-radius-lg);
 }
-/* The design system switches dark via [data-theme="dark"]; the product also follows the OS. */
+/* Dark follows the OS or the Appearance setting. Neutral greys (no blue cast) after the Material 3 /
+   Google dark palette: page #131314, cards #1e1f20, text #e3e3e3, primary #a8c7fa. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
     color-scheme: dark;
-    --nawy-color-bg: #0d1117;
-    --nawy-color-surface: #151b23;
-    --nawy-color-surface-elevated: #1c2430;
-    --nawy-color-text: #f2f4f7;
-    --nawy-color-text-muted: #a0a8b5;
-    --nawy-color-border: #303a48;
+    --nawy-color-bg: #131314;
+    --nawy-color-surface: #1e1f20;
+    --nawy-color-surface-elevated: #282a2c;
+    --nawy-color-text: #e3e3e3;
+    --nawy-color-text-muted: #c4c7c5;
+    --nawy-color-border: #444746;
     --nawy-color-overlay: rgb(0 0 0 / 64%);
-    --hover: #1c2430;
-    --brand-soft: #1d2a47;
-    --on-brand: #0b1020;
-    --brand: #6b9bff;
-    --danger: #ff8a80;
+    --hover: #282a2c;
+    --brand-soft: #0842a0;
+    --on-brand: #062e6f;
+    --brand: #a8c7fa;
+    --danger: #f28b82;
   }
 }
 
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --nawy-color-bg: #0d1117;
-  --nawy-color-surface: #151b23;
-  --nawy-color-surface-elevated: #1c2430;
-  --nawy-color-text: #f2f4f7;
-  --nawy-color-text-muted: #a0a8b5;
-  --nawy-color-border: #303a48;
+  --nawy-color-bg: #131314;
+  --nawy-color-surface: #1e1f20;
+  --nawy-color-surface-elevated: #282a2c;
+  --nawy-color-text: #e3e3e3;
+  --nawy-color-text-muted: #c4c7c5;
+  --nawy-color-border: #444746;
   --nawy-color-overlay: rgb(0 0 0 / 64%);
-  --hover: #1c2430;
-  --brand-soft: #1d2a47;
-  --on-brand: #0b1020;
-  --brand: #6b9bff;
-  --danger: #ff8a80;
+  --hover: #282a2c;
+  --brand-soft: #0842a0;
+  --on-brand: #062e6f;
+  --brand: #a8c7fa;
+  --danger: #f28b82;
 }
 
 /* List colours: product tokens (the design system defines the semantic colours these build on). */
