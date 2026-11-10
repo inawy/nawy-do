@@ -15,6 +15,7 @@ import { AddButton, AddSheet, TaskList as Tasks, UndoToast } from '../tasks';
 import '../styles/index.css';
 import { Drawer } from './Drawer';
 import { InputBar } from './InputBar';
+import { Notices } from './Notices';
 import { ListSheets } from './ListSheets';
 import { Nav, navOrder } from './Nav';
 import { TitleBar } from './TitleBar';
@@ -39,6 +40,10 @@ export function TasksScreen(p: TasksScreenProps) {
     ? list.name
     : t(`view.${selection as 'main' | 'today' | 'starred' | 'scheduled'}`);
 
+  const openData = () => {
+    p.data.onOpen();
+    ui.setDataOpen(true);
+  };
   const order = navOrder(p.lists);
   const [slide, setSlide] = useState<'next' | 'prev' | undefined>();
   const pageSwipe = usePageSwipe(
@@ -105,55 +110,7 @@ export function TasksScreen(p: TasksScreenProps) {
         onAnimationEnd={() => setSlide(undefined)}
         {...pageSwipe}
       >
-        {p.dueNotice && (
-          <div className="update" role="status">
-            <span>
-              {t('notice.attention')}{' '}
-              {[
-                p.dueNotice.overdue > 0 && t('notice.overdue', { count: num(p.dueNotice.overdue) }),
-                p.dueNotice.today > 0 && t('notice.today', { count: num(p.dueNotice.today) }),
-              ]
-                .filter(Boolean)
-                .join('، ')}
-            </span>
-            <button type="button" onClick={p.dueNotice.onShow}>
-              {t('notice.show')}
-            </button>
-            <button type="button" className="later" onClick={p.dueNotice.onLater}>
-              {t('notice.later')}
-            </button>
-          </div>
-        )}
-        {p.backupNudge && !p.dueNotice && (
-          <div className="update" role="status">
-            <span>{t('notice.backup')}</span>
-            <button
-              type="button"
-              onClick={() => {
-                p.data.onOpen();
-                ui.setDataOpen(true);
-              }}
-            >
-              {t('notice.backupDo')}
-            </button>
-            <button type="button" className="later" onClick={p.backupNudge.onLater}>
-              {t('notice.later')}
-            </button>
-          </div>
-        )}
-        {p.applyUpdate && (
-          <div className="update" role="status">
-            <span>{t('notice.update')}</span>
-            <button type="button" onClick={p.applyUpdate}>
-              {t('notice.updateDo')}
-            </button>
-          </div>
-        )}
-        {p.writeFailed && (
-          <p className="status" role="alert">
-            {t('notice.writeFailed')}
-          </p>
-        )}
+        <Notices p={p} onOpenData={openData} />
         {p.failed ? (
           <div className="card">
             {header}
@@ -188,14 +145,7 @@ export function TasksScreen(p: TasksScreenProps) {
       </main>
       {ui.picked === null && ui.query === null && <AddButton onClick={() => ui.setAdding(true)} />}
       {ui.menuOpen && (
-        <Drawer
-          onClose={() => ui.setMenuOpen(false)}
-          onInstall={p.onInstall}
-          onData={() => {
-            p.data.onOpen();
-            ui.setDataOpen(true);
-          }}
-        />
+        <Drawer onClose={() => ui.setMenuOpen(false)} onInstall={p.onInstall} onData={openData} />
       )}
       {ui.adding && <AddSheet onAdd={p.onAdd} onClose={() => ui.setAdding(false)} />}
       {editing && (
