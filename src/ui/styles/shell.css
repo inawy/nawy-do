@@ -433,8 +433,7 @@ html {
   justify-content: space-between;
   padding-inline-start: 0.5rem;
 }
-.drawer-item,
-.drawer-lang {
+.drawer-item {
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -447,33 +446,55 @@ html {
   font-size: 1rem;
   text-align: start;
 }
-.drawer-item:hover,
-.drawer-lang:hover {
+.drawer-item:hover {
   background: var(--hover);
 }
-.drawer-group {
-  margin-block-start: 0.75rem;
-  padding-block-start: 0.5rem;
-  border-block-start: 1px solid var(--line);
+.drawer-section {
+  margin: 1rem 0 0.25rem;
+  padding-inline: 1rem;
+  color: var(--muted);
+  font-size: 0.8125rem;
+  font-weight: 600;
 }
-.drawer-label {
+.setting {
+  padding: 0.5rem 1rem;
+}
+.setting-label {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  margin: 0;
-  padding: 0.5rem 1rem;
-  color: var(--muted);
-  font-size: 0.875rem;
-  font-weight: 600;
+  gap: 0.5rem;
+  margin: 0 0 0.5rem;
+  font-size: 0.9375rem;
 }
-.drawer-lang {
-  inline-size: 100%;
-  padding-inline-start: 3.5rem;
+.segmented {
+  display: flex;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--hover);
 }
-.drawer-lang.on {
-  background: var(--brand-soft);
+.segmented button {
+  flex: 1;
+  min-block-size: 40px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--ink);
+  font-size: 0.9375rem;
+  transition:
+    background-color 0.15s,
+    color 0.15s;
+}
+.segmented button.on {
+  background: var(--card);
   color: var(--brand);
   font-weight: 600;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.18);
+}
+.drawer-foot {
+  margin: auto 0 0;
+  padding: 1rem;
+  color: var(--muted);
+  font-size: 0.8125rem;
 }
 @keyframes drawer-in {
   from {
@@ -489,33 +510,7 @@ html {
   }
 }
 
-/* ---------- moving between lists by swiping ---------- */
-.main[data-slide='next'] {
-  --from: 1;
-}
-.main[data-slide='prev'] {
-  --from: -1;
-}
-[dir='rtl'] .main[data-slide='next'] {
-  --from: -1;
-}
-[dir='rtl'] .main[data-slide='prev'] {
-  --from: 1;
-}
-.main[data-slide] > .card,
-.main[data-slide] > .done-section {
-  animation: page-in 0.22s ease-out;
-}
-@keyframes page-in {
-  from {
-    opacity: 0.35;
-    transform: translateX(calc(var(--from) * 36px));
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .main[data-slide] > .card,
-  .main[data-slide] > .done-section,
-  .drawer {
-    animation: none;
-  }
+/* ---------- moving between lists by swiping (the motion is set by usePageSwipe) ---------- */
+.main {
+  touch-action: pan-y;
 }

@@ -35,6 +35,22 @@
   }
 }
 
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --nawy-color-bg: #0d1117;
+  --nawy-color-surface: #151b23;
+  --nawy-color-surface-elevated: #1c2430;
+  --nawy-color-text: #f2f4f7;
+  --nawy-color-text-muted: #a0a8b5;
+  --nawy-color-border: #303a48;
+  --nawy-color-overlay: rgb(0 0 0 / 64%);
+  --hover: #1c2430;
+  --brand-soft: #1d2a47;
+  --on-brand: #0b1020;
+  --brand: #6b9bff;
+  --danger: #ff8a80;
+}
+
 /* List colours: product tokens (the design system defines the semantic colours these build on). */
 :root {
   --list-blue: var(--nawy-color-brand);

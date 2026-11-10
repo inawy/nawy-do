@@ -17,6 +17,13 @@ export const ar = {
   // Title bar and menu
   'menu.drawer': 'القائمة الجانبية',
   'menu.sort': 'ترتيب',
+  'drawer.settings': 'الإعدادات',
+  'drawer.theme': 'المظهر',
+  'theme.auto': 'تلقائي',
+  'theme.light': 'فاتح',
+  'theme.dark': 'داكن',
+  'drawer.data': 'بياناتك',
+  'drawer.footer': 'كل بياناتك على جهازك بس.',
   'drawer.language': 'اللغة',
   'menu.more': 'المزيد',
   'menu.select': 'تحديد',

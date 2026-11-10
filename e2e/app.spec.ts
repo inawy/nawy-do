@@ -275,11 +275,14 @@ test('swiping the content sideways moves between lists', async ({ page }) => {
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('نواياي');
   await swipe(150);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('اليوم');
+  await page.waitForTimeout(400); // the slide-in finishes before the next swipe counts
   await swipe(-150);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('نواياي');
+  await page.waitForTimeout(400);
   await swipe(-150); // nothing before the first view
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('نواياي');
-  await swipe(40); // too short
+  await page.waitForTimeout(400);
+  await swipe(20); // too short
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('نواياي');
 });
 

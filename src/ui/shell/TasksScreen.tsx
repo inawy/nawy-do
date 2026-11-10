@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef } from 'react';
 import {
   countsFor,
   isSortable,
@@ -45,17 +45,15 @@ export function TasksScreen(p: TasksScreenProps) {
     ui.setDataOpen(true);
   };
   const order = navOrder(p.lists);
-  const [slide, setSlide] = useState<'next' | 'prev' | undefined>();
-  const pageSwipe = usePageSwipe(
-    (delta) => {
-      const target = order[order.indexOf(selection) + delta];
-      if (target === undefined) return;
+  const main = useRef<HTMLElement>(null);
+  usePageSwipe(main, {
+    canStep: (delta) => order[order.indexOf(selection) + delta] !== undefined,
+    onStep: (delta) => {
       ui.reset();
-      setSlide(delta > 0 ? 'next' : 'prev');
-      p.onSelect(target);
+      p.onSelect(order[order.indexOf(selection) + delta]!);
     },
-    ui.picked === null && ui.query === null,
-  );
+    enabled: ui.picked === null && ui.query === null,
+  });
 
   const header = (
     <>
@@ -104,12 +102,7 @@ export function TasksScreen(p: TasksScreenProps) {
         }}
         onNewList={() => ui.setSheet({ mode: 'create' })}
       />
-      <main
-        className="main"
-        data-slide={slide}
-        onAnimationEnd={() => setSlide(undefined)}
-        {...pageSwipe}
-      >
+      <main className="main" ref={main}>
         <Notices p={p} onOpenData={openData} />
         {p.failed ? (
           <div className="card">
