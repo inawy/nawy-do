@@ -46,7 +46,8 @@ export function TasksScreen(p: TasksScreenProps) {
   };
   const order = navOrder(p.lists);
   const main = useRef<HTMLElement>(null);
-  usePageSwipe(main, {
+  const pager = useRef<HTMLDivElement>(null);
+  usePageSwipe(main, pager, {
     canStep: (delta) => order[order.indexOf(selection) + delta] !== undefined,
     onStep: (delta) => {
       ui.reset();
@@ -104,37 +105,39 @@ export function TasksScreen(p: TasksScreenProps) {
       />
       <main className="main" ref={main}>
         <Notices p={p} onOpenData={openData} />
-        {p.failed ? (
-          <div className="card">
-            {header}
-            <p className="status" role="alert">
-              {t('notice.storageFailed')}
-            </p>
-          </div>
-        ) : !p.ready ? (
-          <div className="card">
-            {header}
-            <p className="status">{t('notice.loading')}</p>
-          </div>
-        ) : (
-          <Tasks
-            tasks={visible}
-            today={p.today}
-            view={ui.searching ? 'search' : selection}
-            onToggle={p.onToggle}
-            onStar={p.onStar}
-            onOpen={p.onOpen}
-            sort={p.sort}
-            onLongPress={(t) => ui.startSelecting(t.id)}
-            onMove={p.onMove}
-            onDropOnList={(id, target) =>
-              p.onMoveMany([id], target === 'main' ? undefined : target)
-            }
-            picked={ui.picked ?? undefined}
-            onPick={ui.pick}
-            header={header}
-          />
-        )}
+        <div className="pager" ref={pager}>
+          {p.failed ? (
+            <div className="card">
+              {header}
+              <p className="status" role="alert">
+                {t('notice.storageFailed')}
+              </p>
+            </div>
+          ) : !p.ready ? (
+            <div className="card">
+              {header}
+              <p className="status">{t('notice.loading')}</p>
+            </div>
+          ) : (
+            <Tasks
+              tasks={visible}
+              today={p.today}
+              view={ui.searching ? 'search' : selection}
+              onToggle={p.onToggle}
+              onStar={p.onStar}
+              onOpen={p.onOpen}
+              sort={p.sort}
+              onLongPress={(t) => ui.startSelecting(t.id)}
+              onMove={p.onMove}
+              onDropOnList={(id, target) =>
+                p.onMoveMany([id], target === 'main' ? undefined : target)
+              }
+              picked={ui.picked ?? undefined}
+              onPick={ui.pick}
+              header={header}
+            />
+          )}
+        </div>
       </main>
       {ui.picked === null && ui.query === null && <AddButton onClick={() => ui.setAdding(true)} />}
       {ui.menuOpen && (

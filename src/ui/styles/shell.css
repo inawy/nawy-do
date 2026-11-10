@@ -511,6 +511,14 @@ html {
 }
 
 /* ---------- moving between lists by swiping (the motion is set by usePageSwipe) ---------- */
+/* The cards slide under the fixed header and tabs; nothing may spill sideways while they do. */
 .main {
   touch-action: pan-y;
+  overflow-x: clip;
+}
+@media (max-width: 879.98px) {
+  /* The whole area under the tabs takes the swipe, not just the part covered by cards. */
+  .main {
+    min-block-size: calc(100dvh - 7.5rem);
+  }
 }
