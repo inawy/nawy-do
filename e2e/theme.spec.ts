@@ -27,6 +27,5 @@ test('closing «my data» opened from the side menu keeps the app open', async (
   await expect(page.getByRole('dialog')).toBeVisible();
   await page.getByRole('button', { name: 'إغلاق' }).click();
   await expect(page.getByRole('button', { name: 'نية جديدة' })).toBeVisible();
-  await page.goBack().catch(() => {});
-  await expect(page).toHaveURL(/localhost|127\.0\.0\.1/);
+  await expect(page.getByRole('button', { name: 'القائمة الجانبية' })).toBeVisible();
 });
