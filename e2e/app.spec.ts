@@ -55,7 +55,10 @@ const stored = (page: Page) =>
       }),
   );
 
-const titles = (page: Page) => page.locator('.list[aria-label="النوايا"] .title').allTextContents();
+const titles = async (page: Page) => {
+  await page.locator('.row').first().waitFor(); // after a reload, wait until the list has loaded
+  return page.locator('.list[aria-label="النوايا"] .title').allTextContents();
+};
 
 test('drags an intention to a new place and the order survives a reload', async ({ page }) => {
   await add(page, 'الأولى');
