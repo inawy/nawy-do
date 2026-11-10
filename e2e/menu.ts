@@ -1,11 +1,20 @@
 import type { Page } from '@playwright/test';
 
-/** Opens the «more» menu and picks an item. */
+/** Opens the sort menu (for the exclusive choices) or the «more» menu, and picks an item. */
 export async function chooseFromMenu(
   page: Page,
   name: string,
   role: 'menuitem' | 'menuitemradio' = 'menuitem',
 ) {
-  await page.getByRole('button', { name: /^(المزيد|More)$/ }).click();
+  const button = role === 'menuitemradio' ? /^(ترتيب|Sort)$/ : /^(المزيد|More)$/;
+  await page.getByRole('button', { name: button }).click();
   await page.getByRole(role, { name }).click();
+}
+
+/** Opens the side menu and picks «my data» (a button) or a language (a radio). */
+export async function chooseFromDrawer(page: Page, name: string) {
+  await page.getByRole('button', { name: /^(القائمة الجانبية|Menu)$/ }).click();
+  const dialog = page.getByRole('dialog');
+  const radio = dialog.getByRole('radio', { name });
+  await ((await radio.count()) > 0 ? radio : dialog.getByRole('button', { name })).click();
 }

@@ -11,6 +11,9 @@ export const en: Record<MessageKey, string> = {
   'app.name': 'Nawy To Do',
   'app.prompt': 'What do you intend to do?',
 
+  'menu.drawer': 'Menu',
+  'menu.sort': 'Sort',
+  'drawer.language': 'Language',
   'menu.more': 'More',
   'menu.select': 'Select',
   'menu.data': 'My data',

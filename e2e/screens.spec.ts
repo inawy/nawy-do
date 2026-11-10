@@ -1,4 +1,4 @@
-import { chooseFromMenu } from './menu';
+import { chooseFromDrawer } from './menu';
 import { expect, test, type Page } from '@playwright/test';
 
 // Not assertions about behaviour: a visual record of every main screen, captured from the PRODUCTION
@@ -40,6 +40,6 @@ test('screens', async ({ page }, info) => {
   await shot('3-starred');
   await page.getByRole('button', { name: 'العمل' }).click();
   await shot('4-list');
-  await chooseFromMenu(page, 'بياناتي');
+  await chooseFromDrawer(page, 'بياناتي');
   await shot('5-data');
 });

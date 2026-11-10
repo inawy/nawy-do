@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   countsFor,
   isSortable,
@@ -9,20 +10,24 @@ import {
 import { BackupSheet } from '../backup';
 import { useI18n } from '../i18n';
 import { DetailsSheet } from '../details';
+import { IconButton, MenuIcon } from '../primitives';
 import { AddButton, AddSheet, TaskList as Tasks, UndoToast } from '../tasks';
 import '../styles/index.css';
+import { Drawer } from './Drawer';
 import { InputBar } from './InputBar';
+import { Notices } from './Notices';
 import { ListSheets } from './ListSheets';
-import { Nav } from './Nav';
+import { Nav, navOrder } from './Nav';
 import { TitleBar } from './TitleBar';
 import type { TasksScreenProps } from './types';
+import { usePageSwipe } from './usePageSwipe';
 import { useScreenState } from './useScreenState';
 
 export type { DataProps, TasksScreenProps } from './types';
 
 /** The whole screen as a function of its props: easy to test and to preview without a database. */
 export function TasksScreen(p: TasksScreenProps) {
-  const { t, num } = useI18n();
+  const { t } = useI18n();
   const ui = useScreenState(p.focusAdd === true);
   const selection = resolveSelection(p.selection, p.lists);
   const list = p.lists.find((l) => l.id === selectedListId(selection));
@@ -35,6 +40,23 @@ export function TasksScreen(p: TasksScreenProps) {
     ? list.name
     : t(`view.${selection as 'main' | 'today' | 'starred' | 'scheduled'}`);
 
+  const openData = () => {
+    p.data.onOpen();
+    ui.setDataOpen(true);
+  };
+  const order = navOrder(p.lists);
+  const [slide, setSlide] = useState<'next' | 'prev' | undefined>();
+  const pageSwipe = usePageSwipe(
+    (delta) => {
+      const target = order[order.indexOf(selection) + delta];
+      if (target === undefined) return;
+      ui.reset();
+      setSlide(delta > 0 ? 'next' : 'prev');
+      p.onSelect(target);
+    },
+    ui.picked === null && ui.query === null,
+  );
+
   const header = (
     <>
       <TitleBar
@@ -43,14 +65,9 @@ export function TasksScreen(p: TasksScreenProps) {
         selecting={ui.picked !== null}
         onSearch={ui.toggleSearch}
         onSelect={ui.toggleSelecting}
-        onInstall={p.onInstall}
         sort={
           isSortable(selection) && !ui.searching ? { mode: p.sort, onChange: p.onSort } : undefined
         }
-        onData={() => {
-          p.data.onOpen();
-          ui.setDataOpen(true);
-        }}
         onListOptions={list ? () => ui.setSheet({ mode: 'edit', id: list.id }) : undefined}
       />
       <InputBar
@@ -68,6 +85,13 @@ export function TasksScreen(p: TasksScreenProps) {
   return (
     <div className="shell">
       <header className="side-head">
+        <IconButton
+          label={t('menu.drawer')}
+          aria-haspopup="dialog"
+          onClick={() => ui.setMenuOpen(true)}
+        >
+          <MenuIcon />
+        </IconButton>
         <p className="brand">{t('app.name')}</p>
       </header>
       <Nav
@@ -80,56 +104,13 @@ export function TasksScreen(p: TasksScreenProps) {
         }}
         onNewList={() => ui.setSheet({ mode: 'create' })}
       />
-      <main className="main">
-        {p.dueNotice && (
-          <div className="update" role="status">
-            <span>
-              {t('notice.attention')}{' '}
-              {[
-                p.dueNotice.overdue > 0 && t('notice.overdue', { count: num(p.dueNotice.overdue) }),
-                p.dueNotice.today > 0 && t('notice.today', { count: num(p.dueNotice.today) }),
-              ]
-                .filter(Boolean)
-                .join('، ')}
-            </span>
-            <button type="button" onClick={p.dueNotice.onShow}>
-              {t('notice.show')}
-            </button>
-            <button type="button" className="later" onClick={p.dueNotice.onLater}>
-              {t('notice.later')}
-            </button>
-          </div>
-        )}
-        {p.backupNudge && !p.dueNotice && (
-          <div className="update" role="status">
-            <span>{t('notice.backup')}</span>
-            <button
-              type="button"
-              onClick={() => {
-                p.data.onOpen();
-                ui.setDataOpen(true);
-              }}
-            >
-              {t('notice.backupDo')}
-            </button>
-            <button type="button" className="later" onClick={p.backupNudge.onLater}>
-              {t('notice.later')}
-            </button>
-          </div>
-        )}
-        {p.applyUpdate && (
-          <div className="update" role="status">
-            <span>{t('notice.update')}</span>
-            <button type="button" onClick={p.applyUpdate}>
-              {t('notice.updateDo')}
-            </button>
-          </div>
-        )}
-        {p.writeFailed && (
-          <p className="status" role="alert">
-            {t('notice.writeFailed')}
-          </p>
-        )}
+      <main
+        className="main"
+        data-slide={slide}
+        onAnimationEnd={() => setSlide(undefined)}
+        {...pageSwipe}
+      >
+        <Notices p={p} onOpenData={openData} />
         {p.failed ? (
           <div className="card">
             {header}
@@ -150,7 +131,6 @@ export function TasksScreen(p: TasksScreenProps) {
             onToggle={p.onToggle}
             onStar={p.onStar}
             onOpen={p.onOpen}
-            onRemove={p.onRemove}
             sort={p.sort}
             onLongPress={(t) => ui.startSelecting(t.id)}
             onMove={p.onMove}
@@ -164,6 +144,9 @@ export function TasksScreen(p: TasksScreenProps) {
         )}
       </main>
       {ui.picked === null && ui.query === null && <AddButton onClick={() => ui.setAdding(true)} />}
+      {ui.menuOpen && (
+        <Drawer onClose={() => ui.setMenuOpen(false)} onInstall={p.onInstall} onData={openData} />
+      )}
       {ui.adding && <AddSheet onAdd={p.onAdd} onClose={() => ui.setAdding(false)} />}
       {editing && (
         <DetailsSheet

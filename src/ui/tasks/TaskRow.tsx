@@ -1,9 +1,9 @@
 import { dueState, stepProgress, type Task } from '@/core/model';
 import { formatDue, formatTime } from '../i18n/format';
 import { useI18n } from '../i18n';
-import { AllIcon, GripIcon, StarIcon, TrashIcon } from '../primitives';
+import { GripIcon, StarIcon } from '../primitives';
 import type { SortState } from '../sortable';
-import { useRowSwipe } from './useRowSwipe';
+import { useLongPress } from './useLongPress';
 
 interface Props {
   task: Task;
@@ -11,8 +11,6 @@ interface Props {
   onToggle: (task: Task) => void;
   onStar: (task: Task) => void;
   onOpen: (task: Task) => void;
-  /** Swipe toward the line's start deletes (with undo). */
-  onRemove: (task: Task) => void;
   /** Long press starts selection with this task picked. */
   onLongPress?: (task: Task) => void;
   /** Present only when the row can be re-ordered. */
@@ -22,17 +20,7 @@ interface Props {
 }
 
 /** One intention: circle to complete, the text opens the details, the star marks it. */
-export function TaskRow({
-  task,
-  today,
-  onToggle,
-  onStar,
-  onOpen,
-  onRemove,
-  onLongPress,
-  sort,
-  pick,
-}: Props) {
+export function TaskRow({ task, today, onToggle, onStar, onOpen, onLongPress, sort, pick }: Props) {
   const i18n = useI18n();
   const { t } = i18n;
   const done = task.status === 'done';
@@ -40,25 +28,14 @@ export function TaskRow({
   const progress = stepProgress(task);
   const hasMeta = Boolean(task.due) || progress !== undefined;
   const repeatText = task.repeat ? t(`repeat.${task.repeat}`) : undefined;
-  const swipe = useRowSwipe({
-    enabled: !pick && !sort?.dragging,
-    onComplete: () => onToggle(task),
-    onRemove: () => onRemove(task),
-    onLongPress: onLongPress && !pick ? () => onLongPress(task) : undefined,
-  });
+  const press = useLongPress(onLongPress && !pick ? () => onLongPress(task) : undefined);
   return (
     <li
       ref={sort?.rowRef}
       style={sort?.style}
       className={['row', done && 'done', sort?.dragging && 'dragging'].filter(Boolean).join(' ')}
     >
-      <span className="swipe-hint swipe-complete" aria-hidden="true">
-        <AllIcon />
-      </span>
-      <span className="swipe-hint swipe-delete" aria-hidden="true">
-        <TrashIcon />
-      </span>
-      <div className="row-slide" ref={swipe.slide} {...swipe.handlers}>
+      <div className="row-slide" {...press}>
         {pick ? (
           <label className="hit">
             <input
@@ -120,7 +97,7 @@ export function TaskRow({
           <button
             type="button"
             className="grip"
-            data-no-swipe
+            data-no-press
             aria-label={t('row.move', { title: task.title })}
             {...sort.handle}
           >

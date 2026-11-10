@@ -17,5 +17,8 @@ Source: <https://github.com/google/material-design-icons> at commit `10ecc147906
 | `more_vert.svg`              | list options                                           |
 | `download.svg`               | «بياناتي» (backup)                                     |
 | `search.svg`                 | search                                                 |
+| `swap_vert.svg`              | sort (the arrows beside the list title)                |
+| `menu.svg`                   | the side menu                                          |
+| `language.svg`               | language choice in the side menu                       |
 
 Rules (from the design system): only real Material Symbols files, Outlined; no Emoji, no hand-drawn "Material-style" paths, no second icon pack in the same screen. A new icon = copy the file from the source above, add a row here. They are turned into React components by `vite-plugin-svgr` (`?react`) in `ui/primitives/icons.tsx`.

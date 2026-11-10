@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { chooseFromMenu } from './menu';
+import { chooseFromDrawer } from './menu';
 
 // The language switch: Arabic (RTL) by default, English (LTR) on request, and the choice is kept.
 test('switches to English, flips the direction, and remembers the choice', async ({ page }) => {
@@ -7,7 +7,7 @@ test('switches to English, flips the direction, and remembers the choice', async
   await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
   await expect(page.locator('html')).toHaveAttribute('lang', 'ar');
 
-  await chooseFromMenu(page, 'English');
+  await chooseFromDrawer(page, 'English');
   await expect(page.locator('html')).toHaveAttribute('dir', 'ltr');
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
 
@@ -20,7 +20,6 @@ test('switches to English, flips the direction, and remembers the choice', async
   await expect(page.locator('html')).toHaveAttribute('dir', 'ltr');
   await expect(page.getByText('Call the plumber', { exact: true })).toBeVisible();
 
-  await page.getByRole('button', { name: 'More' }).click();
-  await page.getByRole('menuitem', { name: 'العربية' }).click();
+  await chooseFromDrawer(page, 'العربية');
   await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
 });

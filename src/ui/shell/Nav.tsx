@@ -22,6 +22,12 @@ const SMART: {
   { id: 'scheduled', label: 'view.scheduled', icon: CalendarIcon, count: 'scheduled' },
 ];
 
+/** The views in the order the tabs show them: what a page swipe steps through. */
+export const navOrder = (lists: TaskList[]): Selection[] => [
+  ...SMART.map((s) => s.id),
+  ...lists.map((l) => listSelection(l.id)),
+];
+
 interface Props {
   selection: Selection;
   counts: Counts;

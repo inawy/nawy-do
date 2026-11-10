@@ -212,37 +212,6 @@ test('dragging the sheet handle down closes it; a short drag does not', async ({
   await expect(page.getByRole('dialog')).toBeHidden();
 });
 
-async function swipe(page: Page, title: string, dx: number) {
-  const box = await page.getByRole('button', { name: `تفاصيل: ${title}` }).boundingBox();
-  if (!box) throw new Error('no row');
-  const x = box.x + box.width / 2;
-  const y = box.y + box.height / 2;
-  await page.mouse.move(x, y);
-  await page.mouse.down();
-  await page.mouse.move(x + dx, y, { steps: 8 });
-  await page.mouse.up();
-}
-
-test('swiping a row toward the line end completes it (RTL: leftwards)', async ({ page }) => {
-  await add(page, 'مهمة السحب');
-  await swipe(page, 'مهمة السحب', -200);
-  await expect(page.getByText('المنجزة (1)')).toBeVisible();
-  await expect(page.getByRole('dialog')).toBeHidden(); // the release did not open the details
-});
-
-test('swiping toward the line start deletes with undo; a short swipe does nothing', async ({
-  page,
-}) => {
-  await add(page, 'مهمة الحذف');
-  await swipe(page, 'مهمة الحذف', 40);
-  await expect(page.getByText('مهمة الحذف', { exact: true })).toBeVisible();
-  await expect(page.getByText('المنجزة (1)')).toBeHidden();
-  await swipe(page, 'مهمة الحذف', 200);
-  await expect(page.getByText('اتحذفت: مهمة الحذف')).toBeVisible();
-  await page.getByRole('button', { name: 'تراجع' }).click();
-  await expect(page.getByText('مهمة الحذف', { exact: true })).toBeVisible();
-});
-
 test('a long press on a row starts selection with it picked', async ({ page }) => {
   await add(page, 'ضغطة طويلة');
   await add(page, 'نية تانية');
@@ -263,18 +232,55 @@ test('a normal tap still opens the details (no long press)', async ({ page }) =>
   await expect(page.getByRole('dialog')).toBeVisible();
 });
 
+async function remove(page: Page, title: string) {
+  await page.getByRole('button', { name: `تفاصيل: ${title}` }).click();
+  await page.getByRole('button', { name: 'حذف النية' }).click();
+}
+
 test('two deletions in a row can be undone one after the other', async ({ page }) => {
   await add(page, 'الأولى');
   await add(page, 'التانية');
-  await swipe(page, 'التانية', 200);
+  await remove(page, 'التانية');
   await expect(page.getByText('اتحذفت: التانية')).toBeVisible();
-  await swipe(page, 'الأولى', 200);
+  await remove(page, 'الأولى');
   await expect(page.getByText('اتحذفت: الأولى (+1)')).toBeVisible();
   await page.getByRole('button', { name: 'تراجع' }).click();
   await expect(page.getByText('الأولى', { exact: true })).toBeVisible();
   await expect(page.getByText('اتحذفت: التانية')).toBeVisible();
   await page.getByRole('button', { name: 'تراجع' }).click();
   await expect(page.getByText('التانية', { exact: true })).toBeVisible();
+});
+
+// A finger drag across the content moves to the neighbouring list (RTL: to the right = next).
+test('swiping the content sideways moves between lists', async ({ page }) => {
+  await add(page, 'مهمة');
+  const swipe = (dx: number) =>
+    page.evaluate((dx) => {
+      const main = document.querySelector('main') as HTMLElement;
+      const at = (type: string, x: number) =>
+        main.dispatchEvent(
+          new PointerEvent(type, {
+            bubbles: true,
+            pointerType: 'touch',
+            pointerId: 7,
+            clientX: x,
+            clientY: 300,
+          }),
+        );
+      at('pointerdown', 200);
+      at('pointermove', 200 + dx / 2);
+      at('pointermove', 200 + dx);
+      at('pointerup', 200 + dx);
+    }, dx);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('نواياي');
+  await swipe(150);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('اليوم');
+  await swipe(-150);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('نواياي');
+  await swipe(-150); // nothing before the first view
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('نواياي');
+  await swipe(40); // too short
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('نواياي');
 });
 
 test('text shared from another app becomes an intention, once', async ({ page }) => {
