@@ -6,7 +6,10 @@ import {
   type OrderChange,
   reopenTask,
   restoreTask,
+  trashTask,
   tombstoneTask,
+  untrashTask,
+  isTrashed,
   updateTask,
   type Task,
   type TaskPatch,
@@ -63,9 +66,48 @@ export const completeTaskById = (db: NawyDoDb, id: string, now: number, today: s
   change(db, id, (t) => completeTask(t, now, today));
 export const reopenTaskById = (db: NawyDoDb, id: string, now: number) =>
   change(db, id, (t) => reopenTask(t, now));
-/** Deleting writes a tombstone; the record is never removed here (D-006). */
+/** Deleting moves the task to the trash; the record is never removed here (D-006, ADR 0042). */
 export const removeTask = (db: NawyDoDb, id: string, now: number) =>
-  change(db, id, (t) => tombstoneTask(t, now));
+  change(db, id, (t) => trashTask(t, now));
+
+/** The trash: deleted tasks whose content is still kept, newest deletion first. */
+export async function listTrash(db: NawyDoDb): Promise<Task[]> {
+  const all = await db.tasks.toArray();
+  return all.filter(isTrashed).sort((a, b) => (b.deletedAt ?? 0) - (a.deletedAt ?? 0));
+}
+
+/** Takes a task out of the trash. Does nothing if it is not there (restored or compacted). */
+export async function restoreFromTrash(
+  db: NawyDoDb,
+  id: string,
+  now: number,
+): Promise<Task | undefined> {
+  return db.transaction('rw', db.tasks, async () => {
+    const current = await db.tasks.get(id);
+    if (!current || !isTrashed(current)) return undefined;
+    const next = untrashTask(current, now);
+    await db.tasks.put(next);
+    return next;
+  });
+}
+
+/** «Delete forever»: the trashed tasks become content-less tombstones. Returns how many. */
+export async function deleteForever(
+  db: NawyDoDb,
+  ids: readonly string[],
+  now: number,
+): Promise<number> {
+  return db.transaction('rw', db.tasks, async () => {
+    let n = 0;
+    for (const id of new Set(ids)) {
+      const current = await db.tasks.get(id);
+      if (!current || !isTrashed(current)) continue;
+      await db.tasks.put(tombstoneTask(current, now));
+      n++;
+    }
+    return n;
+  });
+}
 
 /** Merge incoming records into the database with the record-level rule (D-006). */
 export async function applyRecords(db: NawyDoDb, incoming: readonly Task[]): Promise<number> {

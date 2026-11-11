@@ -1,7 +1,8 @@
 import type { Repositories } from '@/core/ports';
 import { exportBackup, importBackup } from './backup';
 import { addList, removeList, editListById, restoreRemovedList, saveListOrder } from './lists';
-import { watchLists, watchTasks } from './live';
+import { watchLists, watchTasks, watchTrash } from './live';
+import { purgeTombstones } from './purge';
 import type { NawyDoDb } from './schema';
 import { snapshotDaily } from './autosnapshot';
 import { listSnapshots, snapshotKind } from './snapshot';
@@ -9,6 +10,8 @@ import {
   addTask,
   completeTaskById,
   completeTasksByIds,
+  deleteForever,
+  restoreFromTrash,
   editTask,
   moveTasksToList,
   removeTask,
@@ -31,6 +34,16 @@ export function createDexieRepositories(db: NawyDoDb): Repositories {
       saveOrder: (changes, now) => saveOrder(db, changes, now),
       moveToList: (ids, listId, now) => moveTasksToList(db, ids, listId, now),
       completeMany: (ids, now, today) => completeTasksByIds(db, ids, now, today),
+      watchTrash: (onChange, onError) => watchTrash(db, onChange, onError),
+      restoreFromTrash: (id, now) => restoreFromTrash(db, id, now),
+      deleteForever: (ids, now) => deleteForever(db, ids, now),
+      tidy: async (now) => {
+        try {
+          await purgeTombstones(db, now);
+        } catch {
+          // Housekeeping only: a failure must never stop the app.
+        }
+      },
     },
     lists: {
       watch: (onChange, onError) => watchLists(db, onChange, onError),

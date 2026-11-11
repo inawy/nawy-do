@@ -553,3 +553,14 @@ html {
     min-block-size: calc(100dvh - 7.5rem);
   }
 }
+
+.drawer-count {
+  margin-inline-start: auto;
+  min-inline-size: 1.5rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 999px;
+  background: var(--hover);
+  color: var(--muted);
+  font-size: 0.8125rem;
+  text-align: center;
+}

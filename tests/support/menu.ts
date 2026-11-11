@@ -7,7 +7,7 @@ export function chooseFromMenu(name: string, role: 'menuitem' | 'menuitemradio' 
 }
 
 /** Opens the side menu and picks an item (a button such as «my data»). */
-export function chooseFromDrawer(name: string) {
+export function chooseFromDrawer(name: string | RegExp) {
   fireEvent.click(screen.getByRole('button', { name: 'القائمة الجانبية' }));
   fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name }));
 }

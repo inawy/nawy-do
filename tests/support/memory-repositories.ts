@@ -13,6 +13,9 @@ import {
   restoreList,
   restoreTask,
   tombstoneList,
+  trashTask,
+  untrashTask,
+  isTrashed,
   tombstoneTask,
   updateTask,
   buildEnvelope,
@@ -110,7 +113,7 @@ export function createMemoryRepositories(): Repositories & {
       },
       remove: async (id, now) => {
         const t = liveTask(id);
-        return t ? putTask(tombstoneTask(t, now)) : undefined;
+        return t ? putTask(trashTask(t, now)) : undefined;
       },
       restore: async (previous, now) => {
         const current = tasks.get(previous.id);
@@ -132,6 +135,28 @@ export function createMemoryRepositories(): Repositories & {
         changeMany(ids, (t) => updateTask(t, { listId: listId ?? '' }, now)),
       completeMany: (ids, now, today) =>
         changeMany(ids, (t) => (t.status === 'open' ? completeTask(t, now, today) : t)),
+      watchTrash: watchOf(taskSubs, () =>
+        [...tasks.values()]
+          .filter(isTrashed)
+          .sort((a, b) => (b.deletedAt ?? 0) - (a.deletedAt ?? 0)),
+      ),
+      restoreFromTrash: async (id, now) => {
+        const t = tasks.get(id);
+        return t && isTrashed(t) ? putTask(untrashTask(t, now)) : undefined;
+      },
+      deleteForever: async (ids, now) => {
+        let n = 0;
+        for (const id of ids) {
+          const t = tasks.get(id);
+          if (t && isTrashed(t)) {
+            tasks.set(id, tombstoneTask(t, now));
+            n++;
+          }
+        }
+        taskSubs.forEach((f) => f());
+        return n;
+      },
+      tidy: async () => {},
     },
     lists: {
       watch: watchOf(listSubs, () => liveLists([...lists.values()])),

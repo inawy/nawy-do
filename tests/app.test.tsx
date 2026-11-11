@@ -1,4 +1,4 @@
-import { chooseFromMenu } from './support/menu';
+import { chooseFromDrawer, chooseFromMenu } from './support/menu';
 import 'fake-indexeddb/auto';
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
@@ -297,5 +297,20 @@ describe('update banner', () => {
     fireEvent.click(screen.getByRole('button', { name: 'حدّث' }));
     expect(applied).toBe(1);
     act(() => updateSignal.set(undefined));
+  });
+
+  it('a deleted intention can be restored from the trash', async () => {
+    render(<App db={db} now={now} today={today} />);
+    await screen.findByText(/مفيش نوايا/);
+    await addIntention('هتتحذف');
+    fireEvent.click(screen.getByText('هتتحذف'));
+    fireEvent.click(await screen.findByRole('button', { name: 'حذف النية' }));
+    await waitFor(() => expect(screen.queryByText('هتتحذف')).toBeNull());
+    chooseFromDrawer(/سلة المحذوفات/);
+    const sheet = await screen.findByRole('dialog', { name: 'سلة المحذوفات' });
+    await within(sheet).findByText('هتتحذف');
+    fireEvent.click(within(sheet).getByRole('button', { name: 'استعادة' }));
+    await waitFor(() => expect(within(sheet).queryByText('هتتحذف')).toBeNull());
+    expect(within(sheet).getByText('السلة فاضية.')).toBeTruthy();
   });
 });

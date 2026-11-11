@@ -25,8 +25,18 @@ export interface DataProps {
   onRestore: (id: number) => void;
 }
 
+/** The trash sheet: what was deleted lately (the content is kept for 30 days). */
+export interface TrashProps {
+  items: Task[];
+  /** The current time, for «deleted N days ago». */
+  now: number;
+  onRestore: (id: string) => void;
+  onDelete: (ids: string[]) => void;
+}
+
 export interface TasksScreenProps {
   data: DataProps;
+  trash: TrashProps;
   /** Set when it is time to ask for a backup; «خُد نسخة» opens «بياناتي», «بعدين» hides it. */
   /** Overdue and due-today counts to flag when the app opens; «اعرضها» goes to «اليوم». */
   dueNotice?: { overdue: number; today: number; onShow: () => void; onLater: () => void };

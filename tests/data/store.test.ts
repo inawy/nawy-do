@@ -44,12 +44,12 @@ describe('store', () => {
     expect((await listTasks(db))[0]).toMatchObject({ title: 'uno', due: '2026-11-01' });
   });
 
-  it('delete writes a tombstone: hidden from the list, kept as a record without content', async () => {
+  it('delete moves to the trash: hidden from the list, content kept for restoring', async () => {
     await addTask(db, 'a', 'سر', 100);
     await removeTask(db, 'a', 200);
     expect(await listTasks(db)).toEqual([]);
     const [rec] = await allRecords(db);
-    expect(rec).toMatchObject({ id: 'a', title: '', deletedAt: 200 });
+    expect(rec).toMatchObject({ id: 'a', title: 'سر', deletedAt: 200 });
   });
 
   it('operations on a missing or deleted task do nothing', async () => {
@@ -57,7 +57,7 @@ describe('store', () => {
     await addTask(db, 'a', 'x', 100);
     await removeTask(db, 'a', 200);
     expect(await editTask(db, 'a', { title: 'back' }, 300)).toBeUndefined();
-    expect((await allRecords(db))[0]?.title).toBe('');
+    expect((await allRecords(db))[0]?.title).toBe('x');
   });
 
   it('merging an older copy never resurrects a deleted task', async () => {
