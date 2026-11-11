@@ -1,4 +1,4 @@
-import { chooseFromDrawer, chooseFromMenu } from './support/menu';
+import { chooseFromDrawer, chooseFromMenu, openEditor } from './support/menu';
 import 'fake-indexeddb/auto';
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
@@ -52,7 +52,7 @@ describe('App', () => {
   it('deletes with a tombstone and undo brings it back', async () => {
     render(<App db={db} now={now} today={today} />);
     await addIntention('سر');
-    fireEvent.click(screen.getByRole('button', { name: 'تفاصيل: سر' }));
+    openEditor('سر');
     fireEvent.click(screen.getByRole('button', { name: 'حذف النية' }));
     await screen.findByText('اتحذفت: سر');
     await waitFor(async () => expect((await allRecords(db))[0]?.deletedAt).toBeDefined());
@@ -64,7 +64,7 @@ describe('App', () => {
   it('quick due choices set and clear the date', async () => {
     render(<App db={db} now={now} today={today} />);
     await addIntention('كلّم أحمد');
-    fireEvent.click(screen.getByRole('button', { name: 'تفاصيل: كلّم أحمد' }));
+    openEditor('كلّم أحمد');
     const input = screen.getByLabelText('تاريخ الاستحقاق') as HTMLInputElement;
     fireEvent.click(screen.getByRole('button', { name: 'بكرة' }));
     expect(input.value).toBe('2026-10-28');
@@ -78,7 +78,7 @@ describe('App', () => {
   it('edits details and shows the task in the scheduled view', async () => {
     render(<App db={db} now={now} today={today} />);
     await addIntention('ادفع الفاتورة');
-    fireEvent.click(screen.getByRole('button', { name: 'تفاصيل: ادفع الفاتورة' }));
+    openEditor('ادفع الفاتورة');
     fireEvent.change(screen.getByLabelText('تاريخ الاستحقاق'), { target: { value: '2026-10-27' } });
     fireEvent.change(screen.getByLabelText('ملاحظات'), { target: { value: 'من التطبيق' } });
     fireEvent.click(screen.getByRole('button', { name: 'حفظ' }));
@@ -94,11 +94,11 @@ describe('App', () => {
   it('clearing the date removes it and the scheduled view says so', async () => {
     render(<App db={db} now={now} today={today} />);
     await addIntention('x');
-    fireEvent.click(screen.getByRole('button', { name: 'تفاصيل: x' }));
+    openEditor('x');
     fireEvent.change(screen.getByLabelText('تاريخ الاستحقاق'), { target: { value: '2026-10-28' } });
     fireEvent.click(screen.getByRole('button', { name: 'حفظ' }));
     await screen.findByText('بكرة');
-    fireEvent.click(screen.getByRole('button', { name: 'تفاصيل: x' }));
+    openEditor('x');
     fireEvent.change(screen.getByLabelText('تاريخ الاستحقاق'), { target: { value: '' } });
     fireEvent.click(screen.getByRole('button', { name: 'حفظ' }));
     await waitFor(() => expect(screen.queryByText('بكرة')).toBeNull());
@@ -135,7 +135,7 @@ describe('steps', () => {
   it('adds steps in the sheet, shows progress, and keeps a typed step on save', async () => {
     render(<App db={db} now={now} today={today} />);
     await addIntention('سفر');
-    fireEvent.click(screen.getByRole('button', { name: 'تفاصيل: سفر' }));
+    openEditor('سفر');
     const input = screen.getByLabelText('خطوة جديدة');
     fireEvent.change(input, { target: { value: 'احجز التذكرة' } });
     fireEvent.click(screen.getByRole('button', { name: 'أضف خطوة' }));
@@ -173,7 +173,7 @@ describe('lists', () => {
     await createListNamed('البيت');
     fireEvent.click(screen.getByRole('button', { name: 'نواياي' }));
     await addIntention('اغسل');
-    fireEvent.click(screen.getByRole('button', { name: 'تفاصيل: اغسل' }));
+    openEditor('اغسل');
     const id = screen.getByRole('option', { name: 'البيت' }).getAttribute('value') ?? '';
     fireEvent.change(screen.getByLabelText('القائمة'), { target: { value: id } });
     fireEvent.click(screen.getByRole('button', { name: 'حفظ' }));
@@ -303,8 +303,8 @@ describe('update banner', () => {
     render(<App db={db} now={now} today={today} />);
     await screen.findByText(/مفيش نوايا/);
     await addIntention('هتتحذف');
-    fireEvent.click(screen.getByText('هتتحذف'));
-    fireEvent.click(await screen.findByRole('button', { name: 'حذف النية' }));
+    fireEvent.click(screen.getByRole('button', { name: 'تفاصيل: هتتحذف' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'حذف' }));
     await waitFor(() => expect(screen.queryByText('هتتحذف')).toBeNull());
     chooseFromDrawer(/سلة المحذوفات/);
     const sheet = await screen.findByRole('dialog', { name: 'سلة المحذوفات' });

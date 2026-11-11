@@ -323,3 +323,95 @@
   color: var(--muted);
   font-size: 0.8125rem;
 }
+
+/* ---------- task card (what a tap on a task opens) ---------- */
+.card-title {
+  margin: 0;
+  font-size: 1.375rem;
+  font-weight: 600;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+.card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.meta-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-block-size: 32px;
+  padding-inline: 0.75rem 0.875rem;
+  border-radius: 999px;
+  background: var(--page);
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+.meta-chip svg {
+  inline-size: 1.125rem;
+  block-size: 1.125rem;
+  fill: currentColor;
+}
+.meta-chip[data-list-color] svg {
+  fill: var(--list-color);
+}
+.card-notes {
+  margin: 0;
+  padding: 0.875rem;
+  border-radius: 16px;
+  background: var(--page);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.card-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+}
+.card-steps li[data-level='1'] {
+  padding-inline-start: 1.75rem;
+}
+.card-steps label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-block-size: 44px;
+}
+.card-steps input {
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+  accent-color: var(--brand);
+}
+.card-actions {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 0.25rem;
+  padding-block: 0.25rem 0.5rem;
+  border-block-start: 1px solid var(--line);
+}
+.card-actions button {
+  display: grid;
+  justify-items: center;
+  gap: 0.125rem;
+  min-block-size: 64px;
+  padding: 0.5rem 0.25rem;
+  border: 0;
+  border-radius: 16px;
+  background: none;
+  color: var(--ink);
+  font-size: 0.8125rem;
+}
+.card-actions button:hover {
+  background: var(--hover);
+}
+.card-actions button.danger {
+  color: var(--danger);
+}
+.card-actions svg {
+  inline-size: 1.5rem;
+  block-size: 1.5rem;
+  fill: currentColor;
+}

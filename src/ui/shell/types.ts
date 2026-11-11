@@ -72,6 +72,10 @@ export interface TasksScreenProps {
   onMoveMany: (ids: string[], listId: string | undefined) => void;
   onCompleteMany: (ids: string[]) => void;
   onClose: () => void;
+  /** Copies text to the clipboard; resolves to whether it worked. */
+  onCopy: (text: string) => Promise<boolean>;
+  /** Set where the browser can share text. */
+  onShare?: ((title: string, text: string) => Promise<boolean>) | undefined;
   onSave: (t: Task, patch: TaskPatch) => void;
   onRemove: (t: Task) => void;
   onAddList: (name: string, color?: ListColor) => Promise<TaskList | 'empty' | 'limit' | 'failed'>;

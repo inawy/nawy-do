@@ -1,4 +1,4 @@
-import { chooseFromMenu } from './menu';
+import { chooseFromMenu, openEditor } from './menu';
 import { expect, test, type Page } from '@playwright/test';
 
 const prompt = 'ناوي تعمل إيه؟';
@@ -27,7 +27,7 @@ test('completes, then deletes with undo', async ({ page }) => {
   await page.getByRole('checkbox').click();
   await expect(page.getByText('المنجزة (1)')).toBeVisible();
   await page.getByText('المنجزة (1)').click();
-  await page.getByRole('button', { name: 'تفاصيل: مهمة اختبار' }).click();
+  await openEditor(page, 'مهمة اختبار');
   await page.getByRole('button', { name: 'حذف النية' }).click();
   await expect(page.getByText('اتحذفت: مهمة اختبار')).toBeVisible();
   await page.getByRole('button', { name: 'تراجع' }).click();
@@ -140,7 +140,7 @@ test('a starred intention appears in the favourites view', async ({ page }) => {
 
 test('a due date shows in the scheduled view', async ({ page }) => {
   await add(page, 'ادفع الفاتورة');
-  await page.getByRole('button', { name: 'تفاصيل: ادفع الفاتورة' }).click();
+  await openEditor(page, 'ادفع الفاتورة');
   await page.getByLabel('تاريخ الاستحقاق').fill('2999-01-01');
   await page.getByRole('button', { name: 'حفظ' }).click();
   await page.getByRole('button', { name: 'مجدولة' }).click();
@@ -236,7 +236,7 @@ test('a normal tap still opens the details (no long press)', async ({ page }) =>
 });
 
 async function remove(page: Page, title: string) {
-  await page.getByRole('button', { name: `تفاصيل: ${title}` }).click();
+  await openEditor(page, title);
   await page.getByRole('button', { name: 'حذف النية' }).click();
 }
 
@@ -333,7 +333,7 @@ test('the today view takes new intentions as due today', async ({ page }) => {
 
 test('completing a repeating task keeps it open on its next date', async ({ page }) => {
   await add(page, 'دواء');
-  await page.getByRole('button', { name: 'تفاصيل: دواء' }).click();
+  await openEditor(page, 'دواء');
   await page.getByRole('button', { name: 'النهارده' }).click();
   await page.getByLabel('تكرار').selectOption('daily');
   await page.getByRole('button', { name: 'حفظ' }).click();
@@ -363,7 +363,7 @@ test('sorting alphabetically orders the list, hides dragging, and is remembered'
 
 test('a due time is set with the date and shown on the row', async ({ page }) => {
   await add(page, 'اجتماع');
-  await page.getByRole('button', { name: 'تفاصيل: اجتماع' }).click();
+  await openEditor(page, 'اجتماع');
   await expect(page.getByLabel('الساعة')).toBeDisabled(); // no date yet
   await page.getByRole('button', { name: 'النهارده' }).click();
   await page.getByLabel('الساعة').fill('21:30');
@@ -408,4 +408,26 @@ test('dropping a dragged intention on a list in the navigation moves it there', 
   await page.getByRole('button', { name: /^هدف/ }).click();
   await expect(page.getByRole('heading', { name: 'هدف', level: 1 })).toBeVisible();
   await expect(page.getByText('منقولة', { exact: true })).toBeVisible();
+});
+
+test('a tap opens a quick card; Edit opens the form; Delete from the card can be undone', async ({
+  page,
+}) => {
+  await add(page, 'بطاقة سريعة');
+  await page.getByRole('button', { name: 'تفاصيل: بطاقة سريعة' }).click();
+  const card = page.getByRole('dialog', { name: 'النية' });
+  await expect(card.getByRole('heading', { name: 'بطاقة سريعة' })).toBeVisible();
+  for (const name of ['تعديل', 'نسخ', 'حذف']) {
+    await expect(card.getByRole('button', { name })).toBeVisible();
+  }
+  await card.getByRole('button', { name: 'تعديل' }).click();
+  await expect(page.getByLabel('ملاحظات')).toBeVisible();
+  await page.getByRole('button', { name: 'إلغاء' }).click();
+  await expect(page.getByRole('dialog')).toBeHidden();
+
+  await page.getByRole('button', { name: 'تفاصيل: بطاقة سريعة' }).click();
+  await page.getByRole('dialog', { name: 'النية' }).getByRole('button', { name: 'حذف' }).click();
+  await expect(page.getByText('اتحذفت: بطاقة سريعة')).toBeVisible();
+  await page.getByRole('button', { name: 'تراجع' }).click();
+  await expect(page.getByText('بطاقة سريعة', { exact: true })).toBeVisible();
 });

@@ -11,3 +11,9 @@ export function chooseFromDrawer(name: string | RegExp) {
   fireEvent.click(screen.getByRole('button', { name: 'القائمة الجانبية' }));
   fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name }));
 }
+
+/** Taps a task (its card opens) and then «Edit» (the full form opens). */
+export function openEditor(title: string) {
+  fireEvent.click(screen.getByRole('button', { name: `تفاصيل: ${title}` }));
+  fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'تعديل' }));
+}

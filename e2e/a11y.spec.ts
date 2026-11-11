@@ -44,9 +44,16 @@ for (const scheme of ['light', 'dark'] as const) {
       expect(await violations(page)).toEqual([]);
     });
 
-    test('details sheet', async ({ page }) => {
+    test('task card', async ({ page }) => {
       await page.getByRole('button', { name: 'تفاصيل: اشتري خبز' }).click();
       await expect(page.getByRole('dialog')).toBeVisible();
+      expect(await violations(page)).toEqual([]);
+    });
+
+    test('details form', async ({ page }) => {
+      await page.getByRole('button', { name: 'تفاصيل: اشتري خبز' }).click();
+      await page.getByRole('button', { name: 'تعديل' }).click();
+      await expect(page.getByLabel('ملاحظات')).toBeVisible();
       expect(await violations(page)).toEqual([]);
     });
 

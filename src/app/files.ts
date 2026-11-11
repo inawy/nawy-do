@@ -33,3 +33,27 @@ export async function shareText(filename: string, text: string): Promise<boolean
     return false;
   }
 }
+
+/** Copies text to the clipboard. False if the browser refused. */
+export async function copyText(text: string): Promise<boolean> {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** Can this browser open the system share sheet for text? */
+export const canShareText = (): boolean =>
+  typeof navigator !== 'undefined' && typeof navigator.share === 'function';
+
+/** Shares text through the system sheet. False if the person cancelled or it failed. */
+export async function shareTextOnly(title: string, text: string): Promise<boolean> {
+  try {
+    await navigator.share({ title, text });
+    return true;
+  } catch {
+    return false;
+  }
+}

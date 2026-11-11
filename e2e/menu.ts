@@ -18,3 +18,9 @@ export async function chooseFromDrawer(page: Page, name: string) {
   const radio = dialog.getByRole('radio', { name });
   await ((await radio.count()) > 0 ? radio : dialog.getByRole('button', { name })).click();
 }
+
+/** Taps a task (its card opens) and then «Edit» (the full form opens). */
+export async function openEditor(page: Page, title: string) {
+  await page.getByRole('button', { name: new RegExp(`^(تفاصيل|Details): ${title}$`) }).click();
+  await page.getByRole('button', { name: /^(تعديل|Edit)$/ }).click();
+}

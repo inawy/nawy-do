@@ -17,7 +17,14 @@ import { I18nProvider, makeI18n, type Lang } from '@/ui/i18n';
 import { TasksScreen } from '@/ui/shell';
 import { formatWhen, systemClock, systemToday } from './clock';
 import { getDb } from './db';
-import { canShareFile, downloadText, shareText } from './files';
+import {
+  canShareFile,
+  canShareText,
+  copyText,
+  downloadText,
+  shareText,
+  shareTextOnly,
+} from './files';
 import { installSignal } from './install';
 import { newId } from './ids';
 import { loadLang, loadSort, saveLang, saveSort } from './prefs';
@@ -186,6 +193,8 @@ export function App({ repositories, db, now = systemClock, today = systemToday }
         onMoveMany={(ids, listId) => void tasks.moveMany(ids, listId)}
         onCompleteMany={(ids) => void tasks.completeMany(ids)}
         onClose={() => setOpenId(null)}
+        onCopy={copyText}
+        onShare={canShareText() ? shareTextOnly : undefined}
         onSave={(t, patch) => void tasks.edit(t, patch)}
         onRemove={(t) => void tasks.remove(t)}
         onAddList={lists.add}

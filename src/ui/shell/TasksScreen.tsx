@@ -9,7 +9,6 @@ import {
 } from '@/core/model';
 import { BackupSheet } from '../backup';
 import { useI18n } from '../i18n';
-import { DetailsSheet } from '../details';
 import { IconButton, MenuIcon } from '../primitives';
 import { AddButton, AddSheet, TaskList as Tasks, UndoToast } from '../tasks';
 import '../styles/index.css';
@@ -17,6 +16,7 @@ import { TrashSheet } from '../trash';
 import { Drawer } from './Drawer';
 import { InputBar } from './InputBar';
 import { Notices } from './Notices';
+import { TaskSheets } from './TaskSheets';
 import { ListSheets } from './ListSheets';
 import { Nav, navOrder } from './Nav';
 import { TitleBar } from './TitleBar';
@@ -153,18 +153,17 @@ export function TasksScreen(p: TasksScreenProps) {
       )}
       {ui.adding && <AddSheet onAdd={p.onAdd} onClose={() => ui.setAdding(false)} />}
       {editing && (
-        <DetailsSheet
+        <TaskSheets
           key={editing.id}
           task={editing}
           lists={p.lists}
           today={p.today}
           newId={p.newId}
           onSave={(patch) => p.onSave(editing, patch)}
-          onRemove={() => {
-            p.onRemove(editing);
-            p.onClose();
-          }}
+          onRemove={() => p.onRemove(editing)}
           onClose={p.onClose}
+          onCopy={p.onCopy}
+          onShare={p.onShare}
         />
       )}
       <ListSheets
