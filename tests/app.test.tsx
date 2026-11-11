@@ -303,8 +303,8 @@ describe('update banner', () => {
     render(<App db={db} now={now} today={today} />);
     await screen.findByText(/مفيش نوايا/);
     await addIntention('هتتحذف');
-    fireEvent.click(screen.getByText('هتتحذف'));
-    fireEvent.click(await screen.findByRole('button', { name: 'حذف النية' }));
+    fireEvent.click(screen.getByRole('button', { name: 'تفاصيل: هتتحذف' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'حذف' }));
     await waitFor(() => expect(screen.queryByText('هتتحذف')).toBeNull());
     chooseFromDrawer(/سلة المحذوفات/);
     const sheet = await screen.findByRole('dialog', { name: 'سلة المحذوفات' });
