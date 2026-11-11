@@ -475,3 +475,34 @@ test('swiping a card down, left or right closes it; a short swipe does not', asy
     await open();
   }
 });
+
+test('swiping the side menu towards its edge closes it; the other way does not', async ({
+  page,
+  context,
+  isMobile,
+}) => {
+  test.skip(!isMobile, 'real touch input is only emulated on the phone project');
+  const cdp = await context.newCDPSession(page);
+  const swipe = async (dx: number) => {
+    const box = await page.locator('.drawer').boundingBox();
+    if (!box) throw new Error('no drawer');
+    const x0 = box.x + box.width / 2;
+    const y0 = box.y + 300;
+    const touch = (type: 'touchStart' | 'touchMove' | 'touchEnd', x: number) =>
+      cdp.send('Input.dispatchTouchEvent', {
+        type,
+        touchPoints: type === 'touchEnd' ? [] : [{ x, y: y0 }],
+      });
+    await touch('touchStart', x0);
+    for (let i = 1; i <= 8; i++) await touch('touchMove', x0 + (dx * i) / 8);
+    await touch('touchEnd', x0 + dx);
+  };
+  await page.goto('/');
+  await page.getByRole('button', { name: 'القائمة الجانبية' }).click();
+  await expect(page.getByRole('dialog')).toBeVisible();
+  await swipe(-200); // Arabic: the menu sits on the right, so this is away from its edge
+  await page.waitForTimeout(400);
+  await expect(page.getByRole('dialog')).toBeVisible();
+  await swipe(200);
+  await expect(page.getByRole('dialog')).toBeHidden();
+});

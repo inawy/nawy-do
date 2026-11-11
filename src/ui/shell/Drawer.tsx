@@ -3,6 +3,7 @@ import { useI18n, LANGS, type Lang } from '../i18n';
 import { CloseIcon, DataIcon, IconButton, LanguageIcon, PlusIcon, TrashIcon } from '../primitives';
 import { loadTheme, setTheme, THEMES } from '../theme';
 import { useBackClose } from '../sheet/useBackClose';
+import { useDrawerSwipe } from '../sheet/useDrawerSwipe';
 import { useFocusTrap } from '../sheet/useFocusTrap';
 
 interface Props {
@@ -55,6 +56,7 @@ export function Drawer({ onClose, onData, onTrash, trashCount, onInstall }: Prop
   const [theme, setThemeState] = useState(loadTheme);
   useBackClose(onClose);
   const trap = useFocusTrap<HTMLDivElement>();
+  useDrawerSwipe(trap.ref, onClose);
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
     document.addEventListener('keydown', onKey);
