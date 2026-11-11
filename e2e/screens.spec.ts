@@ -35,6 +35,8 @@ async function record(page: Page, prefix: string, project: string) {
   await seed(page);
   await shot('1-main');
   await page.getByRole('button', { name: 'تفاصيل: احجز تذكرة السفر' }).click();
+  await shot('2a-card');
+  await page.getByRole('button', { name: 'تعديل' }).click();
   await shot('2-details');
   await page.keyboard.press('Escape');
   await page.getByRole('button', { name: 'المفضلة' }).click();
