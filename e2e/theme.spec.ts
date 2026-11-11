@@ -29,3 +29,11 @@ test('closing «my data» opened from the side menu keeps the app open', async (
   await expect(page.getByRole('button', { name: 'نية جديدة' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'القائمة الجانبية' })).toBeVisible();
 });
+
+test('the black theme is offered and applies', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'القائمة الجانبية' }).click();
+  await page.getByRole('radio', { name: 'أسود' }).click();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'black');
+  await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(0, 0, 0)');
+});

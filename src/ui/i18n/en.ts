@@ -18,6 +18,7 @@ export const en: Record<MessageKey, string> = {
   'theme.auto': 'Automatic',
   'theme.light': 'Light',
   'theme.dark': 'Dark',
+  'theme.black': 'Black',
   'drawer.data': 'Your data',
   'drawer.footer': 'All your data stays on this device.',
   'drawer.language': 'Language',
