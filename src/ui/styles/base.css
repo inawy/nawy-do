@@ -23,6 +23,21 @@ body {
   * {
     -webkit-tap-highlight-color: transparent;
   }
+  /* An app, not a web page: pressing a title or label must not select text or open the system
+     text menu (it fought long-press selection and page swipes). Typing fields stay selectable. */
+  body {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+  input,
+  textarea,
+  [contenteditable],
+  [data-selectable] {
+    -webkit-user-select: text;
+    user-select: text;
+    -webkit-touch-callout: default;
+  }
   button {
     cursor: pointer;
     /* No grey square flash on tap (Android); each control draws its own pressed state. */
