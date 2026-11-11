@@ -448,7 +448,7 @@ test('swiping a card down, left or right closes it; a short swipe does not', asy
     if (!box) throw new Error('no sheet');
     const x0 = box.x + box.width / 2;
     const y0 = box.y + 70;
-    const touch = (type: string, x: number, y: number) =>
+    const touch = (type: 'touchStart' | 'touchMove' | 'touchEnd', x: number, y: number) =>
       cdp.send('Input.dispatchTouchEvent', {
         type,
         touchPoints: type === 'touchEnd' ? [] : [{ x, y }],
