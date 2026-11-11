@@ -306,7 +306,7 @@ describe('update banner', () => {
     fireEvent.click(screen.getByText('هتتحذف'));
     fireEvent.click(await screen.findByRole('button', { name: 'حذف النية' }));
     await waitFor(() => expect(screen.queryByText('هتتحذف')).toBeNull());
-    chooseFromDrawer('سلة المحذوفات');
+    chooseFromDrawer(/سلة المحذوفات/);
     const sheet = await screen.findByRole('dialog', { name: 'سلة المحذوفات' });
     await within(sheet).findByText('هتتحذف');
     fireEvent.click(within(sheet).getByRole('button', { name: 'استعادة' }));
