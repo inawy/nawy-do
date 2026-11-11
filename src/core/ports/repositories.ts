@@ -44,6 +44,14 @@ export interface TaskRepository {
   /** `listId` undefined moves them to the main list. Returns how many changed. */
   moveToList(ids: readonly string[], listId: string | undefined, now: number): Promise<number>;
   completeMany(ids: readonly string[], now: number, today: string): Promise<number>;
+  /** The trash: deleted tasks whose content is still kept, newest deletion first. */
+  watchTrash: Watch<Task>;
+  /** Takes a task out of the trash; does nothing if it is not there. */
+  restoreFromTrash(id: string, now: number): Promise<Task | undefined>;
+  /** Compacts the given trashed tasks to content-less tombstones; returns how many. */
+  deleteForever(ids: readonly string[], now: number): Promise<number>;
+  /** Housekeeping at start-up: compacts old trash and drops expired tombstones. Never throws. */
+  tidy(now: number): Promise<void>;
 }
 
 export type AddListResult = { ok: true; list: TaskList } | { ok: false; reason: 'empty' | 'limit' };

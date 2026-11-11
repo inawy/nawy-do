@@ -12,7 +12,7 @@ import type { Repositories } from '@/core/ports';
 import { createDexieRepositories, type NawyDoDb } from '@/data';
 import { useBackup } from '@/features/backup';
 import { useLists } from '@/features/lists';
-import { useTasks } from '@/features/tasks';
+import { useTasks, useTrash } from '@/features/tasks';
 import { I18nProvider, makeI18n, type Lang } from '@/ui/i18n';
 import { TasksScreen } from '@/ui/shell';
 import { formatWhen, systemClock, systemToday } from './clock';
@@ -43,6 +43,7 @@ export function App({ repositories, db, now = systemClock, today = systemToday }
     [repositories, db],
   );
   const tasks = useTasks(repos.tasks, now, newId, today);
+  const trash = useTrash(repos.tasks, now);
   const lists = useLists(repos.lists, now, newId);
   const backup = useBackup(repos.backup, now);
   const applyUpdate = useSyncExternalStore(updateSignal.subscribe, updateSignal.get);
@@ -67,6 +68,9 @@ export function App({ repositories, db, now = systemClock, today = systemToday }
   useEffect(() => {
     void requestPersistence().then(setStorage);
   }, []);
+  useEffect(() => {
+    void repos.tasks.tidy(now());
+  }, [repos, now]);
 
   const selection = resolveSelection(chosen, lists.lists);
   // What needed attention when the app opened: counted once, so adding a task later does not
@@ -123,6 +127,12 @@ export function App({ repositories, db, now = systemClock, today = systemToday }
           lastExport: exportLog.last === undefined ? undefined : formatWhen(exportLog.last, lang),
           onImport: (file) => void file.text().then(backup.importText),
           onRestore: (id) => void backup.restore(id),
+        }}
+        trash={{
+          items: trash.items,
+          now: now(),
+          onRestore: (id) => void trash.restore(id),
+          onDelete: (ids) => void trash.deleteForever(ids),
         }}
         dueNotice={
           due !== undefined &&

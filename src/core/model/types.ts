@@ -38,7 +38,7 @@ export interface Task {
   createdAt: number;
   updatedAt: number;
   doneAt?: number;
-  /** Set only on a tombstone (D-006). A tombstone keeps no content. */
+  /** Set when deleted (D-006). In the trash the content is kept; a compacted tombstone has none. */
   deletedAt?: number;
 }
 

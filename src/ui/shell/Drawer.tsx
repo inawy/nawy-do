@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { useI18n, LANGS, type Lang } from '../i18n';
-import { CloseIcon, DataIcon, IconButton, LanguageIcon, PlusIcon } from '../primitives';
+import { CloseIcon, DataIcon, IconButton, LanguageIcon, PlusIcon, TrashIcon } from '../primitives';
 import { loadTheme, setTheme, THEMES } from '../theme';
 import { useBackClose } from '../sheet/useBackClose';
 import { useFocusTrap } from '../sheet/useFocusTrap';
@@ -8,6 +8,9 @@ import { useFocusTrap } from '../sheet/useFocusTrap';
 interface Props {
   onClose: () => void;
   onData: () => void;
+  onTrash: () => void;
+  /** How many deleted tasks the trash holds. */
+  trashCount: number;
   /** Present while the browser offers to install the app. */
   onInstall?: (() => void) | undefined;
 }
@@ -47,8 +50,8 @@ function Segmented<V extends string>(p: {
 const NAMES: Record<Lang, string> = { ar: 'العربية', en: 'English' };
 
 /** The side menu: settings and data (the lists themselves are the tabs). */
-export function Drawer({ onClose, onData, onInstall }: Props) {
-  const { t, lang, setLang } = useI18n();
+export function Drawer({ onClose, onData, onTrash, trashCount, onInstall }: Props) {
+  const { t, num, lang, setLang } = useI18n();
   const [theme, setThemeState] = useState(loadTheme);
   useBackClose(onClose);
   const trap = useFocusTrap<HTMLDivElement>();
@@ -107,6 +110,11 @@ export function Drawer({ onClose, onData, onInstall }: Props) {
         <button type="button" className="drawer-item" onClick={pick(onData)}>
           <DataIcon />
           {t('menu.data')}
+        </button>
+        <button type="button" className="drawer-item" onClick={pick(onTrash)}>
+          <TrashIcon />
+          {t('menu.trash')}
+          {trashCount > 0 && <span className="drawer-count">{num(trashCount)}</span>}
         </button>
         {onInstall && (
           <button type="button" className="drawer-item" onClick={pick(onInstall)}>

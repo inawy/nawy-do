@@ -143,6 +143,30 @@ export function tombstoneTask(task: Task, now: number): Task {
 
 export const isDeleted = (task: Task): boolean => task.deletedAt !== undefined;
 
+/** How long a deleted task stays readable in the trash before only its tombstone is kept. */
+export const TRASH_DAYS = 30;
+export const TRASH_TTL_MS = TRASH_DAYS * 24 * 60 * 60 * 1000;
+
+/**
+ * Deleting moves a task to the trash: the record is stamped deleted but keeps its content, so it
+ * can be read and restored for `TRASH_DAYS`. After that (or on «delete forever») it is compacted
+ * to a tombstone with `tombstoneTask`, which keeps no content (ADR 0042).
+ */
+export function trashTask(task: Task, now: number): Task {
+  const t = nextUpdatedAt(task.updatedAt, now);
+  return { ...task, updatedAt: t, deletedAt: t };
+}
+
+/** Deleted and still readable: what the trash shows (a compacted tombstone has no title). */
+export const isTrashed = (task: Task): boolean => isDeleted(task) && task.title !== '';
+
+/** Takes a trashed task back as it was, stamped newer so the restore wins every merge. */
+export function untrashTask(current: Task, now: number): Task {
+  const next: Task = { ...current, updatedAt: nextUpdatedAt(current.updatedAt, now) };
+  delete next.deletedAt;
+  return next;
+}
+
 /**
  * Undo of a delete: the previous live record again, stamped newer than the tombstone so the
  * restore wins every merge (D-006).

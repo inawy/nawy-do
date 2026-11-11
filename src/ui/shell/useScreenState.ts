@@ -11,6 +11,7 @@ export type ListSheetState = { mode: 'create' } | { mode: 'edit'; id: string } |
 export function useScreenState(startAdding = false) {
   const [sheet, setSheet] = useState<ListSheetState>(null);
   const [dataOpen, setDataOpen] = useState(false);
+  const [trashOpen, setTrashOpen] = useState(false);
   const [adding, setAdding] = useState(startAdding);
   const [menuOpen, setMenuOpen] = useState(false);
   // `null` is off. While on, results come from ALL tasks, not just the current view.
@@ -22,6 +23,8 @@ export function useScreenState(startAdding = false) {
     setSheet,
     dataOpen,
     setDataOpen,
+    trashOpen,
+    setTrashOpen,
     adding,
     setAdding,
     menuOpen,

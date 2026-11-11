@@ -13,6 +13,7 @@ import { DetailsSheet } from '../details';
 import { IconButton, MenuIcon } from '../primitives';
 import { AddButton, AddSheet, TaskList as Tasks, UndoToast } from '../tasks';
 import '../styles/index.css';
+import { TrashSheet } from '../trash';
 import { Drawer } from './Drawer';
 import { InputBar } from './InputBar';
 import { Notices } from './Notices';
@@ -23,7 +24,7 @@ import type { TasksScreenProps } from './types';
 import { usePageSwipe } from './usePageSwipe';
 import { useScreenState } from './useScreenState';
 
-export type { DataProps, TasksScreenProps } from './types';
+export type { DataProps, TasksScreenProps, TrashProps } from './types';
 
 /** The whole screen as a function of its props: easy to test and to preview without a database. */
 export function TasksScreen(p: TasksScreenProps) {
@@ -142,7 +143,13 @@ export function TasksScreen(p: TasksScreenProps) {
       </main>
       {ui.picked === null && ui.query === null && <AddButton onClick={() => ui.setAdding(true)} />}
       {ui.menuOpen && (
-        <Drawer onClose={() => ui.setMenuOpen(false)} onInstall={p.onInstall} onData={openData} />
+        <Drawer
+          onClose={() => ui.setMenuOpen(false)}
+          onInstall={p.onInstall}
+          onData={openData}
+          onTrash={() => ui.setTrashOpen(true)}
+          trashCount={p.trash.items.length}
+        />
       )}
       {ui.adding && <AddSheet onAdd={p.onAdd} onClose={() => ui.setAdding(false)} />}
       {editing && (
@@ -170,6 +177,15 @@ export function TasksScreen(p: TasksScreenProps) {
         onDelete={p.onDeleteList}
         onMove={p.onMoveList}
       />
+      {ui.trashOpen && (
+        <TrashSheet
+          items={p.trash.items}
+          now={p.trash.now}
+          onRestore={p.trash.onRestore}
+          onDelete={p.trash.onDelete}
+          onClose={() => ui.setTrashOpen(false)}
+        />
+      )}
       {ui.dataOpen && (
         <BackupSheet
           storage={p.data.storage}
