@@ -29,6 +29,7 @@ test('completes, then deletes with undo', async ({ page }) => {
   await page.getByText('المنجزة (1)').click();
   await openEditor(page, 'مهمة اختبار');
   await page.getByRole('button', { name: 'حذف النية' }).click();
+  await page.getByRole('button', { name: 'تأكيد الحذف' }).click();
   await expect(page.getByText('اتحذفت: مهمة اختبار')).toBeVisible();
   await page.getByRole('button', { name: 'تراجع' }).click();
   await expect(page.getByText('المنجزة (1)')).toBeVisible();
@@ -238,6 +239,7 @@ test('a normal tap still opens the details (no long press)', async ({ page }) =>
 async function remove(page: Page, title: string) {
   await openEditor(page, title);
   await page.getByRole('button', { name: 'حذف النية' }).click();
+  await page.getByRole('button', { name: 'تأكيد الحذف' }).click();
 }
 
 test('two deletions in a row can be undone one after the other', async ({ page }) => {
@@ -427,7 +429,49 @@ test('a tap opens a quick card; Edit opens the form; Delete from the card can be
 
   await page.getByRole('button', { name: 'تفاصيل: بطاقة سريعة' }).click();
   await page.getByRole('dialog', { name: 'النية' }).getByRole('button', { name: 'حذف' }).click();
+  await page.getByRole('button', { name: 'تأكيد الحذف' }).click();
   await expect(page.getByText('اتحذفت: بطاقة سريعة')).toBeVisible();
   await page.getByRole('button', { name: 'تراجع' }).click();
   await expect(page.getByText('بطاقة سريعة', { exact: true })).toBeVisible();
+});
+
+test('swiping a card down, left or right closes it; a short swipe does not', async ({
+  page,
+  context,
+  isMobile,
+}) => {
+  test.skip(!isMobile, 'real touch input is only emulated on the phone project');
+  await add(page, 'سحب البطاقة');
+  const cdp = await context.newCDPSession(page);
+  const swipe = async (dx: number, dy: number) => {
+    const box = await page.locator('.sheet').boundingBox();
+    if (!box) throw new Error('no sheet');
+    const x0 = box.x + box.width / 2;
+    const y0 = box.y + 70;
+    const touch = (type: 'touchStart' | 'touchMove' | 'touchEnd', x: number, y: number) =>
+      cdp.send('Input.dispatchTouchEvent', {
+        type,
+        touchPoints: type === 'touchEnd' ? [] : [{ x, y }],
+      });
+    await touch('touchStart', x0, y0);
+    for (let i = 1; i <= 8; i++) await touch('touchMove', x0 + (dx * i) / 8, y0 + (dy * i) / 8);
+    await touch('touchEnd', x0 + dx, y0 + dy);
+  };
+  const open = async () => {
+    await page.getByRole('button', { name: 'تفاصيل: سحب البطاقة' }).click();
+    await expect(page.getByRole('dialog')).toBeVisible();
+  };
+  await open();
+  await swipe(0, 30); // too short
+  await page.waitForTimeout(400);
+  await expect(page.getByRole('dialog')).toBeVisible();
+  for (const [dx, dy] of [
+    [0, 260],
+    [300, 0],
+    [-300, 0],
+  ] as const) {
+    await swipe(dx, dy);
+    await expect(page.getByRole('dialog')).toBeHidden();
+    await open();
+  }
 });

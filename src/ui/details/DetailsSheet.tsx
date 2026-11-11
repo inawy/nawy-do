@@ -27,6 +27,7 @@ import {
 import { useT } from '../i18n';
 import { Sheet } from '../sheet';
 import { changedFields, formOf } from './formPatch';
+import { ConfirmDelete } from './ConfirmDelete';
 import { StepsField } from './StepsField';
 
 interface Props {
@@ -53,6 +54,7 @@ export function DetailsSheet({ task, lists, today, onSave, newId, onRemove, onCl
   const [starred, setStarred] = useState(task.starred);
   const [steps, setSteps] = useState<Step[]>(task.steps ?? []);
   const [newStep, setNewStep] = useState('');
+  const [confirming, setConfirming] = useState(false);
   // A task whose list was deleted shows as belonging to the main list, but keeps its listId
   // until the person picks another list (changedFields leaves it alone).
   const [listId, setListId] = useState(listOf(task, lists) ?? '');
@@ -199,16 +201,26 @@ export function DetailsSheet({ task, lists, today, onSave, newId, onRemove, onCl
         onAdd={addStep}
       />
 
-      <div className="actions sticky-actions">
-        <IconButton label={t('details.delete')} className="danger-icon" onClick={onRemove}>
-          <TrashIcon />
-        </IconButton>
-        <span className="spacer" />
-        <Button onClick={onClose}>{t('common.cancel')}</Button>
-        <Button type="submit" variant="primary">
-          {t('common.save')}
-        </Button>
-      </div>
+      {confirming ? (
+        <div className="sticky-actions">
+          <ConfirmDelete onConfirm={onRemove} onCancel={() => setConfirming(false)} />
+        </div>
+      ) : (
+        <div className="actions sticky-actions">
+          <IconButton
+            label={t('details.delete')}
+            className="danger-icon"
+            onClick={() => setConfirming(true)}
+          >
+            <TrashIcon />
+          </IconButton>
+          <span className="spacer" />
+          <Button onClick={onClose}>{t('common.cancel')}</Button>
+          <Button type="submit" variant="primary">
+            {t('common.save')}
+          </Button>
+        </div>
+      )}
     </Sheet>
   );
 }

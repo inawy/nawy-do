@@ -29,6 +29,8 @@ export const ar = {
   'menu.more': 'المزيد',
   'menu.select': 'تحديد',
   'menu.data': 'بياناتي',
+  'delete.ask': 'تحذف النية دي؟ هتفضل في سلة المحذوفات {days} يوم وتقدر تستعيدها.',
+  'delete.confirm': 'تأكيد الحذف',
   'card.title': 'النية',
   'card.actions': 'إجراءات سريعة',
   'card.edit': 'تعديل',

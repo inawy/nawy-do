@@ -14,6 +14,7 @@ import {
   TrashIcon,
 } from '../primitives';
 import { Sheet } from '../sheet';
+import { ConfirmDelete } from './ConfirmDelete';
 import { taskText } from './taskText';
 
 interface Props {
@@ -48,6 +49,7 @@ export function TaskCard({
   const i18n = useI18n();
   const { t } = i18n;
   const [copied, setCopied] = useState(false);
+  const [confirming, setConfirming] = useState(false);
   const listId = listOf(task, lists);
   const list = lists.find((l) => l.id === listId);
   const text = () => taskText(task, today, i18n, list?.name);
@@ -122,33 +124,37 @@ export function TaskCard({
         </ul>
       )}
 
-      <div className="card-actions" role="group" aria-label={t('card.actions')}>
-        <button type="button" onClick={onEdit}>
-          <EditIcon />
-          {t('card.edit')}
-        </button>
-        <button
-          type="button"
-          onClick={() =>
-            void onCopy(text()).then((ok) => {
-              setCopied(ok);
-            })
-          }
-        >
-          <CopyIcon />
-          {t('card.copy')}
-        </button>
-        {onShare && (
-          <button type="button" onClick={() => void onShare(task.title, text())}>
-            <ShareIcon />
-            {t('card.share')}
+      {confirming ? (
+        <ConfirmDelete onConfirm={onRemove} onCancel={() => setConfirming(false)} />
+      ) : (
+        <div className="card-actions" role="group" aria-label={t('card.actions')}>
+          <button type="button" onClick={onEdit}>
+            <EditIcon />
+            {t('card.edit')}
           </button>
-        )}
-        <button type="button" className="danger" onClick={onRemove}>
-          <TrashIcon />
-          {t('card.delete')}
-        </button>
-      </div>
+          <button
+            type="button"
+            onClick={() =>
+              void onCopy(text()).then((ok) => {
+                setCopied(ok);
+              })
+            }
+          >
+            <CopyIcon />
+            {t('card.copy')}
+          </button>
+          {onShare && (
+            <button type="button" onClick={() => void onShare(task.title, text())}>
+              <ShareIcon />
+              {t('card.share')}
+            </button>
+          )}
+          <button type="button" className="danger" onClick={() => setConfirming(true)}>
+            <TrashIcon />
+            {t('card.delete')}
+          </button>
+        </div>
+      )}
       <p className="hint" role="status">
         {copied ? t('card.copied') : ''}
       </p>
