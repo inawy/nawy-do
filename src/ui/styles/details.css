@@ -415,3 +415,15 @@
   block-size: 1.5rem;
   fill: currentColor;
 }
+
+.confirm {
+  display: grid;
+  gap: 0.5rem;
+}
+.confirm-text {
+  margin: 0;
+  color: var(--ink);
+}
+.sheet {
+  touch-action: pan-y;
+}

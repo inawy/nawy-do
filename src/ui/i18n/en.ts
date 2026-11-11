@@ -24,6 +24,8 @@ export const en: Record<MessageKey, string> = {
   'drawer.language': 'Language',
   'menu.more': 'More',
   'menu.select': 'Select',
+  'delete.ask': 'Delete this task? It stays in the trash for {days} days and can be restored.',
+  'delete.confirm': 'Confirm delete',
   'card.title': 'Task',
   'card.actions': 'Quick actions',
   'card.edit': 'Edit',

@@ -54,6 +54,7 @@ describe('App', () => {
     await addIntention('سر');
     openEditor('سر');
     fireEvent.click(screen.getByRole('button', { name: 'حذف النية' }));
+    fireEvent.click(screen.getByRole('button', { name: 'تأكيد الحذف' }));
     await screen.findByText('اتحذفت: سر');
     await waitFor(async () => expect((await allRecords(db))[0]?.deletedAt).toBeDefined());
     fireEvent.click(screen.getByRole('button', { name: 'تراجع' }));
@@ -305,6 +306,7 @@ describe('update banner', () => {
     await addIntention('هتتحذف');
     fireEvent.click(screen.getByRole('button', { name: 'تفاصيل: هتتحذف' }));
     fireEvent.click(await screen.findByRole('button', { name: 'حذف' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'تأكيد الحذف' }));
     await waitFor(() => expect(screen.queryByText('هتتحذف')).toBeNull());
     chooseFromDrawer(/سلة المحذوفات/);
     const sheet = await screen.findByRole('dialog', { name: 'سلة المحذوفات' });
