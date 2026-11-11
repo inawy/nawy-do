@@ -67,7 +67,9 @@ export const en: Record<MessageKey, string> = {
   'select.none': 'Choose tasks',
   'select.count': '{count} selected',
   'select.moveLabel': 'Move the selection to',
-  'select.move': 'Move to…',
+  'select.move': 'Move',
+  'select.cancel': 'Cancel selection',
+  'select.doneShort': 'Complete',
   'select.complete': 'Complete selected',
 
   'notice.attention': 'Needs your attention:',

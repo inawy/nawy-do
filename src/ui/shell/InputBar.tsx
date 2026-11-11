@@ -12,6 +12,7 @@ interface Props {
   onMoveMany: (ids: string[], listId: string | undefined) => void;
   onCompleteMany: (ids: string[]) => void;
   onDone: () => void;
+  onCancel: () => void;
 }
 
 /** The bottom bar while searching or selecting (adding is the floating button). */
@@ -27,6 +28,7 @@ function Bar(p: Props) {
           p.onMoveMany(ids, listId);
           p.onDone();
         }}
+        onCancel={p.onCancel}
         onComplete={() => {
           p.onCompleteMany(ids);
           p.onDone();

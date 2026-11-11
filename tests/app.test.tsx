@@ -231,8 +231,8 @@ describe('lists', () => {
     fireEvent.click(screen.getByRole('checkbox', { name: 'تحديد: ا' }));
     fireEvent.click(screen.getByRole('checkbox', { name: 'تحديد: ب' }));
     await screen.findByText('2 محدد');
-    const id = screen.getByRole('option', { name: 'الشغل' }).getAttribute('value') ?? '';
-    fireEvent.change(screen.getByLabelText('نقل المحدد إلى'), { target: { value: id } });
+    fireEvent.click(screen.getByRole('button', { name: 'نقل المحدد إلى' }));
+    fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'الشغل' }));
     await waitFor(() => expect(screen.queryByText('ا')).toBeNull());
     expect(screen.getByText('ج')).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: 'الشغل' }));

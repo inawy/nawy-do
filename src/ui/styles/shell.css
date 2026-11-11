@@ -284,17 +284,44 @@ h2 {
   padding: 0.25rem;
   background: var(--nawy-color-surface-elevated);
   border: 1px solid var(--line);
-  border-radius: var(--nawy-radius-md);
-  box-shadow: 0 8px 24px rgb(0 0 0 / 0.16);
+  border-radius: 16px;
+  box-shadow: 0 8px 28px rgb(0 0 0 / 0.22);
+  transform-origin: top right;
+  animation: menu-in 0.14s ease-out;
+}
+[dir='rtl'] .more-menu {
+  transform-origin: top left;
+}
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
 }
 .more-menu button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   min-block-size: 48px;
-  padding-inline: 1rem;
+  padding-inline: 0.75rem 1rem;
   border: 0;
-  border-radius: var(--nawy-radius-sm);
+  border-radius: 12px;
   background: none;
   text-align: start;
   font-size: var(--nawy-font-size-md);
+}
+.more-menu button::before {
+  content: '';
+  inline-size: 1.25rem;
+  flex: none;
+}
+.more-menu button[aria-checked='true'] {
+  color: var(--brand);
+  font-weight: 600;
+}
+.more-menu button[aria-checked='true']::before {
+  content: '✓';
+  text-align: center;
 }
 .more-menu button:hover {
   background: var(--hover);
@@ -310,9 +337,13 @@ html {
     inset-inline: 0;
     inset-block-end: 0;
     z-index: 6;
-    padding: 0.5rem 1rem calc(0.5rem + env(safe-area-inset-bottom));
-    background: var(--page);
-    border-block-start: 1px solid var(--line);
+    padding: 0.5rem 0.75rem calc(0.5rem + env(safe-area-inset-bottom));
+    pointer-events: none; /* only the bar itself takes taps; the list stays scrollable around it */
+  }
+  .input-dock > * {
+    pointer-events: auto;
+    max-inline-size: 44rem;
+    margin-inline: auto;
   }
   .input-dock .search-bar {
     max-inline-size: 44rem;

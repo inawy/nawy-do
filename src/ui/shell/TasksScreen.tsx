@@ -77,6 +77,7 @@ export function TasksScreen(p: TasksScreenProps) {
         onMoveMany={p.onMoveMany}
         onCompleteMany={p.onCompleteMany}
         onDone={ui.stopSelecting}
+        onCancel={ui.stopSelecting}
       />
     </>
   );
