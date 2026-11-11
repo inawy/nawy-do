@@ -13,9 +13,11 @@ import {
 import {
   Button,
   Chip,
+  CalendarIcon,
   CloseIcon,
   Field,
   IconButton,
+  ListIcon,
   Select,
   StarIcon,
   TextArea,
@@ -112,71 +114,81 @@ export function DetailsSheet({ task, lists, today, onSave, newId, onRemove, onCl
         autoFocus
       />
 
-      <Field label={t('details.notes')}>
-        <TextArea
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-          rows={3}
-          maxLength={20000}
-        />
-      </Field>
-
-      {lists.length > 0 && (
-        <Field label={t('details.list')}>
-          <Select
-            aria-label={t('details.list')}
-            value={listId}
-            onChange={(e) => setListId(e.target.value)}
-          >
-            <option value="">{t('view.main')}</option>
-            {lists.map((l) => (
-              <option key={l.id} value={l.id}>
-                {l.name}
-              </option>
-            ))}
-          </Select>
-        </Field>
-      )}
-
-      <Field label={t('details.due')}>
-        <TextInput type="date" value={due} onChange={(e) => setDue(e.target.value)} />
-        <span className="chips" role="group" aria-label={t('details.quickDue')}>
-          {quickDueOptions(today).map((o) => (
-            <Chip key={o.value} pressed={due === o.value} onClick={() => setDue(o.value)}>
-              {t(`date.${o.key}`)}
-            </Chip>
-          ))}
-          <Chip disabled={due === ''} onClick={() => setDue('')}>
-            {t('details.noDate')}
-          </Chip>
-        </span>
-      </Field>
-
-      <div className="field-row">
-        <Field label={t('details.time')}>
-          <TextInput
-            type="time"
-            value={due === '' ? '' : dueTime}
-            disabled={due === ''}
-            onChange={(e) => setDueTime(e.target.value)}
+      <div className="group">
+        <Field label={t('details.notes')}>
+          <TextArea
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            rows={3}
+            maxLength={20000}
           />
         </Field>
+      </div>
 
-        <Field label={t('details.repeat')}>
-          <Select
-            aria-label={t('details.repeat')}
-            value={due === '' ? '' : repeat}
-            disabled={due === ''}
-            onChange={(e) => setRepeat(REPEATS.find((r) => r === e.target.value) ?? '')}
-          >
-            <option value="">{t('details.noRepeat')}</option>
-            {REPEATS.map((r) => (
-              <option key={r} value={r}>
-                {t(`repeat.${r}`)}
-              </option>
-            ))}
-          </Select>
-        </Field>
+      <div className="group">
+        {lists.length > 0 && (
+          <div className="group-row">
+            <ListIcon />
+            <Field label={t('details.list')}>
+              <Select
+                aria-label={t('details.list')}
+                value={listId}
+                onChange={(e) => setListId(e.target.value)}
+              >
+                <option value="">{t('view.main')}</option>
+                {lists.map((l) => (
+                  <option key={l.id} value={l.id}>
+                    {l.name}
+                  </option>
+                ))}
+              </Select>
+            </Field>
+          </div>
+        )}
+
+        <div className="group-row">
+          <CalendarIcon />
+          <Field label={t('details.due')}>
+            <TextInput type="date" value={due} onChange={(e) => setDue(e.target.value)} />
+            <span className="chips" role="group" aria-label={t('details.quickDue')}>
+              {quickDueOptions(today).map((o) => (
+                <Chip key={o.value} pressed={due === o.value} onClick={() => setDue(o.value)}>
+                  {t(`date.${o.key}`)}
+                </Chip>
+              ))}
+              <Chip disabled={due === ''} onClick={() => setDue('')}>
+                {t('details.noDate')}
+              </Chip>
+            </span>
+          </Field>
+        </div>
+
+        <div className="field-row group-row flat">
+          <Field label={t('details.time')}>
+            <TextInput
+              type="time"
+              value={due === '' ? '' : dueTime}
+              disabled={due === ''}
+              onChange={(e) => setDueTime(e.target.value)}
+            />
+          </Field>
+
+          <Field label={t('details.repeat')}>
+            <Select
+              aria-label={t('details.repeat')}
+              value={due === '' ? '' : repeat}
+              disabled={due === ''}
+              onChange={(e) => setRepeat(REPEATS.find((r) => r === e.target.value) ?? '')}
+            >
+              <option value="">{t('details.noRepeat')}</option>
+              {REPEATS.map((r) => (
+                <option key={r} value={r}>
+                  {t(`repeat.${r}`)}
+                </option>
+              ))}
+            </Select>
+          </Field>
+        </div>
       </div>
 
       <StepsField
@@ -188,10 +200,9 @@ export function DetailsSheet({ task, lists, today, onSave, newId, onRemove, onCl
       />
 
       <div className="actions sticky-actions">
-        <Button variant="danger" onClick={onRemove}>
+        <IconButton label={t('details.delete')} className="danger-icon" onClick={onRemove}>
           <TrashIcon />
-          {t('details.delete')}
-        </Button>
+        </IconButton>
         <span className="spacer" />
         <Button onClick={onClose}>{t('common.cancel')}</Button>
         <Button type="submit" variant="primary">

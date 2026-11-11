@@ -75,7 +75,9 @@ export const ar = {
   'select.none': 'اختار نوايا',
   'select.count': '{count} محدد',
   'select.moveLabel': 'نقل المحدد إلى',
-  'select.move': 'نقل إلى…',
+  'select.move': 'نقل',
+  'select.cancel': 'إلغاء التحديد',
+  'select.doneShort': 'إنجاز',
   'select.complete': 'إنجاز المحدد',
 
   // Notices

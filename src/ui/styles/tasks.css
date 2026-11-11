@@ -259,18 +259,50 @@
 .select-bar {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  padding: 0.5rem 0;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  box-shadow: 0 4px 16px rgb(0 0 0 / 0.16);
 }
 .select-bar .count {
   margin-inline-end: auto;
   font-weight: 600;
 }
-.select-bar select:disabled,
-.select-bar button:disabled {
-  opacity: 0.5;
+.bar-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-block-size: 48px;
+  padding-inline: 0.875rem;
+  border: 0;
+  border-radius: 24px;
+  background: transparent;
+  color: var(--brand);
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+.bar-action:hover {
+  background: var(--hover);
+}
+.bar-action.primary {
+  background: var(--brand);
+  color: var(--on-brand);
+}
+.bar-action:disabled {
+  opacity: 0.45;
   cursor: default;
+  background: transparent;
+}
+.bar-action.primary:disabled {
+  background: var(--hover);
+  color: var(--muted);
+}
+.bar-action svg {
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+  fill: currentColor;
 }
 
 .search-bar {
