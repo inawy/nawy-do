@@ -11,7 +11,8 @@
     <script>
       try {
         var t = localStorage.getItem('nawy-do:theme');
-        if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+        if (t === 'light' || t === 'dark' || t === 'black')
+          document.documentElement.setAttribute('data-theme', t);
       } catch (e) {}
     </script>
     <style>
@@ -26,6 +27,10 @@
           --page: #131314;
           --ink: #e3e3e3;
         }
+      }
+      :root[data-theme='black'] {
+        --page: #000000;
+        --ink: #e3e3e3;
       }
       :root[data-theme='dark'] {
         --page: #131314;

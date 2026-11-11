@@ -52,6 +52,23 @@
   --danger: #f28b82;
 }
 
+/* Black (AMOLED): a true black page, so lit pixels are only the content; cards stay a step lighter. */
+:root[data-theme='black'] {
+  color-scheme: dark;
+  --nawy-color-bg: #000000;
+  --nawy-color-surface: #121212;
+  --nawy-color-surface-elevated: #1c1c1c;
+  --nawy-color-text: #e3e3e3;
+  --nawy-color-text-muted: #c4c7c5;
+  --nawy-color-border: #333333;
+  --nawy-color-overlay: rgb(0 0 0 / 72%);
+  --hover: #1c1c1c;
+  --brand-soft: #0842a0;
+  --on-brand: #062e6f;
+  --brand: #a8c7fa;
+  --danger: #f28b82;
+}
+
 /* List colours: product tokens (the design system defines the semantic colours these build on). */
 :root {
   --list-blue: var(--nawy-color-brand);

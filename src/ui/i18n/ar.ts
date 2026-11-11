@@ -22,6 +22,7 @@ export const ar = {
   'theme.auto': 'تلقائي',
   'theme.light': 'فاتح',
   'theme.dark': 'داكن',
+  'theme.black': 'أسود',
   'drawer.data': 'بياناتك',
   'drawer.footer': 'كل بياناتك على جهازك بس.',
   'drawer.language': 'اللغة',
