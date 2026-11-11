@@ -253,7 +253,9 @@
 }
 .group textarea {
   padding: 0.75rem 0.875rem;
-  resize: vertical;
+  resize: none;
+  field-sizing: content;
+  min-block-size: 5rem;
 }
 .group > label {
   padding: 0.5rem 0.875rem 0;
