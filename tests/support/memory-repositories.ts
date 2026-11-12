@@ -100,6 +100,8 @@ export function createMemoryRepositories(): Repositories & {
         if (options.listId) t.listId = options.listId;
         if (options.starred) t.starred = true;
         if (options.due) t.due = options.due;
+        if (options.due && options.dueTime) t.dueTime = options.dueTime;
+        if (options.due && options.repeat) t.repeat = options.repeat;
         return putTask(t);
       },
       edit: async (id, patch, now) => {

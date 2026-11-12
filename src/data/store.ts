@@ -41,6 +41,8 @@ export async function addTask(
   if (options.listId) task.listId = options.listId;
   if (options.starred) task.starred = true;
   if (options.due) task.due = options.due;
+  if (options.due && options.dueTime) task.dueTime = options.dueTime;
+  if (options.due && options.repeat) task.repeat = options.repeat;
   await db.tasks.add(task);
   return task;
 }

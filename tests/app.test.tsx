@@ -331,4 +331,16 @@ describe('update banner', () => {
     const sheet = await screen.findByRole('dialog', { name: 'سلة المحذوفات' });
     await within(sheet).findByText('خلصانة');
   });
+
+  it("smart add: a date and time in the text become the task's due and are not in its title", async () => {
+    render(<App db={db} now={now} today={today} />);
+    await screen.findByText(/مفيش نوايا/);
+    fireEvent.click(screen.getByRole('button', { name: 'نية جديدة' }));
+    fireEvent.change(screen.getByLabelText('ناوي تعمل إيه؟'), {
+      target: { value: 'اشتري خبز بكرة الساعة 5 م' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'إضافة' }));
+    await screen.findByRole('button', { name: 'تفاصيل: اشتري خبز' });
+    expect(screen.queryByText(/الساعة 5/)).toBeNull();
+  });
 });

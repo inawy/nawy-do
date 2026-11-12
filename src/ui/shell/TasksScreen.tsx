@@ -154,7 +154,14 @@ export function TasksScreen(p: TasksScreenProps) {
           trashCount={p.trash.items.length}
         />
       )}
-      {ui.adding && <AddSheet onAdd={p.onAdd} onClose={() => ui.setAdding(false)} />}
+      {ui.adding && (
+        <AddSheet
+          today={p.today}
+          lists={p.lists}
+          onAdd={p.onAdd}
+          onClose={() => ui.setAdding(false)}
+        />
+      )}
       {editing && (
         <TaskSheets
           key={editing.id}

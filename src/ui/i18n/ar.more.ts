@@ -1,5 +1,8 @@
 /** More interface words (trash, task card, bulk delete), kept apart so each file stays short. */
 export const arMore = {
+  'composer.hint': 'ينفع تكتب: بكرة الساعة 5 م · كل أسبوع · #القائمة · !',
+  'composer.read': 'اللي فهمته من الكتابة',
+  'composer.literal': 'اكتبها زي ما هي',
   'delete.ask': 'تحذف النية دي؟ هتفضل في سلة المحذوفات {days} يوم وتقدر تستعيدها.',
   'delete.confirm': 'تأكيد الحذف',
   'card.title': 'النية',
