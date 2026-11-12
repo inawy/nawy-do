@@ -1,0 +1,23 @@
+<svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="160" cy="216" rx="96" ry="9" style="fill:var(--ill-mid)"/>
+  <circle cx="160" cy="116" r="88" style="fill:var(--ill-soft)"/>
+  <circle cx="160" cy="116" r="58" style="fill:var(--ill-accent)"/>
+  <path class="draw" d="M133 118l20 20 36-42" fill="none" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--on-brand)"/>
+  <g class="pop">
+    <rect x="62" y="48" width="16" height="7" rx="3.5" transform="rotate(-35 70 51)" fill="#f2b134"/>
+    <rect x="246" y="40" width="16" height="7" rx="3.5" transform="rotate(30 254 43)" fill="#ef6f6c"/>
+    <rect x="268" y="130" width="14" height="7" rx="3.5" transform="rotate(-20 275 133)" fill="#4caf7a"/>
+    <rect x="40" y="132" width="14" height="7" rx="3.5" transform="rotate(25 47 135)" fill="#4caf7a"/>
+    <circle cx="94" cy="26" r="5" fill="#ef6f6c"/>
+    <circle cx="228" cy="22" r="5" fill="#f2b134"/>
+    <circle cx="284" cy="84" r="4" style="fill:var(--ill-accent)"/>
+    <circle cx="36" cy="82" r="4" style="fill:var(--ill-accent)"/>
+    <circle cx="82" cy="188" r="4" fill="#f2b134"/>
+    <circle cx="246" cy="186" r="4" fill="#ef6f6c"/>
+  </g>
+  <g class="pop2">
+    <path d="M262 74q0 9 9 9-9 0-9 9 0-9-9-9 9 0 9-9z" transform="translate(0 -4)" style="fill:var(--ill-accent)"/>
+    <path d="M52 168q0 8 8 8-8 0-8 8 0-8-8-8 8 0 8-8z" style="fill:var(--ill-accent)"/>
+    <path d="M118 18q0 6 6 6-6 0-6 6 0-6-6-6 6 0 6-6z" fill="#f2b134"/>
+  </g>
+</svg>

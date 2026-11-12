@@ -113,6 +113,8 @@ export const en: Record<MessageKey, string> = {
   'lists.limit': "You've reached the maximum number of lists.",
   'lists.failed': "Couldn't save the list. Try again.",
 
+  'empty.allDone': 'All tasks completed',
+  'empty.allDoneSub': 'Nice work!',
   'empty.main': 'No tasks yet. Write your first one in the add field.',
   'empty.list': 'This list is empty. Write its first task in the add field.',
   'empty.starred': 'No starred tasks. Tap the star next to any task.',

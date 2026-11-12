@@ -10,6 +10,7 @@ import {
   type Selection,
   type Task,
 } from '@/core/model';
+import { Illustration, type IllustrationName } from '../illustrations';
 import { useI18n } from '../i18n';
 import { ChevronIcon } from '../primitives';
 import { SortableItem, SortableList, type SortState } from '../sortable';
@@ -115,7 +116,7 @@ export function TaskList({
   if (view === 'scheduled' || view === 'today') {
     const g = groupScheduled(tasks, today);
     if (g.overdue.length + g.today.length + g.upcoming.length === 0) {
-      return card(<Empty text={t(`empty.${view}`)} />);
+      return card(<Empty kind="inbox" text={t(`empty.${view}`)} />);
     }
     return card(
       <>
@@ -148,6 +149,7 @@ export function TaskList({
       {card(
         open.length === 0 && done.length === 0 ? (
           <Empty
+            kind={view === 'search' ? 'search' : 'empty'}
             text={t(
               `empty.${selectedListId(view) !== undefined ? 'list' : (view as 'main' | 'starred' | 'search')}`,
             )}
@@ -158,6 +160,8 @@ export function TaskList({
           ) : (
             rows(open, t('group.tasks'))
           )
+        ) : done.length > 0 && view !== 'search' ? (
+          <Empty kind="done" text={t('empty.allDone')} sub={t('empty.allDoneSub')} />
         ) : null,
       )}
       {done.length > 0 && (
@@ -175,21 +179,12 @@ export function TaskList({
   );
 }
 
-function Empty({ text }: { text: string }) {
+function Empty({ kind, text, sub }: { kind: IllustrationName; text: string; sub?: string }) {
   return (
     <div className="empty">
-      <svg viewBox="0 0 96 96" width="96" height="96" aria-hidden="true" focusable="false">
-        <circle cx="48" cy="48" r="40" fill="none" stroke="currentColor" strokeWidth="4" />
-        <path
-          d="M30 49l12 12 24-26"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-      <p>{text}</p>
+      <Illustration name={kind} />
+      <p className={sub ? 'empty-title' : undefined}>{text}</p>
+      {sub && <p>{sub}</p>}
     </div>
   );
 }

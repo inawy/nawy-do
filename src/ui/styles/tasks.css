@@ -190,6 +190,44 @@
 .empty p {
   margin: 0;
 }
+.empty .empty-title {
+  color: var(--ink);
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+.illustration {
+  inline-size: min(240px, 70vw);
+  block-size: auto;
+  margin-block-end: 0.5rem;
+}
+.ill-done .draw {
+  stroke-dasharray: 100;
+  animation: ill-draw 0.6s 0.2s ease-out backwards;
+}
+.ill-done .pop,
+.ill-done .pop2 {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ill-pop 0.5s 0.35s cubic-bezier(0.2, 1.4, 0.4, 1) backwards;
+}
+@keyframes ill-draw {
+  from {
+    stroke-dashoffset: 100;
+  }
+}
+@keyframes ill-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ill-done .draw,
+  .ill-done .pop,
+  .ill-done .pop2 {
+    animation: none;
+  }
+}
 .empty svg {
   color: var(--line);
 }
