@@ -322,7 +322,7 @@ describe('update banner', () => {
     await addIntention('خلصانة');
     await addIntention('لسه');
     fireEvent.click(await screen.findByRole('checkbox', { name: 'إنجاز: خلصانة' }));
-    await waitFor(() => expect(screen.getByRole('button', { name: 'تفاصيل: لسه' })).toBeTruthy());
+    await screen.findByRole('checkbox', { name: 'إلغاء إنجاز: خلصانة', hidden: true });
     chooseFromMenu('حذف المنجزات');
     fireEvent.click(await screen.findByRole('button', { name: 'تأكيد الحذف' }));
     await waitFor(() => expect(screen.queryByText('خلصانة')).toBeNull());
