@@ -455,6 +455,9 @@ html {
   animation: drawer-in var(--nawy-duration-normal, 0.2s) ease-out;
   overflow-y: auto;
 }
+.drawer {
+  touch-action: pan-y;
+}
 .drawer:focus {
   outline: none;
 }
