@@ -48,6 +48,13 @@ async function record(page: Page, prefix: string, project: string) {
   await page.getByRole('button', { name: 'إغلاق' }).click();
   await page.getByRole('button', { name: 'القائمة الجانبية' }).click();
   await shot('6-menu');
+  await page.keyboard.press('Escape');
+  await page.getByRole('checkbox', { name: 'إنجاز: ابعت تقرير الأسبوع' }).click();
+  await shot('7-done');
+  await page.getByRole('button', { name: 'اليوم' }).click();
+  await shot('8-empty-today');
+  await chooseFromDrawer(page, /سلة المحذوفات/);
+  await shot('9-trash');
 }
 
 test('screens', async ({ page }, info) => {

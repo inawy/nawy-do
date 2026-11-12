@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { TRASH_DAYS, TRASH_TTL_MS, type Task } from '@/core/model';
 import { useI18n } from '../i18n';
+import { Illustration } from '../illustrations';
 import { Button, CloseIcon, IconButton, TrashIcon } from '../primitives';
 import { Sheet } from '../sheet';
 
@@ -30,9 +31,10 @@ export function TrashSheet({ items, now, onRestore, onDelete, onClose }: Props) 
       </div>
       <p className="hint">{t('trash.hint', { days: num(TRASH_DAYS) })}</p>
       {items.length === 0 ? (
-        <p className="status" role="status">
-          {t('trash.empty')}
-        </p>
+        <div className="empty" role="status">
+          <Illustration name="trash" />
+          <p>{t('trash.empty')}</p>
+        </div>
       ) : (
         <ul className="trash-list">
           {items.map((task) => {

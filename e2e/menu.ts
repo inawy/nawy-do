@@ -12,7 +12,7 @@ export async function chooseFromMenu(
 }
 
 /** Opens the side menu and picks «my data» (a button) or a language (a radio). */
-export async function chooseFromDrawer(page: Page, name: string) {
+export async function chooseFromDrawer(page: Page, name: string | RegExp) {
   await page.getByRole('button', { name: /^(القائمة الجانبية|Menu)$/ }).click();
   const dialog = page.getByRole('dialog');
   const radio = dialog.getByRole('radio', { name });
