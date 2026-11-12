@@ -1,3 +1,5 @@
+import { arMore } from './ar.more';
+
 /**
  * The source of truth for every word the interface shows. Arabic (Egyptian) is the product
  * language; `en.ts` must have exactly the same keys (the type enforces it). `{name}` marks a value
@@ -29,31 +31,6 @@ export const ar = {
   'menu.more': 'المزيد',
   'menu.select': 'تحديد',
   'menu.data': 'بياناتي',
-  'delete.ask': 'تحذف النية دي؟ هتفضل في سلة المحذوفات {days} يوم وتقدر تستعيدها.',
-  'delete.confirm': 'تأكيد الحذف',
-  'card.title': 'النية',
-  'card.actions': 'إجراءات سريعة',
-  'card.edit': 'تعديل',
-  'card.copy': 'نسخ',
-  'card.share': 'مشاركة',
-  'card.delete': 'حذف',
-  'card.copied': 'اتنسخت.',
-  'menu.clearDone': 'حذف المنجزات',
-  'clearDone.ask': 'تحذف {count} نية منجزة؟ هتفضل في سلة المحذوفات {days} يوم وتقدر تستعيدها.',
-  'menu.trash': 'سلة المحذوفات',
-  'trash.title': 'سلة المحذوفات',
-  'trash.hint': 'النوايا والقوائم المحذوفة بتفضل هنا {days} يوم وبعدها بتتمسح نهائيًا.',
-  'trash.empty': 'السلة فاضية.',
-  'trash.list': 'قائمة: ',
-  'trash.listsFull': 'وصلت للحد الأقصى من القوائم. احذف قائمة الأول.',
-  'trash.today': 'اتحذفت النهارده',
-  'trash.ago': 'اتحذفت من {days} يوم',
-  'trash.left': 'باقي {days} يوم',
-  'trash.restore': 'استعادة',
-  'trash.deleteOne': 'حذف نهائي: {name}',
-  'trash.confirm': 'تأكيد الحذف',
-  'trash.emptyAll': 'إفراغ السلة',
-  'trash.confirmAll': 'تأكيد إفراغ السلة',
   'menu.install': 'تثبيت التطبيق',
   'menu.listOptions': 'خيارات القائمة',
   'menu.search': 'بحث',
@@ -244,6 +221,7 @@ export const ar = {
   'backup.err.big': 'الملف كبير أكتر من اللازم.',
   'backup.err.failed': 'حصلت مشكلة وماحفظتش حاجة. جرّب تاني.',
   'backup.err.unknown': 'الملف ده مش سليم، ومحصلش أي تغيير.',
+  ...arMore,
 } as const;
 
 export type MessageKey = keyof typeof ar;
