@@ -427,3 +427,22 @@
 .sheet {
   touch-action: pan-y;
 }
+
+.group-pad {
+  padding: 0.5rem 0.875rem 0.75rem;
+}
+.group-caption {
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+.group.move-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.group.move-row .group-caption {
+  margin-inline-end: auto;
+}
+.group.move-row > * + * {
+  border-block-start: 0;
+}

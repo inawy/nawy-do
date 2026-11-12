@@ -1,7 +1,15 @@
 import { useState } from 'react';
 import { MAX_LIST_NAME, type ListColor } from '@/core/model';
 import { ColorPicker } from './ColorPicker';
-import { Button, CloseIcon, Field, IconButton, TextInput, TrashIcon } from '../primitives';
+import {
+  Button,
+  CloseIcon,
+  Field,
+  IconButton,
+  ListIcon,
+  TextInput,
+  TrashIcon,
+} from '../primitives';
 import { useT } from '../i18n';
 import { Sheet } from '../sheet';
 
@@ -54,18 +62,26 @@ export function ListSheet({
           <CloseIcon />
         </IconButton>
       </div>
-      <Field label={t('list.name')}>
-        <TextInput
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          maxLength={MAX_LIST_NAME}
-          autoFocus
-          autoComplete="off"
-        />
-      </Field>
-      <ColorPicker value={color} onChange={setColor} />
+      <div className="group">
+        <div className="group-row">
+          <ListIcon />
+          <Field label={t('list.name')}>
+            <TextInput
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              maxLength={MAX_LIST_NAME}
+              autoFocus
+              autoComplete="off"
+            />
+          </Field>
+        </div>
+        <div className="group-pad">
+          <ColorPicker value={color} onChange={setColor} />
+        </div>
+      </div>
       {mode === 'edit' && onMove && (
-        <div className="move-row" role="group" aria-label={t('list.order')}>
+        <div className="group group-pad move-row" role="group" aria-label={t('list.order')}>
+          <span className="group-caption">{t('list.order')}</span>
           <Button disabled={!canMoveEarlier} onClick={() => onMove(-1)}>
             {t('list.earlier')}
           </Button>
@@ -79,25 +95,37 @@ export function ListSheet({
           {error}
         </p>
       )}
-      {confirming && <p className="form-warn">{t('list.deleteWarn')}</p>}
-      <div className="actions sticky-actions">
-        {mode === 'edit' && onDelete && !confirming && (
-          <Button variant="danger" onClick={() => setConfirming(true)}>
-            <TrashIcon />
-            {t('list.delete')}
+      {confirming && onDelete ? (
+        <div className="sticky-actions confirm">
+          <p className="confirm-text" role="alert">
+            {t('list.deleteWarn')}
+          </p>
+          <div className="actions">
+            <span className="spacer" />
+            <Button onClick={() => setConfirming(false)}>{t('common.cancel')}</Button>
+            <Button variant="dangerSolid" onClick={onDelete} autoFocus>
+              {t('list.confirmDelete')}
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <div className="actions sticky-actions">
+          {mode === 'edit' && onDelete && (
+            <IconButton
+              label={t('list.delete')}
+              className="danger-icon"
+              onClick={() => setConfirming(true)}
+            >
+              <TrashIcon />
+            </IconButton>
+          )}
+          <span className="spacer" />
+          <Button onClick={onClose}>{t('common.cancel')}</Button>
+          <Button type="submit" variant="primary" disabled={empty}>
+            {t('common.save')}
           </Button>
-        )}
-        {confirming && onDelete && (
-          <Button variant="dangerSolid" onClick={onDelete}>
-            {t('list.confirmDelete')}
-          </Button>
-        )}
-        <span className="spacer" />
-        <Button onClick={onClose}>{t('common.cancel')}</Button>
-        <Button type="submit" variant="primary" disabled={empty}>
-          {t('common.save')}
-        </Button>
-      </div>
+        </div>
+      )}
     </Sheet>
   );
 }
