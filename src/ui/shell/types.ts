@@ -74,6 +74,7 @@ export interface TasksScreenProps {
   /** Moves the selected tasks to a list (`undefined`: the main list). */
   onMoveMany: (ids: string[], listId: string | undefined) => void;
   onCompleteMany: (ids: string[]) => void;
+  onRemoveMany: (ids: string[]) => void;
   onClose: () => void;
   /** Copies text to the clipboard; resolves to whether it worked. */
   onCopy: (text: string) => Promise<boolean>;

@@ -11,6 +11,8 @@ interface Props {
   onListOptions?: (() => void) | undefined;
   onSearch: () => void;
   onSelect: () => void;
+  /** Present when finished tasks are showing: asks to delete them all. */
+  onClearDone?: (() => void) | undefined;
   /** Present when the view can be sorted: the current mode and how to change it. */
   sort?: { mode: SortMode; onChange: (mode: SortMode) => void } | undefined;
 }
@@ -19,6 +21,7 @@ interface Props {
 export function TitleBar(p: Props) {
   const { t } = useI18n();
   const actions: MenuAction[] = [{ label: t('menu.select'), onPick: p.onSelect }];
+  if (p.onClearDone) actions.push({ label: t('menu.clearDone'), onPick: p.onClearDone });
   if (p.onListOptions) actions.push({ label: t('menu.listOptions'), onPick: p.onListOptions });
   const sorts: MenuAction[] = SORT_MODES.map((mode) => ({
     label: t(`sort.${mode}`),

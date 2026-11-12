@@ -25,6 +25,8 @@ export interface TasksApi {
   /** Moves a selection to a list (`undefined`: the main list). */
   moveMany: (ids: readonly string[], listId: string | undefined) => Promise<void>;
   completeMany: (ids: readonly string[]) => Promise<void>;
+  /** Moves many tasks to the trash at once (no undo toast: the trash is the way back). */
+  removeMany: (ids: readonly string[]) => Promise<void>;
   remove: (task: Task) => Promise<void>;
   undoRemove: () => Promise<void>;
   dismissUndo: () => void;
@@ -124,6 +126,13 @@ export function useTasks(
     [repo, now, today, guard],
   );
 
+  const removeMany = useCallback(
+    async (ids: readonly string[]) => {
+      await guard(() => repo.removeMany(ids, now()));
+    },
+    [repo, now, guard],
+  );
+
   const remove = useCallback(
     async (task: Task) => {
       await guard(async () => {
@@ -157,6 +166,7 @@ export function useTasks(
     move,
     moveMany,
     completeMany,
+    removeMany,
     remove,
     undoRemove,
     dismissUndo,

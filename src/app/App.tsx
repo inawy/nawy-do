@@ -194,6 +194,7 @@ export function App({ repositories, db, now = systemClock, today = systemToday }
         onMove={(id, to, shown) => void tasks.move(id, to, shown)}
         onMoveMany={(ids, listId) => void tasks.moveMany(ids, listId)}
         onCompleteMany={(ids) => void tasks.completeMany(ids)}
+        onRemoveMany={(ids) => void tasks.removeMany(ids)}
         onClose={() => setOpenId(null)}
         onCopy={copyText}
         onShare={canShareText() ? shareTextOnly : undefined}

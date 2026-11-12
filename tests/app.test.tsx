@@ -315,4 +315,20 @@ describe('update banner', () => {
     await waitFor(() => expect(within(sheet).queryByText('هتتحذف')).toBeNull());
     expect(within(sheet).getByText('السلة فاضية.')).toBeTruthy();
   });
+
+  it('«delete completed» moves every finished task to the trash after a confirmation', async () => {
+    render(<App db={db} now={now} today={today} />);
+    await screen.findByText(/مفيش نوايا/);
+    await addIntention('خلصانة');
+    await addIntention('لسه');
+    fireEvent.click(await screen.findByRole('checkbox', { name: 'إنجاز: خلصانة' }));
+    await screen.findByRole('checkbox', { name: 'إلغاء إنجاز: خلصانة', hidden: true });
+    chooseFromMenu('حذف المنجزات');
+    fireEvent.click(await screen.findByRole('button', { name: 'تأكيد الحذف' }));
+    await waitFor(() => expect(screen.queryByText('خلصانة')).toBeNull());
+    expect(screen.getByRole('button', { name: 'تفاصيل: لسه' })).toBeTruthy();
+    chooseFromDrawer(/سلة المحذوفات/);
+    const sheet = await screen.findByRole('dialog', { name: 'سلة المحذوفات' });
+    await within(sheet).findByText('خلصانة');
+  });
 });
