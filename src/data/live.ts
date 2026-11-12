@@ -1,6 +1,6 @@
 import { liveQuery } from 'dexie';
 import type { Task, TaskList } from '@/core/model';
-import { listLists } from './lists';
+import { listLists, listTrashedLists } from './lists';
 import type { NawyDoDb } from './schema';
 import { listTasks, listTrash } from './store';
 
@@ -31,5 +31,15 @@ export function watchTrash(
   onError: (error: unknown) => void,
 ): () => void {
   const sub = liveQuery(() => listTrash(db)).subscribe({ next: onChange, error: onError });
+  return () => sub.unsubscribe();
+}
+
+/** The same for the trashed lists. */
+export function watchTrashedLists(
+  db: NawyDoDb,
+  onChange: (lists: TaskList[]) => void,
+  onError: (error: unknown) => void,
+): () => void {
+  const sub = liveQuery(() => listTrashedLists(db)).subscribe({ next: onChange, error: onError });
   return () => sub.unsubscribe();
 }

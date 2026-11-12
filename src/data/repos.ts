@@ -1,7 +1,15 @@
 import type { Repositories } from '@/core/ports';
 import { exportBackup, importBackup } from './backup';
-import { addList, removeList, editListById, restoreRemovedList, saveListOrder } from './lists';
-import { watchLists, watchTasks, watchTrash } from './live';
+import {
+  addList,
+  deleteListsForever,
+  editListById,
+  removeList,
+  restoreListFromTrash,
+  restoreRemovedList,
+  saveListOrder,
+} from './lists';
+import { watchLists, watchTasks, watchTrash, watchTrashedLists } from './live';
 import { purgeTombstones } from './purge';
 import type { NawyDoDb } from './schema';
 import { snapshotDaily } from './autosnapshot';
@@ -52,6 +60,9 @@ export function createDexieRepositories(db: NawyDoDb): Repositories {
       remove: (id, now) => removeList(db, id, now),
       restore: (previous, now) => restoreRemovedList(db, previous, now),
       saveOrder: (changes, now) => saveListOrder(db, changes, now),
+      watchTrash: (onChange, onError) => watchTrashedLists(db, onChange, onError),
+      restoreFromTrash: (id, now) => restoreListFromTrash(db, id, now),
+      deleteForever: (ids, now) => deleteListsForever(db, ids, now),
     },
     backup: {
       export: (now) => exportBackup(db, now),

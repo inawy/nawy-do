@@ -14,6 +14,9 @@ import {
   restoreTask,
   tombstoneList,
   trashTask,
+  trashList,
+  untrashList,
+  isTrashedList,
   untrashTask,
   isTrashed,
   tombstoneTask,
@@ -173,7 +176,7 @@ export function createMemoryRepositories(): Repositories & {
       },
       remove: async (id, now) => {
         const l = lists.get(id);
-        return l && l.deletedAt === undefined ? putList(tombstoneList(l, now)) : undefined;
+        return l && l.deletedAt === undefined ? putList(trashList(l, now)) : undefined;
       },
       restore: async (previous, now) => {
         const current = lists.get(previous.id);
@@ -191,6 +194,30 @@ export function createMemoryRepositories(): Repositories & {
             updatedAt: nextUpdatedAt(l.updatedAt, now),
           });
           n++;
+        }
+        listSubs.forEach((f) => f());
+        return n;
+      },
+      watchTrash: watchOf(listSubs, () =>
+        [...lists.values()]
+          .filter(isTrashedList)
+          .sort((a, b) => (b.deletedAt ?? 0) - (a.deletedAt ?? 0)),
+      ),
+      restoreFromTrash: async (id, now) => {
+        const l = lists.get(id);
+        if (!l || !isTrashedList(l)) return undefined;
+        const live = liveLists([...lists.values()]);
+        if (live.length >= MAX_LISTS) return undefined;
+        return putList(untrashList(l, (live.at(-1)?.sortOrder ?? 0) + 1, now));
+      },
+      deleteForever: async (ids, now) => {
+        let n = 0;
+        for (const id of ids) {
+          const l = lists.get(id);
+          if (l && isTrashedList(l)) {
+            lists.set(id, tombstoneList(l, now));
+            n++;
+          }
         }
         listSubs.forEach((f) => f());
         return n;

@@ -319,6 +319,10 @@
 .trash-title {
   overflow-wrap: anywhere;
 }
+.trash-kind {
+  color: var(--muted);
+  font-size: 0.8125rem;
+}
 .trash-meta {
   color: var(--muted);
   font-size: 0.8125rem;

@@ -1,24 +1,27 @@
 import { useState } from 'react';
-import { TRASH_DAYS, TRASH_TTL_MS, type Task } from '@/core/model';
+import { TRASH_DAYS, TRASH_TTL_MS, type TrashEntry } from '@/core/model';
 import { useI18n } from '../i18n';
 import { Illustration } from '../illustrations';
 import { Button, CloseIcon, IconButton, TrashIcon } from '../primitives';
 import { Sheet } from '../sheet';
 
 interface Props {
-  items: Task[];
+  items: TrashEntry[];
   now: number;
-  onRestore: (id: string) => void;
-  onDelete: (ids: string[]) => void;
+  /** The list limit is reached, so a deleted list cannot come back yet. */
+  listsFull: boolean;
+  onRestore: (entry: TrashEntry) => void;
+  onDelete: (entries: TrashEntry[]) => void;
   onClose: () => void;
 }
 
 const DAY = 24 * 60 * 60 * 1000;
+const key = (e: TrashEntry) => `${e.kind}:${e.id}`;
 
-/** The trash: deleted tasks, kept for `TRASH_DAYS`, each restorable or deletable for good. */
-export function TrashSheet({ items, now, onRestore, onDelete, onClose }: Props) {
+/** The trash: deleted tasks and lists, kept for `TRASH_DAYS`, each restorable or deletable for good. */
+export function TrashSheet({ items, now, listsFull, onRestore, onDelete, onClose }: Props) {
   const { t, num } = useI18n();
-  // `all`: «empty the trash» asked once; an id: that row's delete-forever asked once.
+  // `all`: «empty the trash» asked once; a key: that row's delete-forever asked once.
   const [confirm, setConfirm] = useState<string | 'all' | null>(null);
 
   return (
@@ -37,40 +40,42 @@ export function TrashSheet({ items, now, onRestore, onDelete, onClose }: Props) 
         </div>
       ) : (
         <ul className="trash-list">
-          {items.map((task) => {
-            const age = Math.max(0, Math.floor((now - (task.deletedAt ?? now)) / DAY));
-            const left = Math.max(
-              0,
-              Math.ceil(((task.deletedAt ?? now) + TRASH_TTL_MS - now) / DAY),
-            );
+          {items.map((e) => {
+            const age = Math.max(0, Math.floor((now - e.deletedAt) / DAY));
+            const left = Math.max(0, Math.ceil((e.deletedAt + TRASH_TTL_MS - now) / DAY));
+            const blocked = e.kind === 'list' && listsFull;
             return (
-              <li key={task.id} className="trash-item">
+              <li key={key(e)} className="trash-item" data-list-color={e.color}>
                 <div className="trash-text">
-                  <span className="trash-title">{task.title}</span>
+                  <span className="trash-title">
+                    {e.kind === 'list' && <span className="trash-kind">{t('trash.list')}</span>}
+                    {e.title}
+                  </span>
                   <span className="trash-meta">
                     {age === 0 ? t('trash.today') : t('trash.ago', { days: num(age) })}
                     {' · '}
                     {t('trash.left', { days: num(left) })}
                   </span>
+                  {blocked && <span className="trash-meta">{t('trash.listsFull')}</span>}
                 </div>
-                <Button variant="text" onClick={() => onRestore(task.id)}>
+                <Button variant="text" disabled={blocked} onClick={() => onRestore(e)}>
                   {t('trash.restore')}
                 </Button>
-                {confirm === task.id ? (
+                {confirm === key(e) ? (
                   <Button
                     variant="dangerSolid"
                     onClick={() => {
                       setConfirm(null);
-                      onDelete([task.id]);
+                      onDelete([e]);
                     }}
                   >
                     {t('trash.confirm')}
                   </Button>
                 ) : (
                   <IconButton
-                    label={t('trash.deleteOne', { name: task.title })}
+                    label={t('trash.deleteOne', { name: e.title })}
                     className="danger-icon"
-                    onClick={() => setConfirm(task.id)}
+                    onClick={() => setConfirm(key(e))}
                   >
                     <TrashIcon />
                   </IconButton>
@@ -87,7 +92,7 @@ export function TrashSheet({ items, now, onRestore, onDelete, onClose }: Props) 
               variant="dangerSolid"
               onClick={() => {
                 setConfirm(null);
-                onDelete(items.map((i) => i.id));
+                onDelete(items);
               }}
             >
               {t('trash.confirmAll')}
