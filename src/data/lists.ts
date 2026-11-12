@@ -11,6 +11,9 @@ import {
   updateList,
   restoreList,
   tombstoneList,
+  trashList,
+  untrashList,
+  isTrashedList,
   type TaskList,
 } from '@/core/model';
 import type { AddListResult } from '@/core/ports';
@@ -60,9 +63,9 @@ async function changeList(
 export const editListById = (db: NawyDoDb, id: string, patch: ListPatch, now: number) =>
   changeList(db, id, (l) => updateList(l, patch, now));
 
-/** Writes a tombstone. The list's tasks are untouched: they show in the main list (D-017). */
+/** Moves the list to the trash. The list's tasks are untouched: they show in the main list (D-017). */
 export const removeList = (db: NawyDoDb, id: string, now: number) =>
-  changeList(db, id, (l) => tombstoneList(l, now));
+  changeList(db, id, (l) => trashList(l, now));
 
 /** Undo of a list delete; its tasks come back to it by themselves. */
 export async function restoreRemovedList(
@@ -76,6 +79,47 @@ export async function restoreRemovedList(
     const next = restoreList(previous, current, now);
     await db.lists.put(next);
     return next;
+  });
+}
+
+/** The trash's lists: deleted lists whose name is still kept, newest deletion first. */
+export async function listTrashedLists(db: NawyDoDb): Promise<TaskList[]> {
+  const all = await db.lists.toArray();
+  return all.filter(isTrashedList).sort((a, b) => (b.deletedAt ?? 0) - (a.deletedAt ?? 0));
+}
+
+/** Takes a list out of the trash (last in the order). Undefined if it is not there or the limit is reached. */
+export async function restoreListFromTrash(
+  db: NawyDoDb,
+  id: string,
+  now: number,
+): Promise<TaskList | undefined> {
+  return db.transaction('rw', db.lists, async () => {
+    const current = await db.lists.get(id);
+    if (!current || !isTrashedList(current)) return undefined;
+    const live = liveLists(await db.lists.toArray());
+    if (live.length >= MAX_LISTS) return undefined;
+    const next = untrashList(current, (live.at(-1)?.sortOrder ?? 0) + 1, now);
+    await db.lists.put(next);
+    return next;
+  });
+}
+
+/** «Delete forever» for trashed lists: they become content-less tombstones. */
+export async function deleteListsForever(
+  db: NawyDoDb,
+  ids: readonly string[],
+  now: number,
+): Promise<number> {
+  return db.transaction('rw', db.lists, async () => {
+    let n = 0;
+    for (const id of new Set(ids)) {
+      const current = await db.lists.get(id);
+      if (!current || !isTrashedList(current)) continue;
+      await db.lists.put(tombstoneList(current, now));
+      n++;
+    }
+    return n;
   });
 }
 

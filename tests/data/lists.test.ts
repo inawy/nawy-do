@@ -50,7 +50,7 @@ describe('lists store', () => {
     const added = await addList(db, 'a', 'العمل', 100);
     expect((await editListById(db, 'a', { name: 'شغل' }, 200))?.name).toBe('شغل');
     const dead = await removeList(db, 'a', 300);
-    expect(dead).toMatchObject({ name: '', deletedAt: 300 });
+    expect(dead).toMatchObject({ name: 'شغل', deletedAt: 300 }); // in the trash: the name is kept
     expect(await listLists(db)).toEqual([]);
     expect(await editListById(db, 'a', { name: 'x' }, 400)).toBeUndefined();
     const prev = added.ok ? { ...added.list, name: 'شغل' } : undefined;

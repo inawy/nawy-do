@@ -6,6 +6,7 @@ import type {
   Task,
   TaskList,
   TaskPatch,
+  TrashEntry,
 } from '@/core/model';
 import type { Outcome, SnapshotItem, StorageStatus } from '../backup';
 
@@ -27,11 +28,13 @@ export interface DataProps {
 
 /** The trash sheet: what was deleted lately (the content is kept for 30 days). */
 export interface TrashProps {
-  items: Task[];
+  items: TrashEntry[];
   /** The current time, for «deleted N days ago». */
   now: number;
-  onRestore: (id: string) => void;
-  onDelete: (ids: string[]) => void;
+  onRestore: (entry: TrashEntry) => void;
+  onDelete: (entries: TrashEntry[]) => void;
+  /** The list limit is reached, so a deleted list cannot come back yet. */
+  listsFull: boolean;
 }
 
 export interface TasksScreenProps {

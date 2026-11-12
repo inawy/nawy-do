@@ -1,4 +1,4 @@
-import { isTrashed, tombstoneTask, TRASH_TTL_MS } from '@/core/model';
+import { isTrashed, isTrashedList, tombstoneList, tombstoneTask, TRASH_TTL_MS } from '@/core/model';
 import type { NawyDoDb } from './schema';
 
 export const TOMBSTONE_TTL_MS = 90 * 24 * 60 * 60 * 1000;
@@ -11,7 +11,11 @@ export async function compactTrash(db: NawyDoDb, now: number): Promise<number> {
   const cutoff = now - TRASH_TTL_MS;
   const old = (await db.tasks.toArray()).filter((t) => isTrashed(t) && (t.deletedAt ?? 0) < cutoff);
   await db.tasks.bulkPut(old.map((t) => tombstoneTask(t, now)));
-  return old.length;
+  const oldLists = (await db.lists.toArray()).filter(
+    (l) => isTrashedList(l) && (l.deletedAt ?? 0) < cutoff,
+  );
+  await db.lists.bulkPut(oldLists.map((l) => tombstoneList(l, now)));
+  return old.length + oldLists.length;
 }
 
 /**

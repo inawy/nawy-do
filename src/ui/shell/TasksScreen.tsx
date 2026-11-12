@@ -180,6 +180,7 @@ export function TasksScreen(p: TasksScreenProps) {
         <TrashSheet
           items={p.trash.items}
           now={p.trash.now}
+          listsFull={p.trash.listsFull}
           onRestore={p.trash.onRestore}
           onDelete={p.trash.onDelete}
           onClose={() => ui.setTrashOpen(false)}

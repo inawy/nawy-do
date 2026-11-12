@@ -12,6 +12,7 @@ import type { Repositories } from '@/core/ports';
 import { createDexieRepositories, type NawyDoDb } from '@/data';
 import { useBackup } from '@/features/backup';
 import { useLists } from '@/features/lists';
+import { MAX_LISTS } from '@/core/model';
 import { useTasks, useTrash } from '@/features/tasks';
 import { I18nProvider, makeI18n, type Lang } from '@/ui/i18n';
 import { TasksScreen } from '@/ui/shell';
@@ -50,7 +51,7 @@ export function App({ repositories, db, now = systemClock, today = systemToday }
     [repositories, db],
   );
   const tasks = useTasks(repos.tasks, now, newId, today);
-  const trash = useTrash(repos.tasks, now);
+  const trash = useTrash(repos.tasks, repos.lists, now);
   const lists = useLists(repos.lists, now, newId);
   const backup = useBackup(repos.backup, now);
   const applyUpdate = useSyncExternalStore(updateSignal.subscribe, updateSignal.get);
@@ -138,8 +139,9 @@ export function App({ repositories, db, now = systemClock, today = systemToday }
         trash={{
           items: trash.items,
           now: now(),
-          onRestore: (id) => void trash.restore(id),
-          onDelete: (ids) => void trash.deleteForever(ids),
+          onRestore: (entry) => void trash.restore(entry),
+          onDelete: (entries) => void trash.deleteForever(entries),
+          listsFull: lists.lists.length >= MAX_LISTS,
         }}
         dueNotice={
           due !== undefined &&

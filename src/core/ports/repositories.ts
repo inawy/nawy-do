@@ -64,6 +64,12 @@ export interface ListRepository {
   remove(id: string, now: number): Promise<TaskList | undefined>;
   restore(previous: TaskList, now: number): Promise<TaskList | undefined>;
   saveOrder(changes: readonly ListOrderChange[], now: number): Promise<number>;
+  /** Deleted lists whose name is still kept (the trash), newest deletion first. */
+  watchTrash: Watch<TaskList>;
+  /** Takes a list out of the trash (last in the order); undefined if it is not there or the limit is reached. */
+  restoreFromTrash(id: string, now: number): Promise<TaskList | undefined>;
+  /** Compacts the given trashed lists to content-less tombstones; returns how many. */
+  deleteForever(ids: readonly string[], now: number): Promise<number>;
 }
 
 export type ImportResult = Result<

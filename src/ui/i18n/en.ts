@@ -35,8 +35,11 @@ export const en: Record<MessageKey, string> = {
   'card.copied': 'Copied.',
   'menu.trash': 'Trash',
   'trash.title': 'Trash',
-  'trash.hint': 'Deleted tasks stay here for {days} days, then they are removed for good.',
+  'trash.hint':
+    'Deleted tasks and lists stay here for {days} days, then they are removed for good.',
   'trash.empty': 'The trash is empty.',
+  'trash.list': 'List: ',
+  'trash.listsFull': 'You have reached the list limit. Delete a list first.',
   'trash.today': 'Deleted today',
   'trash.ago': 'Deleted {days} days ago',
   'trash.left': '{days} days left',

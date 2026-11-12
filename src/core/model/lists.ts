@@ -55,6 +55,30 @@ export function tombstoneList(list: TaskList, now: number): TaskList {
 }
 
 /** Undo of a list delete: the previous record again, newer than the tombstone. */
+/**
+ * Deleting a list moves it to the trash: stamped deleted but keeping its name and colour for
+ * `TRASH_DAYS` (ADR 0042). Its tasks are untouched, so restoring the list brings them back to it.
+ */
+export function trashList(list: TaskList, now: number): TaskList {
+  const t = nextUpdatedAt(list.updatedAt, now);
+  return { ...list, updatedAt: t, deletedAt: t };
+}
+
+/** Deleted and still readable (a compacted tombstone has no name). */
+export const isTrashedList = (list: TaskList): boolean =>
+  list.deletedAt !== undefined && list.name !== '';
+
+/** Takes a trashed list back, last in the order (the old place may be taken), newer than the delete. */
+export function untrashList(current: TaskList, sortOrder: number, now: number): TaskList {
+  const next: TaskList = {
+    ...current,
+    sortOrder,
+    updatedAt: nextUpdatedAt(current.updatedAt, now),
+  };
+  delete next.deletedAt;
+  return next;
+}
+
 export function restoreList(previous: TaskList, current: TaskList, now: number): TaskList {
   const next: TaskList = { ...previous, updatedAt: nextUpdatedAt(current.updatedAt, now) };
   delete next.deletedAt;

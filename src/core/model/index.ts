@@ -17,3 +17,4 @@ export * from './view';
 export * from './launch';
 export * from './recurrence';
 export * from './sorting';
+export * from './trash';
