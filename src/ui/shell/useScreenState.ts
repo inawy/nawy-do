@@ -12,6 +12,8 @@ export function useScreenState(startAdding = false) {
   const [sheet, setSheet] = useState<ListSheetState>(null);
   const [dataOpen, setDataOpen] = useState(false);
   const [trashOpen, setTrashOpen] = useState(false);
+  /** The finished tasks waiting for «delete all completed» to be confirmed. */
+  const [clearIds, setClearIds] = useState<string[] | null>(null);
   const [adding, setAdding] = useState(startAdding);
   const [menuOpen, setMenuOpen] = useState(false);
   // `null` is off. While on, results come from ALL tasks, not just the current view.
@@ -24,6 +26,8 @@ export function useScreenState(startAdding = false) {
     dataOpen,
     setDataOpen,
     trashOpen,
+    clearIds,
+    setClearIds,
     setTrashOpen,
     adding,
     setAdding,

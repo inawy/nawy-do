@@ -38,6 +38,8 @@ export const ar = {
   'card.share': 'مشاركة',
   'card.delete': 'حذف',
   'card.copied': 'اتنسخت.',
+  'menu.clearDone': 'حذف المنجزات',
+  'clearDone.ask': 'تحذف {count} نية منجزة؟ هتفضل في سلة المحذوفات {days} يوم وتقدر تستعيدها.',
   'menu.trash': 'سلة المحذوفات',
   'trash.title': 'سلة المحذوفات',
   'trash.hint': 'النوايا والقوائم المحذوفة بتفضل هنا {days} يوم وبعدها بتتمسح نهائيًا.',

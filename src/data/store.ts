@@ -190,6 +190,10 @@ export const moveTasksToList = (
   now: number,
 ) => changeMany(db, ids, (t) => updateTask(t, { listId: listId ?? '' }, now));
 
+/** Moves the given tasks to the trash (the ones already deleted are skipped). */
+export const removeTasksByIds = (db: NawyDoDb, ids: readonly string[], now: number) =>
+  changeMany(db, ids, (t) => trashTask(t, now));
+
 export const completeTasksByIds = (
   db: NawyDoDb,
   ids: readonly string[],

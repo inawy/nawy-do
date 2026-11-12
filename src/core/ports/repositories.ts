@@ -44,6 +44,8 @@ export interface TaskRepository {
   /** `listId` undefined moves them to the main list. Returns how many changed. */
   moveToList(ids: readonly string[], listId: string | undefined, now: number): Promise<number>;
   completeMany(ids: readonly string[], now: number, today: string): Promise<number>;
+  /** Moves the given tasks to the trash; returns how many were moved. */
+  removeMany(ids: readonly string[], now: number): Promise<number>;
   /** The trash: deleted tasks whose content is still kept, newest deletion first. */
   watchTrash: Watch<Task>;
   /** Takes a task out of the trash; does nothing if it is not there. */

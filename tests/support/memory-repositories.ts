@@ -138,6 +138,7 @@ export function createMemoryRepositories(): Repositories & {
         changeMany(ids, (t) => updateTask(t, { listId: listId ?? '' }, now)),
       completeMany: (ids, now, today) =>
         changeMany(ids, (t) => (t.status === 'open' ? completeTask(t, now, today) : t)),
+      removeMany: (ids, now) => changeMany(ids, (t) => trashTask(t, now)),
       watchTrash: watchOf(taskSubs, () =>
         [...tasks.values()]
           .filter(isTrashed)

@@ -33,6 +33,9 @@ export const en: Record<MessageKey, string> = {
   'card.share': 'Share',
   'card.delete': 'Delete',
   'card.copied': 'Copied.',
+  'menu.clearDone': 'Delete completed',
+  'clearDone.ask':
+    'Delete {count} completed tasks? They stay in the trash for {days} days and can be restored.',
   'menu.trash': 'Trash',
   'trash.title': 'Trash',
   'trash.hint':

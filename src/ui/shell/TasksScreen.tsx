@@ -13,6 +13,7 @@ import { IconButton, MenuIcon } from '../primitives';
 import { AddButton, AddSheet, TaskList as Tasks, UndoToast } from '../tasks';
 import '../styles/index.css';
 import { TrashSheet } from '../trash';
+import { ClearDoneSheet } from './ClearDoneSheet';
 import { Drawer } from './Drawer';
 import { InputBar } from './InputBar';
 import { Notices } from './Notices';
@@ -36,6 +37,7 @@ export function TasksScreen(p: TasksScreenProps) {
     ui.searching && ui.query !== null
       ? searchTasks(p.tasks, ui.query)
       : tasksIn(p.tasks, p.lists, selection, p.today);
+  const doneIds = ui.searching ? [] : visible.filter((x) => x.status === 'done').map((x) => x.id);
   const { editing } = p;
   const viewTitle = list
     ? list.name
@@ -65,6 +67,7 @@ export function TasksScreen(p: TasksScreenProps) {
         selecting={ui.picked !== null}
         onSearch={ui.toggleSearch}
         onSelect={ui.toggleSelecting}
+        onClearDone={doneIds.length > 0 ? () => ui.setClearIds(doneIds) : undefined}
         sort={
           isSortable(selection) && !ui.searching ? { mode: p.sort, onChange: p.onSort } : undefined
         }
@@ -186,17 +189,15 @@ export function TasksScreen(p: TasksScreenProps) {
           onClose={() => ui.setTrashOpen(false)}
         />
       )}
-      {ui.dataOpen && (
-        <BackupSheet
-          storage={p.data.storage}
-          snapshots={p.data.snapshots}
-          outcome={p.data.outcome}
-          onExport={p.data.onExport}
-          onShare={p.data.onShare}
-          lastExport={p.data.lastExport}
-          onImport={p.data.onImport}
-          onRestore={p.data.onRestore}
-          onClose={() => ui.setDataOpen(false)}
+      {ui.dataOpen && <BackupSheet {...p.data} onClose={() => ui.setDataOpen(false)} />}
+      {ui.clearIds && (
+        <ClearDoneSheet
+          count={ui.clearIds.length}
+          onConfirm={() => {
+            p.onRemoveMany(ui.clearIds ?? []);
+            ui.setClearIds(null);
+          }}
+          onClose={() => ui.setClearIds(null)}
         />
       )}
       {p.removed && (
