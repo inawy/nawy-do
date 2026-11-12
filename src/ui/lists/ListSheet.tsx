@@ -70,7 +70,7 @@ export function ListSheet({
               value={name}
               onChange={(e) => setName(e.target.value)}
               maxLength={MAX_LIST_NAME}
-              autoFocus
+              autoFocus={mode === 'create'}
               autoComplete="off"
             />
           </Field>
