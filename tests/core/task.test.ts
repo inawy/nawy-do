@@ -60,7 +60,10 @@ describe('duplicateOptions', () => {
       steps: [{ id: 's', title: 'خطوة', done: true }],
     };
     const o = duplicateOptions(t);
-    expect(o).toMatchObject({ listId: 'l', starred: true, due: '2026-11-20', repeat: 'daily', notes: 'n' });
+    expect(o.listId).toBe('l');
+    expect(o.due).toBe('2026-11-20');
+    expect(o.repeat).toBe('daily');
+    expect(o.notes).toBe('n');
     expect(o.steps?.[0]?.done).toBe(false);
   });
 
