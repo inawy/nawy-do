@@ -24,6 +24,7 @@ export interface NewTaskOptions {
   due?: string;
   dueTime?: string;
   repeat?: Repeat;
+  repeatEvery?: number;
   notes?: string;
   steps?: Step[];
 }

@@ -14,6 +14,8 @@ export interface DetailsForm {
   due: string;
   dueTime: string;
   repeat: Repeat | '';
+  /** `1`: every one. */
+  every: number;
   starred: boolean;
   steps: Step[];
   listId: string;
@@ -39,6 +41,8 @@ export function changedFields(before: DetailsForm, after: DetailsForm): TaskPatc
   if (after.due !== before.due) patch.due = after.due;
   if (dueTime !== before.dueTime) patch.dueTime = dueTime;
   if (repeat !== before.repeat) patch.repeat = repeat;
+  const every = repeat === '' ? 1 : after.every;
+  if (every !== before.every) patch.repeatEvery = every;
   if (!sameSteps(before.steps, after.steps)) patch.steps = after.steps;
   if (after.listId !== before.listId) patch.listId = after.listId;
   return patch;
@@ -52,6 +56,7 @@ export function formOf(task: Task, lists: readonly TaskList[]): DetailsForm {
     due: task.due ?? '',
     dueTime: task.dueTime ?? '',
     repeat: task.repeat ?? '',
+    every: task.repeatEvery ?? 1,
     starred: task.starred,
     steps: task.steps ?? [],
     listId: listOf(task, lists) ?? '',

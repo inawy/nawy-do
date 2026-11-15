@@ -13,6 +13,11 @@ export const MAX_STEP_TITLE = 500;
 /** How often a task comes back once it is completed (it needs a due date). */
 /** `workdays` is Sunday to Thursday, the working week of the people this is made for (D-035). */
 export type Repeat = 'daily' | 'workdays' | 'weekly' | 'monthly' | 'yearly';
+/** «Every N days/weeks/months/years»: the largest N a task may use. */
+export const MAX_REPEAT_EVERY = 99;
+/** The repeats that can take an interval (workdays cannot). */
+export const intervalRepeat = (r: Repeat | undefined): boolean =>
+  r === 'daily' || r === 'weekly' || r === 'monthly' || r === 'yearly';
 export const REPEATS: readonly Repeat[] = ['daily', 'workdays', 'weekly', 'monthly', 'yearly'];
 
 /** A task («نية»). Dates are `YYYY-MM-DD` civil dates; instants are epoch milliseconds. */
@@ -31,6 +36,8 @@ export interface Task {
    * record, so two devices completing the same occurrence agree instead of duplicating).
    */
   repeat?: Repeat;
+  /** Interval of `repeat`: 2 = every other day/week/…. Absent = every one. */
+  repeatEvery?: number;
   steps?: Step[];
   /** The list it belongs to. Absent = the main list. A list that no longer exists = main too. */
   listId?: string;

@@ -7,6 +7,7 @@ const base: DetailsForm = {
   due: '',
   dueTime: '',
   repeat: '',
+  every: 1,
   starred: false,
   steps: [],
   listId: '',

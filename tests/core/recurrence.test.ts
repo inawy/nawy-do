@@ -129,3 +129,16 @@ describe('workdays and yearly', () => {
     expect(nextDue('2020-05-01', 'yearly', '2026-11-05')).toBe('2027-05-01');
   });
 });
+
+describe('nextDue with an interval', () => {
+  it('every 3 days, every 2 weeks, every 2 months, every 2 years', () => {
+    expect(nextDue('2026-11-10', 'daily', '2026-11-10', 3)).toBe('2026-11-13');
+    expect(nextDue('2026-11-10', 'weekly', '2026-11-10', 2)).toBe('2026-11-24');
+    expect(nextDue('2026-11-10', 'monthly', '2026-11-10', 2)).toBe('2027-01-10');
+    expect(nextDue('2026-11-10', 'yearly', '2026-11-10', 2)).toBe('2028-11-10');
+  });
+
+  it('a task missed for a long time lands on the next interval after today', () => {
+    expect(nextDue('2026-11-01', 'daily', '2026-11-10', 4)).toBe('2026-11-13');
+  });
+});

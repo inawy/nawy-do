@@ -1,6 +1,14 @@
 import { isCivilDate, isCivilTime } from './civil';
 import { isRepeating, nextDue } from './recurrence';
-import { MAX_STEPS, MAX_STEP_TITLE, type Repeat, type Step, type Task } from './types';
+import {
+  intervalRepeat,
+  MAX_REPEAT_EVERY,
+  MAX_STEPS,
+  MAX_STEP_TITLE,
+  type Repeat,
+  type Step,
+  type Task,
+} from './types';
 
 /**
  * The next `updatedAt`: the current time, but strictly greater than the previous value, so two
@@ -28,6 +36,8 @@ export type TaskPatch = Partial<
 > & {
   /** `''` removes the repetition. */
   repeat?: Repeat | '';
+  /** `1` or `undefined` removes the interval. */
+  repeatEvery?: number;
 };
 
 /** Trims titles, drops empty ones and duplicate ids, and caps the count. */
@@ -60,11 +70,16 @@ export function stepProgress(task: Task): { done: number; total: number } | unde
  * or `due` set to `undefined` or `''` removes the field.
  */
 export function updateTask(task: Task, patch: TaskPatch, now: number): Task {
-  const { repeat, ...rest } = patch;
+  const { repeat, repeatEvery, ...rest } = patch;
   const next: Task = { ...task, ...rest, updatedAt: nextUpdatedAt(task.updatedAt, now) };
   if ('repeat' in patch) {
     if (repeat === undefined || repeat === '') delete next.repeat;
     else next.repeat = repeat;
+  }
+  if ('repeatEvery' in patch) {
+    if (repeatEvery !== undefined && repeatEvery >= 2) {
+      next.repeatEvery = Math.min(MAX_REPEAT_EVERY, Math.floor(repeatEvery));
+    } else delete next.repeatEvery;
   }
   if (patch.title !== undefined) {
     const title = patch.title.trim();
@@ -101,6 +116,7 @@ export function updateTask(task: Task, patch: TaskPatch, now: number): Task {
     delete next.repeat;
     delete next.dueTime;
   }
+  if (!intervalRepeat(next.repeat)) delete next.repeatEvery;
   return next;
 }
 
@@ -112,7 +128,11 @@ export function completeTask(task: Task, now: number, today: string): Task {
   if (task.status === 'done') return task;
   const t = nextUpdatedAt(task.updatedAt, now);
   if (isRepeating(task)) {
-    const next: Task = { ...task, due: nextDue(task.due, task.repeat, today), updatedAt: t };
+    const next: Task = {
+      ...task,
+      due: nextDue(task.due, task.repeat, today, task.repeatEvery),
+      updatedAt: t,
+    };
     if (task.steps) next.steps = task.steps.map((s) => ({ ...s, done: false }));
     return next;
   }
@@ -185,6 +205,7 @@ export function duplicateOptions(task: Task) {
     due?: string;
     dueTime?: string;
     repeat?: Repeat;
+    repeatEvery?: number;
     notes?: string;
     steps?: Step[];
   } = {};
@@ -194,6 +215,7 @@ export function duplicateOptions(task: Task) {
     options.due = task.due;
     if (task.dueTime) options.dueTime = task.dueTime;
     if (task.repeat) options.repeat = task.repeat;
+    if (task.repeatEvery) options.repeatEvery = task.repeatEvery;
   }
   if (task.notes) options.notes = task.notes;
   if (task.steps?.length) options.steps = task.steps.map((s) => ({ ...s, done: false }));

@@ -32,4 +32,9 @@ export const arMore = {
   'backup.googleHint':
     'بتنقل من Google Tasks؟ نزّل بياناتك من Google Takeout واختار ملف Tasks.json، وهيتحول لنواياك مع قوائمك وتواريخها وخطواتها.',
   'menu.export': 'تصدير المهام كنص',
+  'details.every': 'كل كام',
+  'repeatEvery.daily': 'كل {n} يوم',
+  'repeatEvery.weekly': 'كل {n} أسبوع',
+  'repeatEvery.monthly': 'كل {n} شهر',
+  'repeatEvery.yearly': 'كل {n} سنة',
 } as const;

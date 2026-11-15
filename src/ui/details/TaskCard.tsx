@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { listOf, type Task, type TaskList, type TaskPatch } from '@/core/model';
 import { useI18n } from '../i18n';
+import { repeatLabel } from '../i18n/repeatLabel';
 import { formatDue, formatTime } from '../i18n/format';
 import {
   CalendarIcon,
@@ -94,7 +95,7 @@ export function TaskCard({
               <CalendarIcon />
               {formatDue(task.due, today, i18n)}
               {task.dueTime ? ` · ${formatTime(task.dueTime, i18n)}` : ''}
-              {task.repeat ? ` · ${t(`repeat.${task.repeat}`)}` : ''}
+              {task.repeat ? ` · ${repeatLabel(task, t, i18n.num)}` : ''}
             </span>
           )}
         </div>

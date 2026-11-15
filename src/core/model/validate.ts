@@ -2,7 +2,9 @@ import { isCivilDate, isCivilTime } from './civil';
 import { err, ok, type Result } from './result';
 import {
   isListColor,
+  intervalRepeat,
   MAX_LIST_NAME,
+  MAX_REPEAT_EVERY,
   MAX_STEPS,
   MAX_STEP_TITLE,
   REPEATS,
@@ -81,6 +83,14 @@ export function parseTask(raw: unknown): Result<Task, string> {
     const repeat = REPEATS.find((x) => x === r['repeat']);
     if (repeat === undefined || task.due === undefined) return err('repeat');
     task.repeat = repeat satisfies Repeat;
+  }
+  if (r['repeatEvery'] !== undefined) {
+    const n = r['repeatEvery'];
+    if (!Number.isInteger(n) || (n as number) < 2 || (n as number) > MAX_REPEAT_EVERY) {
+      return err('repeatEvery');
+    }
+    if (!intervalRepeat(task.repeat)) return err('repeatEvery');
+    task.repeatEvery = n as number;
   }
   if (r['steps'] !== undefined) {
     const steps = parseSteps(r['steps']);
