@@ -71,3 +71,14 @@ describe('duplicateOptions', () => {
     expect(duplicateOptions(createTask('a', 'x', 1))).toEqual({});
   });
 });
+
+describe('repeatEvery', () => {
+  it('is kept with a repeat, dropped when the repeat goes or is 1', () => {
+    const base = createTask('a', 'x', 1);
+    const a = updateTask(base, { due: '2026-11-20', repeat: 'daily', repeatEvery: 3 }, 2);
+    expect(a.repeatEvery).toBe(3);
+    expect(updateTask(a, { repeatEvery: 1 }, 3).repeatEvery).toBeUndefined();
+    expect(updateTask(a, { repeat: '' }, 3).repeatEvery).toBeUndefined();
+    expect(updateTask(a, { repeat: 'workdays' }, 3).repeatEvery).toBeUndefined();
+  });
+});

@@ -82,7 +82,7 @@ describe('envelope with lists (version 2)', () => {
   it('upgrades a real version-1 file with the shipped migration (no lists, tasks kept)', () => {
     const v1 = { app: 'nawy-do', schemaVersion: 1, exportedAt: 1, tasks: [t] };
     const r = parseEnvelope(text(v1));
-    expect(r.ok && r.value.schemaVersion).toBe(7);
+    expect(r.ok && r.value.schemaVersion).toBe(8);
     expect(r.ok && r.value.tasks).toEqual([t]);
     expect(r.ok && r.value.lists).toEqual([]);
   });

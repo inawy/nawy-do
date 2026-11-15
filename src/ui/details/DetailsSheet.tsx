@@ -3,7 +3,6 @@ import {
   listOf,
   MAX_STEPS,
   quickDueOptions,
-  REPEATS,
   type Repeat,
   type Step,
   type Task,
@@ -28,6 +27,7 @@ import { useT } from '../i18n';
 import { Sheet } from '../sheet';
 import { changedFields, formOf } from './formPatch';
 import { ConfirmDelete } from './ConfirmDelete';
+import { RepeatFields } from './RepeatFields';
 import { StepsField } from './StepsField';
 
 interface Props {
@@ -51,6 +51,7 @@ export function DetailsSheet({ task, lists, today, onSave, newId, onRemove, onCl
   const [due, setDue] = useState(task.due ?? '');
   const [dueTime, setDueTime] = useState(task.dueTime ?? '');
   const [repeat, setRepeat] = useState<Repeat | ''>(task.repeat ?? '');
+  const [every, setEvery] = useState(task.repeatEvery ?? 1);
   const [starred, setStarred] = useState(task.starred);
   const [steps, setSteps] = useState<Step[]>(task.steps ?? []);
   const [newStep, setNewStep] = useState('');
@@ -84,6 +85,7 @@ export function DetailsSheet({ task, lists, today, onSave, newId, onRemove, onCl
           due,
           dueTime,
           repeat,
+          every,
           steps: all,
           starred,
           listId,
@@ -175,21 +177,13 @@ export function DetailsSheet({ task, lists, today, onSave, newId, onRemove, onCl
             />
           </Field>
 
-          <Field label={t('details.repeat')}>
-            <Select
-              aria-label={t('details.repeat')}
-              value={due === '' ? '' : repeat}
-              disabled={due === ''}
-              onChange={(e) => setRepeat(REPEATS.find((r) => r === e.target.value) ?? '')}
-            >
-              <option value="">{t('details.noRepeat')}</option>
-              {REPEATS.map((r) => (
-                <option key={r} value={r}>
-                  {t(`repeat.${r}`)}
-                </option>
-              ))}
-            </Select>
-          </Field>
+          <RepeatFields
+            disabled={due === ''}
+            repeat={repeat}
+            every={every}
+            onRepeat={setRepeat}
+            onEvery={setEvery}
+          />
         </div>
       </div>
 

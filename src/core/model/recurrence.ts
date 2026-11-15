@@ -14,27 +14,31 @@ export function addMonths(date: string, n: number): string {
   return `${pad(y, 4)}-${pad(m, 2)}-${pad(d, 2)}`;
 }
 
+/** Whole intervals of `every` needed to reach `elapsed` units later (at least one). */
+const stepsAhead = (elapsed: number, every: number): number =>
+  Math.max(1, Math.floor(elapsed / every));
+
 /**
  * The next occurrence of a repeating task: the first one after both its current due date and
  * `today`, so a task missed for a week does not come back as seven overdue copies. Completing
  * early moves it one step ahead of its due date. (Monthly: a 31st becomes the 28th after
  * February and stays there: the anchor day is not remembered.)
  */
-export function nextDue(due: string, repeat: Repeat, today: string): string {
+export function nextDue(due: string, repeat: Repeat, today: string, every = 1): string {
   const a = daysFromCivil(due);
   const t = daysFromCivil(today);
   const c = parseCivil(due);
   const tc = parseCivil(today);
   if (a === undefined || t === undefined || !c || !tc) return due;
   if (repeat === 'monthly') {
-    const k = Math.max(1, tc.y * 12 + tc.m - (c.y * 12 + c.m));
-    const next = addMonths(due, k);
-    return next > today ? next : addMonths(due, k + 1);
+    const k = stepsAhead(tc.y * 12 + tc.m - (c.y * 12 + c.m), every);
+    const next = addMonths(due, k * every);
+    return next > today ? next : addMonths(due, (k + 1) * every);
   }
   if (repeat === 'yearly') {
-    const k = Math.max(1, tc.y - c.y);
-    const next = addMonths(due, 12 * k);
-    return next > today ? next : addMonths(due, 12 * (k + 1));
+    const k = stepsAhead(tc.y - c.y, every);
+    const next = addMonths(due, 12 * k * every);
+    return next > today ? next : addMonths(due, 12 * (k + 1) * every);
   }
   if (repeat === 'workdays') {
     // 1970-01-01 was a Thursday; Friday (5) and Saturday (6) are the weekend.
@@ -42,7 +46,7 @@ export function nextDue(due: string, repeat: Repeat, today: string): string {
     while ((day + 4) % 7 >= 5) day += 1;
     return addDays(due, day - a);
   }
-  const step = repeat === 'daily' ? 1 : 7;
+  const step = (repeat === 'daily' ? 1 : 7) * every;
   const k = Math.max(1, Math.floor((t - a) / step) + 1);
   return addDays(due, k * step);
 }

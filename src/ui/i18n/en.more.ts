@@ -36,4 +36,9 @@ export const enMore: Record<keyof typeof arMore, string> = {
   'backup.googleHint':
     'Coming from Google Tasks? Download your data from Google Takeout and choose Tasks.json: your lists, dates and subtasks come across.',
   'menu.export': 'Export tasks as text',
+  'details.every': 'Every',
+  'repeatEvery.daily': 'Every {n} days',
+  'repeatEvery.weekly': 'Every {n} weeks',
+  'repeatEvery.monthly': 'Every {n} months',
+  'repeatEvery.yearly': 'Every {n} years',
 };
