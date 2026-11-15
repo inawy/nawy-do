@@ -9,7 +9,7 @@ export const arMore = {
   'card.actions': 'إجراءات سريعة',
   'card.edit': 'تعديل',
   'card.copy': 'نسخ',
-  'card.duplicate': 'إنشاء نسخة',
+  'card.duplicate': 'تكرار النية',
   'card.share': 'مشاركة',
   'card.delete': 'حذف',
   'card.copied': 'اتنسخت.',

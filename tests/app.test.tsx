@@ -53,7 +53,7 @@ describe('App', () => {
     render(<App db={db} now={now} today={today} />);
     await addIntention('كتاب');
     fireEvent.click(screen.getByText('كتاب'));
-    fireEvent.click(await screen.findByRole('button', { name: 'إنشاء نسخة' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'تكرار النية' }));
     await waitFor(() => expect(screen.getAllByText('كتاب')).toHaveLength(2));
   });
 
