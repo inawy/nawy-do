@@ -3,7 +3,7 @@ import {
   dueSummary,
   type DueSummary,
   needsBackupNudge,
-  newTaskDefaults,
+  quickTask,
   resolveSelection,
   type Selection,
   type SortMode,
@@ -187,7 +187,10 @@ export function App({ repositories, db, now = systemClock, today = systemToday }
         onInstall={onInstall}
         focusAdd={launch.newTask}
         onSelect={setChosen}
-        onAdd={(title) => void tasks.add(title, newTaskDefaults(selection, today()))}
+        onAdd={(text, literal) => {
+          const q = quickTask(text, literal, selection, lists.lists, today());
+          void tasks.add(q.title, q.options);
+        }}
         onToggle={(t) => void tasks.toggle(t)}
         onStar={(t) => void tasks.edit(t, { starred: !t.starred })}
         onOpen={(t) => setOpenId(t.id)}

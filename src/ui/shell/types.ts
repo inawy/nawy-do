@@ -66,7 +66,8 @@ export interface TasksScreenProps {
   /** Opened by the «new intention» shortcut: focus the add field. */
   focusAdd: boolean;
   onSelect: (s: Selection) => void;
-  onAdd: (title: string) => void;
+  /** `literal`: save the text as typed, without reading dates and so on out of it. */
+  onAdd: (text: string, literal: boolean) => void;
   onToggle: (t: Task) => void;
   onStar: (t: Task) => void;
   onOpen: (t: Task) => void;

@@ -2,6 +2,9 @@ import type { arMore } from './ar.more';
 
 /** More interface words (trash, task card, bulk delete), kept apart so each file stays short. */
 export const enMore: Record<keyof typeof arMore, string> = {
+  'composer.hint': 'You can type: tomorrow at 5 pm · every week · #list · !',
+  'composer.read': 'What was read from the text',
+  'composer.literal': 'Keep as typed',
   'delete.ask': 'Delete this task? It stays in the trash for {days} days and can be restored.',
   'delete.confirm': 'Confirm delete',
   'card.title': 'Task',

@@ -5,6 +5,7 @@ import type {
   OrderChange,
   ListColor,
   ListPatch,
+  Repeat,
   Result,
   Task,
   TaskList,
@@ -20,6 +21,8 @@ export interface NewTaskOptions {
   listId?: string;
   starred?: boolean;
   due?: string;
+  dueTime?: string;
+  repeat?: Repeat;
 }
 
 /** Calls `onChange` now and after every change (also from another tab); returns the unsubscribe. */
