@@ -10,11 +10,13 @@ import {
 import { BackupSheet } from '../backup';
 import { useI18n } from '../i18n';
 import { IconButton, MenuIcon } from '../primitives';
-import { AddButton, AddSheet, TaskList as Tasks, UndoToast } from '../tasks';
+import { AddButton, AddSheet, TaskList as Tasks } from '../tasks';
 import '../styles/index.css';
 import { TrashSheet } from '../trash';
 import { ClearDoneSheet } from './ClearDoneSheet';
 import { Drawer } from './Drawer';
+import { ExportSheet } from './ExportSheet';
+import { RemovedToast } from './RemovedToast';
 import { InputBar } from './InputBar';
 import { Notices } from './Notices';
 import { TaskSheets } from './TaskSheets';
@@ -68,6 +70,7 @@ export function TasksScreen(p: TasksScreenProps) {
         onSearch={ui.toggleSearch}
         onSelect={ui.toggleSelecting}
         onClearDone={doneIds.length > 0 ? () => ui.setClearIds(doneIds) : undefined}
+        onExport={visible.length > 0 ? () => ui.setExportOpen(true) : undefined}
         sort={
           isSortable(selection) && !ui.searching ? { mode: p.sort, onChange: p.onSort } : undefined
         }
@@ -208,15 +211,13 @@ export function TasksScreen(p: TasksScreenProps) {
           onClose={() => ui.setClearIds(null)}
         />
       )}
-      {p.removed && (
-        <UndoToast
-          message={
-            t(p.removed.kind === 'list' ? 'toast.removedList' : 'toast.removed', {
-              name: p.removed.label,
-            }) + (p.removed.more > 0 ? ` (+${p.removed.more})` : '')
-          }
-          onUndo={p.onUndo}
-          onDismiss={p.onDismissUndo}
+      <RemovedToast p={p} />
+      {ui.exportOpen && (
+        <ExportSheet
+          p={p}
+          title={viewTitle}
+          tasks={visible}
+          onClose={() => ui.setExportOpen(false)}
         />
       )}
     </div>

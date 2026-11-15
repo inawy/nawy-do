@@ -450,3 +450,20 @@
 .group.move-row > * + * {
   border-block-start: 0;
 }
+
+.export-text {
+  width: 100%;
+  min-height: 12rem;
+  max-height: 50vh;
+  resize: none;
+  box-sizing: border-box;
+  padding: 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  user-select: text;
+}
