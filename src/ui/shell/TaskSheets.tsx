@@ -12,6 +12,7 @@ interface Props {
   onDuplicate: () => void;
   onClose: () => void;
   onCopy: (text: string) => Promise<boolean>;
+  onCalendar: () => void;
   onShare?: ((title: string, text: string) => Promise<boolean>) | undefined;
 }
 
@@ -46,6 +47,7 @@ export function TaskSheets(p: Props) {
       }}
       onClose={p.onClose}
       onCopy={p.onCopy}
+      onCalendar={p.onCalendar}
       onShare={p.onShare}
     />
   );

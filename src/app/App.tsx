@@ -6,6 +6,7 @@ import {
   needsBackupNudge,
   quickTask,
   resolveSelection,
+  taskToIcs,
   type Selection,
   type SortMode,
 } from '@/core/model';
@@ -201,6 +202,10 @@ export function App({ repositories, db, now = systemClock, today = systemToday }
         onRemoveMany={(ids) => void tasks.removeMany(ids)}
         onClose={() => setOpenId(null)}
         onCopy={copyText}
+        onCalendar={(t) => {
+          const ics = taskToIcs(t, now());
+          if (ics) downloadText('nawy-do-task.ics', ics, 'text/calendar');
+        }}
         onShare={canShareText() ? shareTextOnly : undefined}
         onSave={(t, patch) => void tasks.edit(t, patch)}
         onRemove={(t) => void tasks.remove(t)}
