@@ -19,3 +19,4 @@ export * from './recurrence';
 export * from './sorting';
 export * from './trash';
 export * from './quickAdd';
+export * from './googleTasks';

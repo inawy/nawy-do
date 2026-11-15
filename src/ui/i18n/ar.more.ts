@@ -29,4 +29,6 @@ export const arMore = {
   'trash.confirm': 'تأكيد الحذف',
   'trash.emptyAll': 'إفراغ السلة',
   'trash.confirmAll': 'تأكيد إفراغ السلة',
+  'backup.googleHint':
+    'بتنقل من Google Tasks؟ نزّل بياناتك من Google Takeout واختار ملف Tasks.json، وهيتحول لنواياك مع قوائمك وتواريخها وخطواتها.',
 } as const;

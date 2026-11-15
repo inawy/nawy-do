@@ -1,6 +1,18 @@
 import { useCallback, useEffect, useState } from 'react';
-import { type EnvelopeError } from '@/core/model';
+import { googleTasksToEnvelope, isGoogleTasks, type EnvelopeError } from '@/core/model';
 import type { BackupRepository, SafetyCopy } from '@/core/ports';
+
+/** A Google Tasks (Takeout) file becomes this app's backup text; anything else passes through. */
+function fromGoogle(text: string, at: number): string {
+  try {
+    const raw: unknown = JSON.parse(text);
+    if (!isGoogleTasks(raw)) return text;
+    const converted = googleTasksToEnvelope(raw, at);
+    return converted.ok ? JSON.stringify(converted.value) : text;
+  } catch {
+    return text;
+  }
+}
 
 /** What the last data action did; the UI turns it into words. */
 export type BackupOutcome =
@@ -69,7 +81,7 @@ export function useBackup(repo: BackupRepository, now: () => number): BackupApi 
     async (text: string, restored: boolean) => {
       if (text.length > MAX_FILE_CHARS) return setOutcome({ kind: 'error', code: 'too-big' });
       try {
-        const result = await repo.import(text, { now: now() });
+        const result = await repo.import(fromGoogle(text, now()), { now: now() });
         if (!result.ok) return setOutcome({ kind: 'error', code: result.error.code });
         const changed = result.value.changed + result.value.listsChanged;
         setOutcome(
