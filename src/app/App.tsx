@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import {
   dueSummary,
+  duplicateOptions,
   type DueSummary,
   needsBackupNudge,
   quickTask,
@@ -203,6 +204,7 @@ export function App({ repositories, db, now = systemClock, today = systemToday }
         onShare={canShareText() ? shareTextOnly : undefined}
         onSave={(t, patch) => void tasks.edit(t, patch)}
         onRemove={(t) => void tasks.remove(t)}
+        onDuplicate={(t) => void tasks.add(t.title, duplicateOptions(t))}
         onAddList={lists.add}
         onEditList={(l, patch) => void lists.edit(l, patch)}
         onDeleteList={(l) => void lists.remove(l)}

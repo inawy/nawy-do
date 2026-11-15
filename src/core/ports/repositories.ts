@@ -7,6 +7,7 @@ import type {
   ListPatch,
   Repeat,
   Result,
+  Step,
   Task,
   TaskList,
   TaskPatch,
@@ -23,6 +24,8 @@ export interface NewTaskOptions {
   due?: string;
   dueTime?: string;
   repeat?: Repeat;
+  notes?: string;
+  steps?: Step[];
 }
 
 /** Calls `onChange` now and after every change (also from another tab); returns the unsubscribe. */

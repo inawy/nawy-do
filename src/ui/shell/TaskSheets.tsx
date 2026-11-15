@@ -9,6 +9,7 @@ interface Props {
   newId: () => string;
   onSave: (patch: TaskPatch) => void;
   onRemove: () => void;
+  onDuplicate: () => void;
   onClose: () => void;
   onCopy: (text: string) => Promise<boolean>;
   onShare?: ((title: string, text: string) => Promise<boolean>) | undefined;
@@ -39,6 +40,10 @@ export function TaskSheets(p: Props) {
       onSave={p.onSave}
       onEdit={() => setEditing(true)}
       onRemove={remove}
+      onDuplicate={() => {
+        p.onDuplicate();
+        p.onClose();
+      }}
       onClose={p.onClose}
       onCopy={p.onCopy}
       onShare={p.onShare}

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   completeTask,
   createTask,
+  duplicateOptions,
   isDeleted,
   nextUpdatedAt,
   reopenTask,
@@ -44,5 +45,26 @@ describe('task model', () => {
     expect(dead.title).toBe('');
     expect(dead.notes).toBeUndefined();
     expect(dead.deletedAt).toBe(dead.updatedAt);
+  });
+});
+
+describe('duplicateOptions', () => {
+  it('keeps the content and unchecks the steps', () => {
+    const t = {
+      ...createTask('a', 'x', 1),
+      listId: 'l',
+      starred: true,
+      due: '2026-11-20',
+      repeat: 'daily' as const,
+      notes: 'n',
+      steps: [{ id: 's', title: 'خطوة', done: true }],
+    };
+    const o = duplicateOptions(t);
+    expect(o).toMatchObject({ listId: 'l', starred: true, due: '2026-11-20', repeat: 'daily', notes: 'n' });
+    expect(o.steps?.[0]?.done).toBe(false);
+  });
+
+  it('keeps nothing extra for a bare task', () => {
+    expect(duplicateOptions(createTask('a', 'x', 1))).toEqual({});
   });
 });

@@ -22,6 +22,7 @@ Source: <https://github.com/google/material-design-icons> at commit `10ecc147906
 | `language.svg`               | language choice in the side menu                       |
 | `edit.svg`                   | edit, on the task card                                 |
 | `content_copy.svg`           | copy a task as text, on the task card                  |
+| `library_add.svg`            | duplicate a task, on the task card                     |
 | `share.svg`                  | share a task, on the task card                         |
 
 Rules (from the design system): only real Material Symbols files, Outlined; no Emoji, no hand-drawn "Material-style" paths, no second icon pack in the same screen. A new icon = copy the file from the source above, add a row here. They are turned into React components by `vite-plugin-svgr` (`?react`) in `ui/primitives/icons.tsx`.

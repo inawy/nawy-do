@@ -11,6 +11,7 @@ export const enMore: Record<keyof typeof arMore, string> = {
   'card.actions': 'Quick actions',
   'card.edit': 'Edit',
   'card.copy': 'Copy',
+  'card.duplicate': 'Duplicate',
   'card.share': 'Share',
   'card.delete': 'Delete',
   'card.copied': 'Copied.',
