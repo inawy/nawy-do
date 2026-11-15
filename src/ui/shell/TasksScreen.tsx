@@ -171,6 +171,7 @@ export function TasksScreen(p: TasksScreenProps) {
           newId={p.newId}
           onSave={(patch) => p.onSave(editing, patch)}
           onRemove={() => p.onRemove(editing)}
+          onDuplicate={() => p.onDuplicate(editing)}
           onClose={p.onClose}
           onCopy={p.onCopy}
           onShare={p.onShare}

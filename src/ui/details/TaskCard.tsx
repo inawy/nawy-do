@@ -6,6 +6,7 @@ import {
   CalendarIcon,
   CloseIcon,
   CopyIcon,
+  DuplicateIcon,
   EditIcon,
   IconButton,
   ListIcon,
@@ -24,6 +25,7 @@ interface Props {
   onSave: (patch: TaskPatch) => void;
   onEdit: () => void;
   onRemove: () => void;
+  onDuplicate: () => void;
   onClose: () => void;
   /** Copies text to the clipboard; resolves to whether it worked. */
   onCopy: (text: string) => Promise<boolean>;
@@ -42,6 +44,7 @@ export function TaskCard({
   onSave,
   onEdit,
   onRemove,
+  onDuplicate,
   onClose,
   onCopy,
   onShare,
@@ -131,6 +134,10 @@ export function TaskCard({
           <button type="button" onClick={onEdit}>
             <EditIcon />
             {t('card.edit')}
+          </button>
+          <button type="button" onClick={onDuplicate}>
+            <DuplicateIcon />
+            {t('card.duplicate')}
           </button>
           <button
             type="button"

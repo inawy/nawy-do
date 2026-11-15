@@ -83,6 +83,8 @@ export interface TasksScreenProps {
   onShare?: ((title: string, text: string) => Promise<boolean>) | undefined;
   onSave: (t: Task, patch: TaskPatch) => void;
   onRemove: (t: Task) => void;
+  /** Adds a copy of the task (same list, date, notes and steps; steps unchecked). */
+  onDuplicate: (t: Task) => void;
   onAddList: (name: string, color?: ListColor) => Promise<TaskList | 'empty' | 'limit' | 'failed'>;
   onEditList: (list: TaskList, patch: ListPatch) => void;
   onDeleteList: (list: TaskList) => void;

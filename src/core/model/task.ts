@@ -176,3 +176,26 @@ export function restoreTask(previous: Task, current: Task, now: number): Task {
   delete next.deletedAt;
   return next;
 }
+
+/** What a copy of `task` keeps: list, date, time, repeat, star, notes and steps (all unchecked). */
+export function duplicateOptions(task: Task) {
+  const options: {
+    listId?: string;
+    starred?: boolean;
+    due?: string;
+    dueTime?: string;
+    repeat?: Repeat;
+    notes?: string;
+    steps?: Step[];
+  } = {};
+  if (task.listId) options.listId = task.listId;
+  if (task.starred) options.starred = true;
+  if (task.due) {
+    options.due = task.due;
+    if (task.dueTime) options.dueTime = task.dueTime;
+    if (task.repeat) options.repeat = task.repeat;
+  }
+  if (task.notes) options.notes = task.notes;
+  if (task.steps?.length) options.steps = task.steps.map((s) => ({ ...s, done: false }));
+  return options;
+}

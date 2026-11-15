@@ -49,6 +49,14 @@ describe('App', () => {
     await waitFor(() => expect(screen.queryByText('المنجزة (1)')).toBeNull());
   });
 
+  it('duplicates a task from its card', async () => {
+    render(<App db={db} now={now} today={today} />);
+    await addIntention('كتاب');
+    fireEvent.click(screen.getByText('كتاب'));
+    fireEvent.click(await screen.findByRole('button', { name: 'تكرار النية' }));
+    await waitFor(() => expect(screen.getAllByText('كتاب')).toHaveLength(2));
+  });
+
   it('deletes with a tombstone and undo brings it back', async () => {
     render(<App db={db} now={now} today={today} />);
     await addIntention('سر');
