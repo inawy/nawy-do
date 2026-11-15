@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useShortcuts } from './useShortcuts';
 
 /** A list sheet: creating a new one, or the options of an existing one. */
 export type ListSheetState = { mode: 'create' } | { mode: 'edit'; id: string } | null;
@@ -21,6 +22,9 @@ export function useScreenState(startAdding = false) {
   const [query, setQuery] = useState<string | null>(null);
   const [picked, setPicked] = useState<ReadonlySet<string> | null>(null);
 
+  const toggleSearch = () => setQuery((q) => (q === null ? '' : null));
+  useShortcuts({ onNew: () => setAdding(true), onSearch: toggleSearch });
+
   return {
     sheet,
     setSheet,
@@ -39,7 +43,7 @@ export function useScreenState(startAdding = false) {
     query,
     searching: query !== null && query.trim() !== '',
     picked,
-    toggleSearch: () => setQuery((q) => (q === null ? '' : null)),
+    toggleSearch,
     setQuery,
     toggleSelecting: () => {
       setQuery(null);

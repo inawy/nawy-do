@@ -65,6 +65,15 @@ describe('App', () => {
     expect(box.value).toContain('- [ ] خبز');
   });
 
+  it('N opens the add sheet; typing in a field does not trigger shortcuts', async () => {
+    render(<App db={db} now={now} today={today} />);
+    await screen.findByText(/مفيش نوايا/);
+    fireEvent.keyDown(window, { key: 'n' });
+    const field = await screen.findByRole('textbox');
+    fireEvent.keyDown(field, { key: 'n' });
+    expect(screen.getAllByRole('dialog')).toHaveLength(1);
+  });
+
   it('deletes with a tombstone and undo brings it back', async () => {
     render(<App db={db} now={now} today={today} />);
     await addIntention('سر');
