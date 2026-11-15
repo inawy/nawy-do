@@ -13,6 +13,8 @@ interface Props {
   onSelect: () => void;
   /** Present when finished tasks are showing: asks to delete them all. */
   onClearDone?: (() => void) | undefined;
+  /** Present when there is something to export: opens the text export. */
+  onExport?: (() => void) | undefined;
   /** Present when the view can be sorted: the current mode and how to change it. */
   sort?: { mode: SortMode; onChange: (mode: SortMode) => void } | undefined;
 }
@@ -22,6 +24,7 @@ export function TitleBar(p: Props) {
   const { t } = useI18n();
   const actions: MenuAction[] = [{ label: t('menu.select'), onPick: p.onSelect }];
   if (p.onClearDone) actions.push({ label: t('menu.clearDone'), onPick: p.onClearDone });
+  if (p.onExport) actions.push({ label: t('menu.export'), onPick: p.onExport });
   if (p.onListOptions) actions.push({ label: t('menu.listOptions'), onPick: p.onListOptions });
   const sorts: MenuAction[] = SORT_MODES.map((mode) => ({
     label: t(`sort.${mode}`),

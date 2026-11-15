@@ -57,6 +57,14 @@ describe('App', () => {
     await waitFor(() => expect(screen.getAllByText('كتاب')).toHaveLength(2));
   });
 
+  it('exports the tasks on screen as Markdown text', async () => {
+    render(<App db={db} now={now} today={today} />);
+    await addIntention('خبز');
+    chooseFromMenu('تصدير المهام كنص');
+    const box = (await screen.findByRole('textbox')) as HTMLTextAreaElement;
+    expect(box.value).toContain('- [ ] خبز');
+  });
+
   it('deletes with a tombstone and undo brings it back', async () => {
     render(<App db={db} now={now} today={today} />);
     await addIntention('سر');

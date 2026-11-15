@@ -35,4 +35,5 @@ export const enMore: Record<keyof typeof arMore, string> = {
   'trash.confirmAll': 'Confirm empty trash',
   'backup.googleHint':
     'Coming from Google Tasks? Download your data from Google Takeout and choose Tasks.json: your lists, dates and subtasks come across.',
+  'menu.export': 'Export tasks as text',
 };

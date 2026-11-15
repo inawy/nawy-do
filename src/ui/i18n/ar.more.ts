@@ -31,4 +31,5 @@ export const arMore = {
   'trash.confirmAll': 'تأكيد إفراغ السلة',
   'backup.googleHint':
     'بتنقل من Google Tasks؟ نزّل بياناتك من Google Takeout واختار ملف Tasks.json، وهيتحول لنواياك مع قوائمك وتواريخها وخطواتها.',
+  'menu.export': 'تصدير المهام كنص',
 } as const;
