@@ -90,6 +90,7 @@ export function BackupSheet({
       <p className="hint">
         {lastExport ? t('backup.last', { when: lastExport }) : t('backup.never')}
       </p>
+      <p className="hint">{t('backup.googleHint')}</p>
       <div className="actions data-actions">
         <Button variant="primary" onClick={onExport}>
           {t('backup.export')}
