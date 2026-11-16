@@ -203,7 +203,7 @@ export function App({ repositories, db, now = systemClock, today = systemToday }
         onClose={() => setOpenId(null)}
         onCopy={copyText}
         onCalendar={(t) => {
-          const ics = taskToIcs(t, now());
+          const ics = taskToIcs(t, new Date(now()).toISOString().replace(/[-:]|\.\d+/g, ''));
           if (ics) downloadText('nawy-do-task.ics', ics, 'text/calendar');
         }}
         onShare={canShareText() ? shareTextOnly : undefined}

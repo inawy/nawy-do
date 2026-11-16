@@ -1,10 +1,14 @@
 import { intervalRepeat, type Task } from './types';
 
 // A task as an iCalendar (.ics) event with an alarm, so the phone's calendar does the reminding
-// (it works with the app closed and the screen locked). Pure: `now` is passed in.
+// (it works with the app closed and the screen locked). Pure: the caller supplies `stamp`, the UTC time as `YYYYMMDDTHHMMSSZ`.
 
 const esc = (s: string): string =>
-  s.replace(/\\/g, '\\\\').replace(/;/g, '\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n');
+  s
+    .replace(/\\/g, '\\\\')
+    .replace(/;/g, () => '\\;')
+    .replace(/,/g, '\\,')
+    .replace(/\r?\n/g, '\\n');
 
 /** Folds a line to 75 octets as RFC 5545 asks, never splitting a UTF-8 character. */
 function fold(line: string): string {
@@ -38,10 +42,9 @@ function rrule(task: Task): string | undefined {
 }
 
 /** The calendar file for a task with a due date; `undefined` when it has none. */
-export function taskToIcs(task: Task, now: number): string | undefined {
+export function taskToIcs(task: Task, stamp: string): string | undefined {
   if (!task.due) return undefined;
   const day = task.due.replace(/-/g, '');
-  const stamp = new Date(now).toISOString().replace(/[-:]/g, '').replace(/\.\d+/, '');
   const timed = task.dueTime !== undefined;
   const lines = [
     'BEGIN:VCALENDAR',
