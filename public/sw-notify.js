@@ -1,3 +1,4 @@
+/* global self */
 // Imported by the generated service worker: tapping a due-time notification opens the app.
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
