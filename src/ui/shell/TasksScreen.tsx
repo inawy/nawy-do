@@ -151,7 +151,7 @@ export function TasksScreen(p: TasksScreenProps) {
       {ui.menuOpen && (
         <Drawer
           onClose={() => ui.setMenuOpen(false)}
-          onInstall={p.onInstall}
+          offers={p.offers}
           onData={openData}
           onTrash={() => ui.setTrashOpen(true)}
           trashCount={p.trash.items.length}

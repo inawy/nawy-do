@@ -1,6 +1,14 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { useI18n, LANGS, type Lang } from '../i18n';
-import { CloseIcon, DataIcon, IconButton, LanguageIcon, PlusIcon, TrashIcon } from '../primitives';
+import {
+  BellIcon,
+  CloseIcon,
+  DataIcon,
+  IconButton,
+  LanguageIcon,
+  PlusIcon,
+  TrashIcon,
+} from '../primitives';
 import { loadTheme, setTheme, THEMES } from '../theme';
 import { useBackClose } from '../sheet/useBackClose';
 import { useDrawerSwipe } from '../sheet/useDrawerSwipe';
@@ -12,8 +20,15 @@ interface Props {
   onTrash: () => void;
   /** How many deleted tasks the trash holds. */
   trashCount: number;
-  /** Present while the browser offers to install the app. */
+  /** What the browser currently lets the app offer: each is present only while it applies. */
+  offers: Offers;
+}
+
+export interface Offers {
+  /** The browser offers to install the app. */
   onInstall?: (() => void) | undefined;
+  /** Due-time alerts can be turned on (permission not yet asked). */
+  onAlerts?: (() => void) | undefined;
 }
 
 /** One choice out of a few, as a row of buttons (a radio group). */
@@ -51,7 +66,7 @@ function Segmented<V extends string>(p: {
 const NAMES: Record<Lang, string> = { ar: 'العربية', en: 'English' };
 
 /** The side menu: settings and data (the lists themselves are the tabs). */
-export function Drawer({ onClose, onData, onTrash, trashCount, onInstall }: Props) {
+export function Drawer({ onClose, onData, onTrash, trashCount, offers }: Props) {
   const { t, num, lang, setLang } = useI18n();
   const [theme, setThemeState] = useState(loadTheme);
   useBackClose(onClose);
@@ -118,8 +133,14 @@ export function Drawer({ onClose, onData, onTrash, trashCount, onInstall }: Prop
           {t('menu.trash')}
           {trashCount > 0 && <span className="drawer-count">{num(trashCount)}</span>}
         </button>
-        {onInstall && (
-          <button type="button" className="drawer-item" onClick={pick(onInstall)}>
+        {offers.onAlerts && (
+          <button type="button" className="drawer-item" onClick={pick(offers.onAlerts)}>
+            <BellIcon />
+            {t('menu.alerts')}
+          </button>
+        )}
+        {offers.onInstall && (
+          <button type="button" className="drawer-item" onClick={pick(offers.onInstall)}>
             <PlusIcon />
             {t('menu.install')}
           </button>

@@ -102,6 +102,8 @@ export default defineConfig({
         // Store screenshots are for the install dialog only: not worth precaching.
         globIgnores: ['screenshots/**'],
         cleanupOutdatedCaches: true,
+        // Tapping a due-time notification opens the app (public/sw-notify.js).
+        importScripts: ['sw-notify.js'],
         globPatterns: ['**/*.{js,css,html,svg,woff,woff2,png,ico,webmanifest}'],
       },
     }),
