@@ -19,3 +19,7 @@ export function msUntilLocalMidnight(now: number): number {
   const next = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1).getTime();
   return next - now + 1000;
 }
+
+/** A timestamp as UTC `YYYYMMDDTHHMMSSZ` (iCalendar's DTSTAMP). */
+export const utcStamp = (ms: number): string =>
+  new Date(ms).toISOString().replace(/[-:]|\.\d+/g, '');
