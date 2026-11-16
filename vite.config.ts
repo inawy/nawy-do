@@ -70,6 +70,20 @@ export default defineConfig({
             label: 'المفضلة',
           },
           {
+            src: 'screenshots/narrow-card.png',
+            sizes: '1082x2202',
+            type: 'image/png',
+            form_factor: 'narrow',
+            label: 'بطاقة النية: إجراءات سريعة',
+          },
+          {
+            src: 'screenshots/narrow-empty.png',
+            sizes: '1082x2202',
+            type: 'image/png',
+            form_factor: 'narrow',
+            label: 'حالة فارغة بصور لطيفة',
+          },
+          {
             src: 'screenshots/wide-main.png',
             sizes: '1280x720',
             type: 'image/png',
