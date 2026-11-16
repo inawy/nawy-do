@@ -5,8 +5,10 @@ import { App } from '@/app/App';
 import { prepareStorage } from '@/app/bootstrap';
 import { listenForInstall } from '@/app/install';
 import { updateSignal } from '@/app/updateSignal';
+import { loadTheme, syncThemeColor } from '@/ui/theme';
 
 listenForInstall();
+syncThemeColor(loadTheme());
 const root = document.getElementById('root');
 if (!root) throw new Error('#root is missing');
 // A safety copy of an older database first (never blocks for more than a moment), then render.
