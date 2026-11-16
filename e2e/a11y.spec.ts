@@ -29,9 +29,16 @@ async function violations(page: Page): Promise<string[]> {
     );
 }
 
-for (const scheme of ['light', 'dark'] as const) {
+// «black» is the AMOLED theme: chosen in the app, stored per device, on top of a dark system.
+for (const scheme of ['light', 'dark', 'black'] as const) {
   test.describe(scheme, () => {
-    test.use({ colorScheme: scheme });
+    test.use({ colorScheme: scheme === 'light' ? 'light' : 'dark' });
+
+    if (scheme === 'black') {
+      test.beforeEach(async ({ page }) => {
+        await page.addInitScript(() => localStorage.setItem('nawy-do:theme', 'black'));
+      });
+    }
 
     test.beforeEach(async ({ page }) => {
       await page.goto('/');
@@ -59,6 +66,27 @@ for (const scheme of ['light', 'dark'] as const) {
 
     test('data sheet', async ({ page }) => {
       await chooseFromDrawer(page, 'بياناتي');
+      await expect(page.getByRole('dialog')).toBeVisible();
+      expect(await violations(page)).toEqual([]);
+    });
+
+    test('add sheet', async ({ page }) => {
+      await page.getByRole('button', { name: 'نية جديدة' }).click();
+      await expect(page.getByLabel(prompt)).toBeVisible();
+      expect(await violations(page)).toEqual([]);
+    });
+
+    test('trash with an item', async ({ page }) => {
+      await page.getByRole('button', { name: 'تفاصيل: اشتري خبز' }).click();
+      await page.getByRole('button', { name: 'حذف', exact: true }).click();
+      await page.getByRole('button', { name: 'تأكيد الحذف' }).click();
+      await chooseFromDrawer(page, /سلة المحذوفات/);
+      await expect(page.getByRole('dialog')).toBeVisible();
+      expect(await violations(page)).toEqual([]);
+    });
+
+    test('drawer', async ({ page }) => {
+      await page.getByRole('button', { name: 'القائمة الجانبية' }).click();
       await expect(page.getByRole('dialog')).toBeVisible();
       expect(await violations(page)).toEqual([]);
     });
