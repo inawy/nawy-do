@@ -23,3 +23,10 @@ export function msUntilLocalMidnight(now: number): number {
 /** A timestamp as UTC `YYYYMMDDTHHMMSSZ` (iCalendar's DTSTAMP). */
 export const utcStamp = (ms: number): string =>
   new Date(ms).toISOString().replace(/[-:]|\.\d+/g, '');
+
+/** A civil date (`YYYY-MM-DD`) and time (`HH:MM`) in the device's time zone, as a timestamp. */
+export function localTimeMs(date: string, time: string): number {
+  const [y = 0, mo = 1, d = 1] = date.split('-').map(Number);
+  const [h = 0, mi = 0] = time.split(':').map(Number);
+  return new Date(y, mo - 1, d, h, mi).getTime();
+}

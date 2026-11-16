@@ -8,6 +8,7 @@ import type {
   TaskPatch,
   TrashEntry,
 } from '@/core/model';
+import type { Offers } from './Drawer';
 import type { Outcome, SnapshotItem, StorageStatus } from '../backup';
 
 /** Everything the «بياناتي» sheet needs; the screen only shows it. */
@@ -61,8 +62,8 @@ export interface TasksScreenProps {
   onSort: (mode: SortMode) => void;
   /** Set when a new app version is waiting. */
   applyUpdate: (() => void) | undefined;
-  /** Set while the browser offers to install the app. */
-  onInstall: (() => void) | undefined;
+  /** Install and alerts offers for the side menu. */
+  offers: Offers;
   /** Opened by the «new intention» shortcut: focus the add field. */
   focusAdd: boolean;
   onSelect: (s: Selection) => void;
