@@ -25,7 +25,7 @@ const BAR: Record<Exclude<Theme, 'auto'>, string> = {
 export function syncThemeColor(theme: Theme): void {
   const tags = document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]');
   tags.forEach((tag) => {
-    const dark = tag.media.includes('dark');
+    const dark = (tag.getAttribute('media') ?? '').includes('dark');
     tag.content = theme === 'auto' ? BAR[dark ? 'dark' : 'light'] : BAR[theme];
   });
 }
