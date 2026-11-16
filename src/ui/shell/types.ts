@@ -79,6 +79,8 @@ export interface TasksScreenProps {
   onClose: () => void;
   /** Copies text to the clipboard; resolves to whether it worked. */
   onCopy: (text: string) => Promise<boolean>;
+  /** Hands the task to the phone's calendar (a .ics file with an alarm). */
+  onCalendar: (task: Task) => void;
   /** Set where the browser can share text. */
   onShare?: ((title: string, text: string) => Promise<boolean>) | undefined;
   onSave: (t: Task, patch: TaskPatch) => void;

@@ -6,6 +6,7 @@ import {
   needsBackupNudge,
   quickTask,
   resolveSelection,
+  taskToIcs,
   type Selection,
   type SortMode,
 } from '@/core/model';
@@ -17,7 +18,7 @@ import { MAX_LISTS } from '@/core/model';
 import { useTasks, useTrash } from '@/features/tasks';
 import { I18nProvider, makeI18n, type Lang } from '@/ui/i18n';
 import { TasksScreen } from '@/ui/shell';
-import { formatWhen, systemClock, systemToday } from './clock';
+import { formatWhen, systemClock, systemToday, utcStamp } from './clock';
 import { getDb } from './db';
 import {
   canShareFile,
@@ -201,6 +202,10 @@ export function App({ repositories, db, now = systemClock, today = systemToday }
         onRemoveMany={(ids) => void tasks.removeMany(ids)}
         onClose={() => setOpenId(null)}
         onCopy={copyText}
+        onCalendar={(t) => {
+          const ics = taskToIcs(t, utcStamp(now()));
+          if (ics) downloadText('nawy-do-task.ics', ics, 'text/calendar');
+        }}
         onShare={canShareText() ? shareTextOnly : undefined}
         onSave={(t, patch) => void tasks.edit(t, patch)}
         onRemove={(t) => void tasks.remove(t)}

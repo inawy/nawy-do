@@ -177,6 +177,7 @@ export function TasksScreen(p: TasksScreenProps) {
           onDuplicate={() => p.onDuplicate(editing)}
           onClose={p.onClose}
           onCopy={p.onCopy}
+          onCalendar={() => p.onCalendar(editing)}
           onShare={p.onShare}
         />
       )}

@@ -31,6 +31,8 @@ interface Props {
   /** Copies text to the clipboard; resolves to whether it worked. */
   onCopy: (text: string) => Promise<boolean>;
   /** Present where the browser can share text. */
+  /** Offered only for a task with a date. */
+  onCalendar: () => void;
   onShare?: ((title: string, text: string) => Promise<boolean>) | undefined;
 }
 
@@ -48,6 +50,7 @@ export function TaskCard({
   onDuplicate,
   onClose,
   onCopy,
+  onCalendar,
   onShare,
 }: Props) {
   const i18n = useI18n();
@@ -151,6 +154,12 @@ export function TaskCard({
             <CopyIcon />
             {t('card.copy')}
           </button>
+          {task.due && (
+            <button type="button" onClick={onCalendar}>
+              <CalendarIcon />
+              {t('card.calendar')}
+            </button>
+          )}
           {onShare && (
             <button type="button" onClick={() => void onShare(task.title, text())}>
               <ShareIcon />

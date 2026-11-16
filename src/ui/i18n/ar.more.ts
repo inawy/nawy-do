@@ -37,4 +37,5 @@ export const arMore = {
   'repeatEvery.weekly': 'كل {n} أسبوع',
   'repeatEvery.monthly': 'كل {n} شهر',
   'repeatEvery.yearly': 'كل {n} سنة',
+  'card.calendar': 'إضافة للتقويم',
 } as const;
