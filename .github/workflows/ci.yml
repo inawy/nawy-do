@@ -60,6 +60,11 @@ jobs:
             echo "::error title=build failed::$(tail -n 25 build.log | sed 's/%/%25/g' | sed ':a;N;$!ba;s/\n/%0A/g')"
           fi
           exit "$code"
+      - name: Bundle report (where the kilobytes come from; informational)
+        continue-on-error: true
+        run: |
+          pnpm exec vite build --sourcemap --outDir "$RUNNER_TEMP/report"
+          node scripts/bundle-report.mjs "$RUNNER_TEMP/report" | tee bundle-report.txt
       - name: Bundle budget (gzip size of what a first visit downloads)
         run: pnpm run budget
       - name: Install Playwright browser
