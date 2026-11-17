@@ -54,8 +54,10 @@ async function record(page: Page, prefix: string, project: string) {
   await page.getByText(/^المنجزة/).click();
   await shot('7a-done-open');
   await page.getByRole('button', { name: 'اليوم' }).click();
+  await expect(page.locator('svg.illustration')).toBeVisible(); // the drawing loads on demand
   await shot('8-empty-today');
   await chooseFromDrawer(page, /سلة المحذوفات/);
+  await expect(page.getByRole('dialog').locator('svg.illustration')).toBeVisible();
   await shot('9-trash');
   // A row with a date, a time and a repeat (typed in plain words): the details line under the title.
   await page.keyboard.press('Escape');
