@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { Suspense, useRef } from 'react';
 import {
   countsFor,
   isSortable,
@@ -7,15 +7,13 @@ import {
   selectedListId,
   tasksIn,
 } from '@/core/model';
-import { BackupSheet } from '../backup';
 import { useI18n } from '../i18n';
 import { IconButton, MenuIcon } from '../primitives';
 import { AddButton, AddSheet, TaskList as Tasks } from '../tasks';
 import '../styles/index.css';
-import { TrashSheet } from '../trash';
 import { ClearDoneSheet } from './ClearDoneSheet';
 import { Drawer } from './Drawer';
-import { ExportSheet } from './ExportSheet';
+import { BackupSheet, ExportSheet, TrashSheet } from './lazySheets';
 import { RemovedToast } from './RemovedToast';
 import { InputBar } from './InputBar';
 import { Notices } from './Notices';
@@ -191,36 +189,38 @@ export function TasksScreen(p: TasksScreenProps) {
         onDelete={p.onDeleteList}
         onMove={p.onMoveList}
       />
-      {ui.trashOpen && (
-        <TrashSheet
-          items={p.trash.items}
-          now={p.trash.now}
-          listsFull={p.trash.listsFull}
-          onRestore={p.trash.onRestore}
-          onDelete={p.trash.onDelete}
-          onClose={() => ui.setTrashOpen(false)}
-        />
-      )}
-      {ui.dataOpen && <BackupSheet {...p.data} onClose={() => ui.setDataOpen(false)} />}
-      {ui.clearIds && (
-        <ClearDoneSheet
-          count={ui.clearIds.length}
-          onConfirm={() => {
-            p.onRemoveMany(ui.clearIds ?? []);
-            ui.setClearIds(null);
-          }}
-          onClose={() => ui.setClearIds(null)}
-        />
-      )}
-      <RemovedToast p={p} />
-      {ui.exportOpen && (
-        <ExportSheet
-          p={p}
-          title={viewTitle}
-          tasks={visible}
-          onClose={() => ui.setExportOpen(false)}
-        />
-      )}
+      <Suspense fallback={null}>
+        {ui.trashOpen && (
+          <TrashSheet
+            items={p.trash.items}
+            now={p.trash.now}
+            listsFull={p.trash.listsFull}
+            onRestore={p.trash.onRestore}
+            onDelete={p.trash.onDelete}
+            onClose={() => ui.setTrashOpen(false)}
+          />
+        )}
+        {ui.dataOpen && <BackupSheet {...p.data} onClose={() => ui.setDataOpen(false)} />}
+        {ui.clearIds && (
+          <ClearDoneSheet
+            count={ui.clearIds.length}
+            onConfirm={() => {
+              p.onRemoveMany(ui.clearIds ?? []);
+              ui.setClearIds(null);
+            }}
+            onClose={() => ui.setClearIds(null)}
+          />
+        )}
+        <RemovedToast p={p} />
+        {ui.exportOpen && (
+          <ExportSheet
+            p={p}
+            title={viewTitle}
+            tasks={visible}
+            onClose={() => ui.setExportOpen(false)}
+          />
+        )}
+      </Suspense>
     </div>
   );
 }
