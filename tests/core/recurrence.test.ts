@@ -162,3 +162,33 @@ describe('the end of a repeat', () => {
     expect(completeTask(first, 6, '2026-11-17').status).toBe('done');
   });
 });
+
+describe('parsing and editing the end of a repeat', () => {
+  const rec = { ...createTask('a', 'x', 1), due: '2026-11-10', repeat: 'daily' as const };
+  const raw = (extra: object) => ({ ...rec, ...extra });
+
+  it('accepts a valid limit and rejects broken ones', () => {
+    expect(parseTask(raw({ repeatUntil: '2026-12-01' })).ok).toBe(true);
+    expect(parseTask(raw({ repeatTimes: 3 })).ok).toBe(true);
+    expect(parseTask(raw({ repeatUntil: 'soon' })).ok).toBe(false);
+    expect(parseTask(raw({ repeatTimes: 0 })).ok).toBe(false);
+    expect(parseTask(raw({ repeatTimes: 1.5 })).ok).toBe(false);
+    expect(parseTask(raw({ repeatTimes: 5000 })).ok).toBe(false);
+    expect(parseTask(raw({ repeatUntil: '2026-12-01', repeatTimes: 3 })).ok).toBe(false);
+    expect(parseTask(raw({ repeat: undefined, repeatTimes: 3 })).ok).toBe(false);
+    expect(parseTask(raw({ repeatEvery: 1 })).ok).toBe(false);
+    expect(parseTask(raw({ repeatEvery: 500 })).ok).toBe(false);
+    expect(parseTask(raw({ repeat: 'workdays', repeatEvery: 2 })).ok).toBe(false);
+  });
+
+  it('a date replaces a count, a limit goes with the repeat, an empty value clears it', () => {
+    const counted = updateTask(rec, { repeatTimes: 4 }, 2);
+    expect(counted.repeatTimes).toBe(4);
+    const dated = updateTask(counted, { repeatUntil: '2026-12-01' }, 3);
+    expect(dated.repeatTimes).toBeUndefined();
+    expect(updateTask(dated, { repeatUntil: '' }, 4).repeatUntil).toBeUndefined();
+    expect(updateTask(counted, { repeatTimes: 0 }, 3).repeatTimes).toBeUndefined();
+    expect(updateTask(counted, { repeat: '' }, 3).repeatTimes).toBeUndefined();
+    expect(updateTask(counted, { repeatTimes: 99999 }, 3).repeatTimes).toBe(999);
+  });
+});
