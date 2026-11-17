@@ -37,3 +37,15 @@ describe('taskToIcs', () => {
     }
   });
 });
+
+describe('taskToIcs repeat end', () => {
+  const t = updateTask(base, { due: '2026-11-20', repeat: 'daily' }, 2);
+  it('UNTIL in the form of DTSTART, and COUNT', () => {
+    expect(taskToIcs(updateTask(t, { repeatUntil: '2026-12-01' }, 3), 'x')).toContain(
+      'RRULE:FREQ=DAILY;UNTIL=20261201\r\n',
+    );
+    const timed = updateTask(t, { dueTime: '09:00', repeatUntil: '2026-12-01' }, 3);
+    expect(taskToIcs(timed, 'x')).toContain('UNTIL=20261201T235959');
+    expect(taskToIcs(updateTask(t, { repeatTimes: 5 }, 3), 'x')).toContain('COUNT=5');
+  });
+});

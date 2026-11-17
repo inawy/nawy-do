@@ -40,4 +40,8 @@ export const arMore = {
   'card.calendar': 'إضافة للتقويم',
   'menu.alerts': 'تفعيل تنبيهات الاستحقاق',
   'alerts.title': 'ناوي دو',
+  'details.repeatEnd': 'ينتهي التكرار',
+  'details.endNever': 'أبدًا',
+  'details.endUntil': 'في تاريخ',
+  'details.endTimes': 'بعد عدد مرات',
 } as const;

@@ -142,3 +142,23 @@ describe('nextDue with an interval', () => {
     expect(nextDue('2026-11-01', 'daily', '2026-11-10', 4)).toBe('2026-11-13');
   });
 });
+
+describe('the end of a repeat', () => {
+  const base = { ...createTask('a', 'x', 1), due: '2026-11-10', repeat: 'weekly' as const };
+
+  it('a repeat with a date limit finishes when the next one would pass it', () => {
+    const t = { ...base, repeatUntil: '2026-11-20' };
+    const first = completeTask(t, 5, '2026-11-10');
+    expect(first.status).toBe('open');
+    expect(first.due).toBe('2026-11-17');
+    expect(completeTask(first, 6, '2026-11-17').status).toBe('done');
+  });
+
+  it('a repeat with a count counts down and then finishes', () => {
+    const t = { ...base, repeatTimes: 2 };
+    const first = completeTask(t, 5, '2026-11-10');
+    expect(first.repeatTimes).toBe(1);
+    expect(first.status).toBe('open');
+    expect(completeTask(first, 6, '2026-11-17').status).toBe('done');
+  });
+});

@@ -44,4 +44,8 @@ export const enMore: Record<keyof typeof arMore, string> = {
   'card.calendar': 'Add to calendar',
   'menu.alerts': 'Turn on due alerts',
   'alerts.title': 'Nawy To Do',
+  'details.repeatEnd': 'Ends',
+  'details.endNever': 'Never',
+  'details.endUntil': 'On date',
+  'details.endTimes': 'After a number of times',
 };

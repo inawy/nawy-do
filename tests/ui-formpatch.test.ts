@@ -8,6 +8,8 @@ const base: DetailsForm = {
   dueTime: '',
   repeat: '',
   every: 1,
+  until: '',
+  times: 0,
   starred: false,
   steps: [],
   listId: '',
@@ -41,5 +43,23 @@ describe('changedFields', () => {
   it('leaves the list alone unless the person picked another', () => {
     expect(changedFields(base, { ...base, title: 'جديدة' })).not.toHaveProperty('listId');
     expect(changedFields(base, { ...base, listId: 'L' })).toEqual({ listId: 'L' });
+  });
+});
+
+describe('changedFields: the end of a repeat', () => {
+  const repeating: DetailsForm = { ...base, due: '2026-11-20', repeat: 'daily' };
+
+  it('sends a date limit, then a count when it replaces the date', () => {
+    const withDate = { ...repeating, until: '2026-12-01' };
+    expect(changedFields(repeating, withDate)).toEqual({ repeatUntil: '2026-12-01' });
+    expect(changedFields(withDate, { ...repeating, times: 3 })).toEqual({
+      repeatUntil: '',
+      repeatTimes: 3,
+    });
+  });
+
+  it('drops the limits when the repeat goes', () => {
+    const limited = { ...repeating, times: 3 };
+    expect(changedFields(limited, { ...limited, repeat: '' })).toMatchObject({ repeatTimes: 0 });
   });
 });

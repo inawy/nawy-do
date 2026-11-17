@@ -54,3 +54,9 @@ export function nextDue(due: string, repeat: Repeat, today: string, every = 1): 
 /** Does completing this task bring it back instead of finishing it? */
 export const isRepeating = (task: Task): task is Task & { due: string; repeat: Repeat } =>
   task.status === 'open' && task.repeat !== undefined && task.due !== undefined;
+
+/** Whether finishing this occurrence ends the series: its limit (a date or a count) is reached. */
+export function seriesEnds(task: Task, next: string): boolean {
+  if (task.repeatUntil !== undefined && next > task.repeatUntil) return true;
+  return task.repeatTimes !== undefined && task.repeatTimes <= 1;
+}

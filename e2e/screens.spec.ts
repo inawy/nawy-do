@@ -65,6 +65,10 @@ async function record(page: Page, prefix: string, project: string) {
   await page.getByRole('button', { name: 'إضافة' }).click();
   await expect(page.getByText('ادفع الفاتورة', { exact: true })).toBeVisible();
   await shot('10-rows');
+  await page.getByRole('button', { name: 'تفاصيل: ادفع الفاتورة' }).click();
+  await page.getByRole('button', { name: 'تعديل' }).click();
+  await page.getByLabel('ينتهي التكرار').selectOption('times');
+  await shot('11-repeat-end');
 }
 
 test('screens', async ({ page }, info) => {

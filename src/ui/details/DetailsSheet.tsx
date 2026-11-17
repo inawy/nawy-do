@@ -52,6 +52,7 @@ export function DetailsSheet({ task, lists, today, onSave, newId, onRemove, onCl
   const [dueTime, setDueTime] = useState(task.dueTime ?? '');
   const [repeat, setRepeat] = useState<Repeat | ''>(task.repeat ?? '');
   const [every, setEvery] = useState(task.repeatEvery ?? 1);
+  const [end, setEnd] = useState({ until: task.repeatUntil ?? '', times: task.repeatTimes ?? 0 });
   const [starred, setStarred] = useState(task.starred);
   const [steps, setSteps] = useState<Step[]>(task.steps ?? []);
   const [newStep, setNewStep] = useState('');
@@ -86,6 +87,7 @@ export function DetailsSheet({ task, lists, today, onSave, newId, onRemove, onCl
           dueTime,
           repeat,
           every,
+          ...end,
           steps: all,
           starred,
           listId,
@@ -181,6 +183,9 @@ export function DetailsSheet({ task, lists, today, onSave, newId, onRemove, onCl
             disabled={due === ''}
             repeat={repeat}
             every={every}
+            due={due}
+            end={end}
+            onEnd={setEnd}
             onRepeat={setRepeat}
             onEvery={setEvery}
           />

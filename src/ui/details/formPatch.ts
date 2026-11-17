@@ -16,6 +16,10 @@ export interface DetailsForm {
   repeat: Repeat | '';
   /** `1`: every one. */
   every: number;
+  /** The date the repeat stops after, or `''`. */
+  until: string;
+  /** How many occurrences in all, or `0` for no limit. */
+  times: number;
   starred: boolean;
   steps: Step[];
   listId: string;
@@ -43,6 +47,10 @@ export function changedFields(before: DetailsForm, after: DetailsForm): TaskPatc
   if (repeat !== before.repeat) patch.repeat = repeat;
   const every = repeat === '' ? 1 : after.every;
   if (every !== before.every) patch.repeatEvery = every;
+  const until = repeat === '' ? '' : after.until;
+  const times = repeat === '' || until !== '' ? 0 : after.times;
+  if (until !== before.until) patch.repeatUntil = until;
+  if (times !== before.times) patch.repeatTimes = times;
   if (!sameSteps(before.steps, after.steps)) patch.steps = after.steps;
   if (after.listId !== before.listId) patch.listId = after.listId;
   return patch;
@@ -57,6 +65,8 @@ export function formOf(task: Task, lists: readonly TaskList[]): DetailsForm {
     dueTime: task.dueTime ?? '',
     repeat: task.repeat ?? '',
     every: task.repeatEvery ?? 1,
+    until: task.repeatUntil ?? '',
+    times: task.repeatTimes ?? 0,
     starred: task.starred,
     steps: task.steps ?? [],
     listId: listOf(task, lists) ?? '',
