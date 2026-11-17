@@ -83,28 +83,29 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+/* The date, repeat and steps run on in one line of text and wrap like words, not one chip each. */
 .meta {
-  display: flex;
-  gap: 0.375rem;
-  flex-wrap: wrap;
+  display: block;
   margin-block-start: 2px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
+  color: var(--muted);
 }
 .chip {
-  font-size: 0.8125rem;
+  display: inline;
+  white-space: nowrap;
   color: var(--muted);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 0 0.5rem;
-  line-height: 1.5rem;
-  background: var(--card);
+}
+.chip + .chip::before {
+  content: '\00b7';
+  margin-inline: 0.375rem;
+  color: var(--muted);
 }
 .chip.overdue {
   color: var(--danger);
-  border-color: var(--danger);
 }
 .chip.today {
   color: var(--brand);
-  border-color: var(--brand);
 }
 .row.done .title {
   text-decoration: line-through;
