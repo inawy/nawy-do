@@ -158,6 +158,13 @@
 .done-section {
   margin-block-start: 0.75rem;
 }
+/* No divider under the last finished row: it would run along the rounded bottom edge. */
+.done-section[open] {
+  padding-block-end: 0.5rem;
+}
+.done-section .row:last-child {
+  border-block-end: 0;
+}
 .done-section summary {
   list-style: none;
   display: flex;
