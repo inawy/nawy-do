@@ -19,6 +19,7 @@ const open = async () => {
   render(<App db={db} now={now} today={today} />);
   await screen.findByText(/مفيش نوايا لسه|جاري/);
   chooseFromDrawer('بياناتي');
+  await screen.findByRole('dialog'); // the sheet loads on first use
 };
 
 const file = (text: string) => new File([text], 'b.json', { type: 'application/json' });

@@ -9,13 +9,19 @@ import { join } from 'node:path';
 // import, export, calendar file, alerts, repeat end and lead time) brought it to ~160 / ~7 / ~168,
 // so js is raised to 170 and total to 190 on purpose. Next saving to make is lazy-loading the
 // rarely used sheets (trash, export, data) rather than raising this again.
-const BUDGET_KB = { js: 170, css: 8, total: 190 };
+// `critical` is what the first screen loads: the scripts index.html names (entry and the chunks
+// it preloads). Rarely opened sheets load on first use, so they count in `js` but not here.
+const BUDGET_KB = { critical: 160, js: 170, css: 8, total: 190 };
 const dir = 'dist/assets';
 const sizes = { js: 0, css: 0 };
 for (const file of readdirSync(dir)) {
   const kind = file.endsWith('.js') ? 'js' : file.endsWith('.css') ? 'css' : undefined;
   if (kind) sizes[kind] += gzipSync(readFileSync(join(dir, file))).length / 1024;
 }
+const html = readFileSync('dist/index.html', 'utf8');
+const named = new Set([...html.matchAll(/assets\/([^"']+\.js)/g)].map((m) => m[1]));
+sizes.critical = 0;
+for (const file of named) sizes.critical += gzipSync(readFileSync(join(dir, file))).length / 1024;
 sizes.total = sizes.js + sizes.css + gzipSync(readFileSync('dist/index.html')).length / 1024;
 
 let failed = false;
