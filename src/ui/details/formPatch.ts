@@ -13,6 +13,8 @@ export interface DetailsForm {
   notes: string;
   due: string;
   dueTime: string;
+  /** Minutes before the time the reminder rings; `0` = at the time. */
+  remind: number;
   repeat: Repeat | '';
   /** `1`: every one. */
   every: number;
@@ -44,6 +46,8 @@ export function changedFields(before: DetailsForm, after: DetailsForm): TaskPatc
   const repeat = after.due === '' ? '' : after.repeat;
   if (after.due !== before.due) patch.due = after.due;
   if (dueTime !== before.dueTime) patch.dueTime = dueTime;
+  const remind = dueTime === '' ? 0 : after.remind;
+  if (remind !== before.remind) patch.remindBefore = remind;
   if (repeat !== before.repeat) patch.repeat = repeat;
   const every = repeat === '' ? 1 : after.every;
   if (every !== before.every) patch.repeatEvery = every;
@@ -63,6 +67,7 @@ export function formOf(task: Task, lists: readonly TaskList[]): DetailsForm {
     notes: task.notes ?? '',
     due: task.due ?? '',
     dueTime: task.dueTime ?? '',
+    remind: task.remindBefore ?? 0,
     repeat: task.repeat ?? '',
     every: task.repeatEvery ?? 1,
     until: task.repeatUntil ?? '',

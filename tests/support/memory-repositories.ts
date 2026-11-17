@@ -102,6 +102,7 @@ export function createMemoryRepositories(): Repositories & {
         if (options.due) t.due = options.due;
         if (options.due && options.dueTime) t.dueTime = options.dueTime;
         if (options.due && options.repeat) t.repeat = options.repeat;
+        if (t.dueTime && options.remindBefore) t.remindBefore = options.remindBefore;
         if (t.repeat && options.repeatEvery) t.repeatEvery = options.repeatEvery;
         if (t.repeat && options.repeatUntil) t.repeatUntil = options.repeatUntil;
         else if (t.repeat && options.repeatTimes) t.repeatTimes = options.repeatTimes;

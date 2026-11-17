@@ -192,3 +192,23 @@ describe('parsing and editing the end of a repeat', () => {
     expect(updateTask(counted, { repeatTimes: 99999 }, 3).repeatTimes).toBe(999);
   });
 });
+
+describe('remindBefore', () => {
+  const timed = updateTask(createTask('a', 'x', 1), { due: '2026-11-20', dueTime: '09:00' }, 2);
+
+  it('is kept with a time and dropped without one, or when it is not a known lead', () => {
+    const r = updateTask(timed, { remindBefore: 30 }, 3);
+    expect(r.remindBefore).toBe(30);
+    expect(updateTask(r, { remindBefore: 7 }, 4).remindBefore).toBeUndefined();
+    expect(updateTask(r, { remindBefore: 0 }, 4).remindBefore).toBeUndefined();
+    expect(updateTask(r, { dueTime: '' }, 4).remindBefore).toBeUndefined();
+  });
+
+  it('parses only a known lead on a timed task', () => {
+    expect(parseTask({ ...timed, remindBefore: 30 }).ok).toBe(true);
+    expect(parseTask({ ...timed, remindBefore: 7 }).ok).toBe(false);
+    expect(parseTask({ ...timed, remindBefore: 0 }).ok).toBe(false);
+    const dateOnly = { ...createTask('b', 'y', 1), due: '2026-11-20', remindBefore: 30 };
+    expect(parseTask(dateOnly).ok).toBe(false);
+  });
+});

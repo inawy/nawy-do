@@ -26,6 +26,7 @@ export interface NewTaskOptions {
   repeat?: Repeat;
   repeatEvery?: number;
   repeatUntil?: string;
+  remindBefore?: number;
   repeatTimes?: number;
   notes?: string;
   steps?: Step[];

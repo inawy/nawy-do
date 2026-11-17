@@ -69,6 +69,9 @@ async function record(page: Page, prefix: string, project: string) {
   await page.getByRole('button', { name: 'تعديل' }).click();
   await page.getByLabel('ينتهي التكرار').selectOption('times');
   await shot('11-repeat-end');
+  await page.getByLabel('التذكير').selectOption('30');
+  await page.getByLabel('التذكير').scrollIntoViewIfNeeded();
+  await shot('12-remind');
 }
 
 test('screens', async ({ page }, info) => {
