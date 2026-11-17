@@ -55,6 +55,14 @@ async function record(page: Page, prefix: string, project: string) {
   await shot('8-empty-today');
   await chooseFromDrawer(page, /سلة المحذوفات/);
   await shot('9-trash');
+  // A row with a date, a time and a repeat (typed in plain words): the details line under the title.
+  await page.keyboard.press('Escape');
+  await page.getByRole('button', { name: 'نواياي' }).click();
+  await page.getByRole('button', { name: 'نية جديدة' }).click();
+  await page.getByLabel(prompt).fill('ادفع الفاتورة بكرة 5 مساء كل اسبوع');
+  await page.getByRole('button', { name: 'إضافة' }).click();
+  await expect(page.getByText('ادفع الفاتورة', { exact: true })).toBeVisible();
+  await shot('10-rows');
 }
 
 test('screens', async ({ page }, info) => {

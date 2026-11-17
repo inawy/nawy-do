@@ -3,7 +3,7 @@ import { dueState, stepProgress, type Task } from '@/core/model';
 import { formatDue, formatTime } from '../i18n/format';
 import { useI18n } from '../i18n';
 import { repeatLabel } from '../i18n/repeatLabel';
-import { GripIcon, StarIcon } from '../primitives';
+import { CalendarIcon, ChecklistIcon, GripIcon, RepeatIcon, StarIcon } from '../primitives';
 import type { SortState } from '../sortable';
 import { useLongPress } from './useLongPress';
 
@@ -83,13 +83,20 @@ export function TaskRow({ task, today, onToggle, onStar, onOpen, onLongPress, so
             <span className="meta">
               {task.due && (
                 <span className={done ? 'chip' : `chip ${state ?? ''}`}>
+                  <CalendarIcon />
                   {formatDue(task.due, today, i18n)}
                   {task.dueTime && ` · ${formatTime(task.dueTime, i18n)}`}
                 </span>
               )}
-              {repeatText && !done && <span className="chip">{repeatText}</span>}
+              {repeatText && !done && (
+                <span className="chip">
+                  <RepeatIcon />
+                  {repeatText}
+                </span>
+              )}
               {progress && (
                 <span className="chip">
+                  <ChecklistIcon />
                   {t('row.steps', { done: progress.done, total: progress.total })}
                 </span>
               )}

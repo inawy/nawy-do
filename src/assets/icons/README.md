@@ -22,6 +22,8 @@ Source: <https://github.com/google/material-design-icons> at commit `10ecc147906
 | `language.svg`               | language choice in the side menu                       |
 | `edit.svg`                   | edit, on the task card                                 |
 | `content_copy.svg`           | copy a task as text, on the task card                  |
+| `repeat.svg`                 | repeat, in a task row's details line                   |
+| `checklist.svg`              | steps done, in a task row's details line               |
 | `notifications.svg`          | turn on due-time alerts, in the side menu              |
 | `library_add.svg`            | duplicate a task, on the task card                     |
 | `share.svg`                  | share a task, on the task card                         |
