@@ -44,6 +44,8 @@ export async function addTask(
   if (options.due && options.dueTime) task.dueTime = options.dueTime;
   if (options.due && options.repeat) task.repeat = options.repeat;
   if (task.repeat && options.repeatEvery) task.repeatEvery = options.repeatEvery;
+  if (task.repeat && options.repeatUntil) task.repeatUntil = options.repeatUntil;
+  else if (task.repeat && options.repeatTimes) task.repeatTimes = options.repeatTimes;
   if (options.notes?.trim()) task.notes = options.notes;
   if (options.steps?.length) task.steps = options.steps;
   await db.tasks.add(task);

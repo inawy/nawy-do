@@ -15,6 +15,8 @@ export const MAX_STEP_TITLE = 500;
 export type Repeat = 'daily' | 'workdays' | 'weekly' | 'monthly' | 'yearly';
 /** «Every N days/weeks/months/years»: the largest N a task may use. */
 export const MAX_REPEAT_EVERY = 99;
+/** The most occurrences a repeat may be limited to. */
+export const MAX_REPEAT_TIMES = 999;
 /** The repeats that can take an interval (workdays cannot). */
 export const intervalRepeat = (r: Repeat | undefined): boolean =>
   r === 'daily' || r === 'weekly' || r === 'monthly' || r === 'yearly';
@@ -38,6 +40,10 @@ export interface Task {
   repeat?: Repeat;
   /** Interval of `repeat`: 2 = every other day/week/…. Absent = every one. */
   repeatEvery?: number;
+  /** The repeat stops after this date: the last due date it may land on. */
+  repeatUntil?: string;
+  /** The repeat stops after this many more occurrences, this one included (1 = the last). */
+  repeatTimes?: number;
   steps?: Step[];
   /** The list it belongs to. Absent = the main list. A list that no longer exists = main too. */
   listId?: string;

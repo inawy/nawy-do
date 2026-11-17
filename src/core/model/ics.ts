@@ -35,10 +35,18 @@ const FREQ = { daily: 'DAILY', weekly: 'WEEKLY', monthly: 'MONTHLY', yearly: 'YE
 
 function rrule(task: Task): string | undefined {
   if (!task.repeat) return undefined;
-  if (task.repeat === 'workdays') return 'FREQ=WEEKLY;BYDAY=SU,MO,TU,WE,TH';
   const every =
     intervalRepeat(task.repeat) && task.repeatEvery ? `;INTERVAL=${task.repeatEvery}` : '';
-  return `FREQ=${FREQ[task.repeat]}${every}`;
+  const base =
+    task.repeat === 'workdays'
+      ? 'FREQ=WEEKLY;BYDAY=SU,MO,TU,WE,TH'
+      : `FREQ=${FREQ[task.repeat]}${every}`;
+  if (task.repeatUntil) {
+    const day = task.repeatUntil.replace(/-/g, '');
+    // UNTIL must have the same form as DTSTART: a date, or a (floating) date-time.
+    return `${base};UNTIL=${task.dueTime === undefined ? day : `${day}T235959`}`;
+  }
+  return task.repeatTimes ? `${base};COUNT=${task.repeatTimes}` : base;
 }
 
 /** The calendar file for a task with a due date; `undefined` when it has none. */

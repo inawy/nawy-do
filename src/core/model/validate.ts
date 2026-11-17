@@ -5,6 +5,7 @@ import {
   intervalRepeat,
   MAX_LIST_NAME,
   MAX_REPEAT_EVERY,
+  MAX_REPEAT_TIMES,
   MAX_STEPS,
   MAX_STEP_TITLE,
   REPEATS,
@@ -91,6 +92,19 @@ export function parseTask(raw: unknown): Result<Task, string> {
     }
     if (!intervalRepeat(task.repeat)) return err('repeatEvery');
     task.repeatEvery = n as number;
+  }
+  if (r['repeatUntil'] !== undefined) {
+    const u = r['repeatUntil'];
+    if (typeof u !== 'string' || !isCivilDate(u) || task.repeat === undefined)
+      return err('repeatUntil');
+    task.repeatUntil = u;
+  }
+  if (r['repeatTimes'] !== undefined) {
+    const n = r['repeatTimes'];
+    const ok = Number.isInteger(n) && (n as number) >= 1 && (n as number) <= MAX_REPEAT_TIMES;
+    if (!ok || task.repeat === undefined || task.repeatUntil !== undefined)
+      return err('repeatTimes');
+    task.repeatTimes = n as number;
   }
   if (r['steps'] !== undefined) {
     const steps = parseSteps(r['steps']);
