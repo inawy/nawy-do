@@ -51,6 +51,8 @@ async function record(page: Page, prefix: string, project: string) {
   await page.keyboard.press('Escape');
   await page.getByRole('checkbox', { name: 'إنجاز: ابعت تقرير الأسبوع' }).click();
   await shot('7-done');
+  await page.getByText(/^المنجزة/).click();
+  await shot('7a-done-open');
   await page.getByRole('button', { name: 'اليوم' }).click();
   await shot('8-empty-today');
   await chooseFromDrawer(page, /سلة المحذوفات/);
