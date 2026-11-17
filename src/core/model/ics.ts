@@ -31,6 +31,8 @@ function fold(line: string): string {
   return parts.join('\r\n ');
 }
 
+const trigger = (minutes = 0): string => (minutes > 0 ? `-PT${minutes}M` : 'PT0S');
+
 const FREQ = { daily: 'DAILY', weekly: 'WEEKLY', monthly: 'MONTHLY', yearly: 'YEARLY' } as const;
 
 function rrule(task: Task): string | undefined {
@@ -81,7 +83,7 @@ export function taskToIcs(task: Task, stamp: string): string | undefined {
     'ACTION:DISPLAY',
     `DESCRIPTION:${esc(task.title)}`,
     // At the time itself; an all-day task rings at 09:00.
-    timed ? 'TRIGGER;RELATED=START:PT0S' : 'TRIGGER;RELATED=START:PT9H',
+    timed ? `TRIGGER;RELATED=START:${trigger(task.remindBefore)}` : 'TRIGGER;RELATED=START:PT9H',
     'END:VALARM',
     'END:VEVENT',
     'END:VCALENDAR',

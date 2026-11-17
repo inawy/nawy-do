@@ -49,3 +49,10 @@ describe('taskToIcs repeat end', () => {
     expect(taskToIcs(updateTask(t, { repeatTimes: 5 }, 3), 'x')).toContain('COUNT=5');
   });
 });
+
+describe('taskToIcs remind before', () => {
+  it('rings earlier by the chosen minutes', () => {
+    const t = updateTask(base, { due: '2026-11-20', dueTime: '09:00', remindBefore: 30 }, 2);
+    expect(taskToIcs(t, 'x')).toContain('TRIGGER;RELATED=START:-PT30M');
+  });
+});

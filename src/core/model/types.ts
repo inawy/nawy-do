@@ -17,6 +17,8 @@ export type Repeat = 'daily' | 'workdays' | 'weekly' | 'monthly' | 'yearly';
 export const MAX_REPEAT_EVERY = 99;
 /** The most occurrences a repeat may be limited to. */
 export const MAX_REPEAT_TIMES = 999;
+/** How long before a timed task its reminder may ring, in minutes (0 = at the time itself). */
+export const REMIND_MINUTES = [0, 5, 10, 15, 30, 60, 120, 1440] as const;
 /** The repeats that can take an interval (workdays cannot). */
 export const intervalRepeat = (r: Repeat | undefined): boolean =>
   r === 'daily' || r === 'weekly' || r === 'monthly' || r === 'yearly';
@@ -42,6 +44,8 @@ export interface Task {
   repeatEvery?: number;
   /** The repeat stops after this date: the last due date it may land on. */
   repeatUntil?: string;
+  /** Minutes before `dueTime` the reminder rings; absent = at the time. Needs a `dueTime`. */
+  remindBefore?: number;
   /** The repeat stops after this many more occurrences, this one included (1 = the last). */
   repeatTimes?: number;
   steps?: Step[];

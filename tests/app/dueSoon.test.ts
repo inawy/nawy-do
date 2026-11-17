@@ -27,3 +27,14 @@ describe('dueSoon', () => {
     expect(dueSoon([task('2026-11-18', '11:00')], at)).toHaveLength(0);
   });
 });
+
+describe('dueSoon with a lead time', () => {
+  it('rings that many minutes early', () => {
+    const t = updateTask(
+      createTask('a', 'x', 1),
+      { due: '2026-11-16', dueTime: '10:30', remindBefore: 15 },
+      2,
+    );
+    expect(dueSoon([t], at)[0]?.delay).toBe(15 * 60 * 1000);
+  });
+});

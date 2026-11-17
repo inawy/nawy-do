@@ -4,6 +4,7 @@ import {
   intervalRepeat,
   MAX_REPEAT_EVERY,
   MAX_REPEAT_TIMES,
+  REMIND_MINUTES,
   MAX_STEPS,
   MAX_STEP_TITLE,
   type Repeat,
@@ -43,6 +44,8 @@ export type TaskPatch = Partial<
   repeatUntil?: string;
   /** How many occurrences in all, this one included; `0` or `undefined` removes the limit. */
   repeatTimes?: number;
+  /** Minutes before the time the reminder rings; `0` or `undefined` = at the time. */
+  remindBefore?: number;
 };
 
 /** Trims titles, drops empty ones and duplicate ids, and caps the count. */
@@ -75,7 +78,7 @@ export function stepProgress(task: Task): { done: number; total: number } | unde
  * or `due` set to `undefined` or `''` removes the field.
  */
 export function updateTask(task: Task, patch: TaskPatch, now: number): Task {
-  const { repeat, repeatEvery, repeatUntil, repeatTimes, ...rest } = patch;
+  const { repeat, repeatEvery, repeatUntil, repeatTimes, remindBefore, ...rest } = patch;
   const next: Task = { ...task, ...rest, updatedAt: nextUpdatedAt(task.updatedAt, now) };
   if ('repeat' in patch) {
     if (repeat === undefined || repeat === '') delete next.repeat;
@@ -85,6 +88,11 @@ export function updateTask(task: Task, patch: TaskPatch, now: number): Task {
     if (repeatEvery !== undefined && repeatEvery >= 2) {
       next.repeatEvery = Math.min(MAX_REPEAT_EVERY, Math.floor(repeatEvery));
     } else delete next.repeatEvery;
+  }
+  if ('remindBefore' in patch) {
+    if (REMIND_MINUTES.some((m) => m === remindBefore) && remindBefore) {
+      next.remindBefore = remindBefore;
+    } else delete next.remindBefore;
   }
   if ('repeatUntil' in patch) {
     if (repeatUntil) next.repeatUntil = repeatUntil;
@@ -131,6 +139,7 @@ export function updateTask(task: Task, patch: TaskPatch, now: number): Task {
     delete next.repeat;
     delete next.dueTime;
   }
+  if (next.dueTime === undefined) delete next.remindBefore;
   if (!intervalRepeat(next.repeat)) delete next.repeatEvery;
   if (next.repeat === undefined) {
     delete next.repeatUntil;
@@ -227,6 +236,7 @@ export function duplicateOptions(task: Task) {
     repeatEvery?: number;
     repeatUntil?: string;
     repeatTimes?: number;
+    remindBefore?: number;
     notes?: string;
     steps?: Step[];
   } = {};
@@ -235,6 +245,7 @@ export function duplicateOptions(task: Task) {
   if (task.due) {
     options.due = task.due;
     if (task.dueTime) options.dueTime = task.dueTime;
+    if (task.remindBefore) options.remindBefore = task.remindBefore;
     if (task.repeat) options.repeat = task.repeat;
     if (task.repeatEvery) options.repeatEvery = task.repeatEvery;
     if (task.repeatUntil) options.repeatUntil = task.repeatUntil;

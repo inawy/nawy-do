@@ -6,6 +6,7 @@ import {
   MAX_LIST_NAME,
   MAX_REPEAT_EVERY,
   MAX_REPEAT_TIMES,
+  REMIND_MINUTES,
   MAX_STEPS,
   MAX_STEP_TITLE,
   REPEATS,
@@ -92,6 +93,13 @@ export function parseTask(raw: unknown): Result<Task, string> {
     }
     if (!intervalRepeat(task.repeat)) return err('repeatEvery');
     task.repeatEvery = n as number;
+  }
+  if (r['remindBefore'] !== undefined) {
+    const n = r['remindBefore'];
+    if (!REMIND_MINUTES.some((m) => m === n) || n === 0 || task.dueTime === undefined) {
+      return err('remindBefore');
+    }
+    task.remindBefore = n as number;
   }
   if (r['repeatUntil'] !== undefined) {
     const u = r['repeatUntil'];

@@ -27,6 +27,7 @@ import { useT } from '../i18n';
 import { Sheet } from '../sheet';
 import { changedFields, formOf } from './formPatch';
 import { ConfirmDelete } from './ConfirmDelete';
+import { RemindField } from './RemindField';
 import { RepeatFields } from './RepeatFields';
 import { StepsField } from './StepsField';
 
@@ -50,6 +51,7 @@ export function DetailsSheet({ task, lists, today, onSave, newId, onRemove, onCl
   const [notes, setNotes] = useState(task.notes ?? '');
   const [due, setDue] = useState(task.due ?? '');
   const [dueTime, setDueTime] = useState(task.dueTime ?? '');
+  const [remind, setRemind] = useState(task.remindBefore ?? 0);
   const [repeat, setRepeat] = useState<Repeat | ''>(task.repeat ?? '');
   const [every, setEvery] = useState(task.repeatEvery ?? 1);
   const [end, setEnd] = useState({ until: task.repeatUntil ?? '', times: task.repeatTimes ?? 0 });
@@ -85,6 +87,7 @@ export function DetailsSheet({ task, lists, today, onSave, newId, onRemove, onCl
           notes,
           due,
           dueTime,
+          remind,
           repeat,
           every,
           ...end,
@@ -178,6 +181,7 @@ export function DetailsSheet({ task, lists, today, onSave, newId, onRemove, onCl
               onChange={(e) => setDueTime(e.target.value)}
             />
           </Field>
+          {due !== '' && dueTime !== '' && <RemindField value={remind} onChange={setRemind} />}
 
           <RepeatFields
             disabled={due === ''}

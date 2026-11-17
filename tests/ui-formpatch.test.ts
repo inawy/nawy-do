@@ -6,6 +6,7 @@ const base: DetailsForm = {
   notes: '',
   due: '',
   dueTime: '',
+  remind: 0,
   repeat: '',
   every: 1,
   until: '',

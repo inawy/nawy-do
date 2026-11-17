@@ -44,4 +44,13 @@ export const arMore = {
   'details.endNever': 'أبدًا',
   'details.endUntil': 'في تاريخ',
   'details.endTimes': 'بعد عدد مرات',
+  'details.remind': 'التذكير',
+  'remind.0': 'عند الوقت',
+  'remind.5': 'قبلها بـ 5 دقايق',
+  'remind.10': 'قبلها بـ 10 دقايق',
+  'remind.15': 'قبلها بـ 15 دقيقة',
+  'remind.30': 'قبلها بنص ساعة',
+  'remind.60': 'قبلها بساعة',
+  'remind.120': 'قبلها بساعتين',
+  'remind.1440': 'قبلها بيوم',
 } as const;

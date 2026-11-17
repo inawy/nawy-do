@@ -13,7 +13,7 @@ export function dueSoon(tasks: readonly Task[], at: number): { task: Task; delay
   const out: { task: Task; delay: number }[] = [];
   for (const task of tasks) {
     if (task.status === 'done' || !task.due || !task.dueTime) continue;
-    const delay = localTimeMs(task.due, task.dueTime) - at;
+    const delay = localTimeMs(task.due, task.dueTime) - (task.remindBefore ?? 0) * 60_000 - at;
     if (delay >= -GRACE_MS && delay <= DAY_MS) out.push({ task, delay: Math.max(0, delay) });
   }
   return out;
@@ -50,7 +50,7 @@ export function useDueAlerts(
   useEffect(() => {
     if (permission !== 'granted') return;
     const timers = dueSoon(tasks, now()).flatMap(({ task, delay }) => {
-      const key = `${task.id}|${task.due}|${task.dueTime}`;
+      const key = `${task.id}|${task.due}|${task.dueTime}|${task.remindBefore ?? 0}`;
       if (fired.current.has(key)) return [];
       return [
         window.setTimeout(() => {

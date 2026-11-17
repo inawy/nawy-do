@@ -48,4 +48,13 @@ export const enMore: Record<keyof typeof arMore, string> = {
   'details.endNever': 'Never',
   'details.endUntil': 'On date',
   'details.endTimes': 'After a number of times',
+  'details.remind': 'Remind',
+  'remind.0': 'At the time',
+  'remind.5': '5 minutes before',
+  'remind.10': '10 minutes before',
+  'remind.15': '15 minutes before',
+  'remind.30': '30 minutes before',
+  'remind.60': '1 hour before',
+  'remind.120': '2 hours before',
+  'remind.1440': '1 day before',
 };
