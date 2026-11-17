@@ -7,8 +7,10 @@ interface Actions {
   onSearch: () => void;
 }
 
+/** A checkbox is an <input> but takes no text, so the row's circle is not «typing». */
 const typing = (el: Element | null): boolean =>
   el instanceof HTMLElement &&
+  !(el instanceof HTMLInputElement && el.type === 'checkbox') &&
   (el.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName));
 
 /** The part of a row that holds focus: the circle, the title button or the star. */
