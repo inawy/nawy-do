@@ -5,7 +5,11 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
 import { join } from 'node:path';
 
-const BUDGET_KB = { js: 160, css: 8, total: 180 }; // today: ~136 / ~5.4 / ~142 (D-039)
+// D-039 set 160 / 8 / 180 at ~136 / ~5.4 / ~142. The offline-parity round (D-0043: smart add, trash,
+// import, export, calendar file, alerts, repeat end and lead time) brought it to ~160 / ~7 / ~168,
+// so js is raised to 170 and total to 190 on purpose. Next saving to make is lazy-loading the
+// rarely used sheets (trash, export, data) rather than raising this again.
+const BUDGET_KB = { js: 170, css: 8, total: 190 };
 const dir = 'dist/assets';
 const sizes = { js: 0, css: 0 };
 for (const file of readdirSync(dir)) {
