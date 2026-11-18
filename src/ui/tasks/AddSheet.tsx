@@ -3,6 +3,7 @@ import { findListByName, parseQuickAdd, type TaskList } from '@/core/model';
 import { Button, CloseIcon, IconButton, PlusIcon, TextInput } from '../primitives';
 import { useI18n } from '../i18n';
 import { formatDue, formatTime } from '../i18n/format';
+import { repeatLabel } from '../i18n/repeatLabel';
 import { Sheet } from '../sheet';
 
 /** The round floating button that opens the add sheet (phone and desktop alike). */
@@ -41,7 +42,7 @@ export function AddSheet({
   const chips: string[] = [];
   if (read?.due) chips.push(formatDue(read.due, today, i18n));
   if (read?.dueTime) chips.push(formatTime(read.dueTime, i18n));
-  if (read?.repeat) chips.push(t(`repeat.${read.repeat}`));
+  if (read?.repeat) chips.push(repeatLabel(read, t, i18n.num) ?? '');
   if (read?.starred) chips.push(t('details.starred'));
   if (list) chips.push(list.name);
   const understood = read !== undefined && read.matches.length > 0;

@@ -21,3 +21,4 @@ export * from './trash';
 export * from './quickAdd';
 export * from './googleTasks';
 export * from './ics';
+export * from './quickRepeat';

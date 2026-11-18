@@ -368,4 +368,20 @@ describe('update banner', () => {
     await screen.findByRole('button', { name: 'تفاصيل: اشتري خبز' });
     expect(screen.queryByText(/الساعة 5/)).toBeNull();
   });
+  it('smart add: «كل 3 أيام» shows as an interval chip and the task repeats every 3 days', async () => {
+    render(<App db={db} now={now} today={today} />);
+    await screen.findByText(/مفيش نوايا/);
+    fireEvent.click(screen.getByRole('button', { name: 'نية جديدة' }));
+    fireEvent.change(screen.getByLabelText('ناوي تعمل إيه؟'), {
+      target: { value: 'دواء كل 3 أيام' },
+    });
+    expect(screen.getByText(/كل .*3.* يوم|كل .*٣.* يوم/)).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'إضافة' }));
+    await screen.findByRole('button', { name: 'تفاصيل: دواء' });
+    await waitFor(async () =>
+      expect((await allRecords(db)).some((t) => t.repeat === 'daily' && t.repeatEvery === 3)).toBe(
+        true,
+      ),
+    );
+  });
 });

@@ -1,6 +1,7 @@
 import { addDays, daysFromCivil } from './civil';
 import { newTaskDefaults } from './view';
 import type { Selection } from './selection';
+import { readRepeat } from './quickRepeat';
 import type { Repeat } from './types';
 
 // Smart quick-add: «اشتري خبز بكرة الساعة 5 م كل أسبوع #البيت !» becomes a title plus a date, a time,
@@ -20,6 +21,8 @@ export interface QuickAdd {
   due?: string;
   dueTime?: string;
   repeat?: Repeat;
+  /** «Every N» (2–99) with `repeat`; absent for a plain repeat. */
+  repeatEvery?: number;
   starred?: boolean;
   /** The list name written after `#` (the caller looks it up). */
   listName?: string;
@@ -53,13 +56,6 @@ const WEEKDAYS: [number, string][] = [
   [6, 'السبت|saturday|sat'],
 ];
 const DAY = String.raw`(?:يوم\s+|on\s+)?`;
-
-const REPEATS: [Repeat, string][] = [
-  ['daily', 'كل يوم|يوميا|every\\s+day|daily'],
-  ['weekly', 'كل اسبوع|اسبوعيا|every\\s+week|weekly'],
-  ['monthly', 'كل شهر|شهريا|every\\s+month|monthly'],
-  ['yearly', 'كل سنه|كل عام|سنويا|every\\s+year|yearly|annually'],
-];
 
 const dow = (date: string): number => ((((daysFromCivil(date) ?? 0) + 4) % 7) + 7) % 7;
 
@@ -100,8 +96,11 @@ export function parseQuickAdd(
   };
 
   // Repeat first (it contains «كل يوم»), then dates, then the time.
-  for (const [r, src] of REPEATS) {
-    if (!out.repeat && take(re(src).exec(n), 'repeat')) out.repeat = r;
+  const rep = readRepeat(n);
+  if (rep) {
+    spans.push({ start: rep.start, end: rep.end, kind: 'repeat' });
+    out.repeat = rep.repeat;
+    if (rep.every) out.repeatEvery = rep.every;
   }
 
   const rel: [string, number][] = [
@@ -203,6 +202,7 @@ export function quickTask(
     due?: string;
     dueTime?: string;
     repeat?: Repeat;
+    repeatEvery?: number;
   };
 } {
   const options: ReturnType<typeof quickTask>['options'] = newTaskDefaults(selection, today);
@@ -214,5 +214,6 @@ export function quickTask(
   if (r.due) options.due = r.due;
   if (r.dueTime) options.dueTime = r.dueTime;
   if (r.repeat) options.repeat = r.repeat;
+  if (r.repeatEvery) options.repeatEvery = r.repeatEvery;
   return { title: r.title, options };
 }
