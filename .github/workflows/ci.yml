@@ -67,6 +67,21 @@ jobs:
           node scripts/bundle-report.mjs "$RUNNER_TEMP/report" | tee bundle-report.txt
       - name: Bundle budget (gzip size of what a first visit downloads)
         run: pnpm run budget
+      - name: Lighthouse (performance, accessibility, best practices; informational for now)
+        continue-on-error: true
+        run: |
+          pnpm --package=@lhci/cli@0.15.1 dlx lhci autorun 2>&1 | tail -40
+          node -e '
+            const fs = require("fs");
+            const runs = fs.readdirSync(".lighthouseci").filter((f) => /^lhr-.*\.json$/.test(f));
+            const rows = runs.map((f) => JSON.parse(fs.readFileSync(".lighthouseci/" + f, "utf8")));
+            for (const [id, c] of Object.entries(rows[0].categories)) {
+              const all = rows.map((r) => Math.round(r.categories[id].score * 100));
+              console.log(c.title.padEnd(16), all.join(" / "));
+            }
+            const lcp = rows.map((r) => Math.round(r.audits["largest-contentful-paint"].numericValue));
+            console.log("LCP ms".padEnd(16), lcp.join(" / "));
+          '
       - name: Install Playwright browser
         timeout-minutes: 12
         # Runner mirrors are sometimes slow: retry before calling it a failure.
