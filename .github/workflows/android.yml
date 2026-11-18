@@ -9,7 +9,7 @@ on:
     branches: ['ci/android*']
 
 permissions:
-  contents: read
+  contents: write # only to publish screenshots to the `ci-screenshots-android` branch
 
 jobs:
   emulator:
@@ -50,3 +50,15 @@ jobs:
           name: screenshots-android
           path: screenshots-android
           if-no-files-found: ignore
+      - name: Publish screenshots to the ci-screenshots-android branch
+        if: always()
+        continue-on-error: true
+        run: |
+          [ -d screenshots-android ] || exit 0
+          cd screenshots-android
+          git init -q -b ci-screenshots-android
+          git config user.name "github-actions"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          git commit -qm "android screenshots of ${GITHUB_SHA}"
+          git push -qf "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" ci-screenshots-android
