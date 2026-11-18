@@ -24,10 +24,10 @@ try {
   await page.getByRole('button', { name: 'نية جديدة' }).waitFor(wait);
   await shot('1-home');
 
-  await page.getByRole('button', { name: 'نية جديدة' }).tap();
+  await page.getByRole('button', { name: 'نية جديدة' }).click();
   await page.getByLabel('ناوي تعمل إيه؟').fill('اشتري خبز كل 3 أيام');
   await shot('2-add');
-  await page.getByRole('button', { name: 'إضافة' }).tap();
+  await page.getByRole('button', { name: 'إضافة' }).click();
   await page.getByRole('button', { name: 'تفاصيل: اشتري خبز' }).waitFor(wait);
   await shot('3-added');
 
@@ -36,7 +36,7 @@ try {
   await page.getByRole('button', { name: 'تفاصيل: اشتري خبز' }).waitFor(wait);
 
   // Complete it by tapping the circle; the repeat moves it to the next date instead of finishing.
-  await page.getByRole('checkbox', { name: /اشتري خبز/ }).tap();
+  await page.getByRole('checkbox', { name: /اشتري خبز/ }).click();
   await page.waitForTimeout(600);
   await shot('4-completed');
 
