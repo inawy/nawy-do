@@ -40,11 +40,13 @@ try {
   await page.waitForTimeout(600);
   await shot('4-completed');
 
-  const worker = await page.evaluate(
-    async () => (await navigator.serviceWorker.ready).active?.state,
+  // `ready` can resolve while the worker is still «activating»: wait for it to finish.
+  await page.waitForFunction(
+    async () => (await navigator.serviceWorker.ready).active?.state === 'activated',
+    undefined,
+    wait,
   );
-  console.log('service worker:', worker);
-  if (worker !== 'activated') throw new Error('the service worker did not activate');
+  console.log('service worker: activated');
   console.log('android smoke: ok');
 } catch (error) {
   await shot('failure').catch(() => {});
