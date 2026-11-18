@@ -63,6 +63,7 @@ try {
   const after = (await order()).join(' | ');
   console.log('after drag:', after);
   await page.reload();
+  await page.getByRole('button', { name: 'تحريك: الثالثة' }).waitFor(wait);
   const kept = (await order()).join(' | ');
   console.log('after reload:', kept);
   if (kept !== 'الثانية | الأولى | الثالثة') throw new Error(`the order after a drag was: ${kept}`);
