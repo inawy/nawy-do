@@ -67,10 +67,11 @@ jobs:
           node scripts/bundle-report.mjs "$RUNNER_TEMP/report" | tee bundle-report.txt
       - name: Bundle budget (gzip size of what a first visit downloads)
         run: pnpm run budget
-      - name: Lighthouse (performance, accessibility, best practices; informational for now)
-        continue-on-error: true
+      - name: Lighthouse (accessibility, best practices and SEO must stay >= 95; performance only warns)
         run: |
+          # The best of the 3 runs counts (the runner is noisy); the report prints either way.
           pnpm --package=@lhci/cli@0.15.1 dlx lhci autorun 2>&1 | tail -40
+          lhci_code=${PIPESTATUS[0]}
           node -e '
             const fs = require("fs");
             const runs = fs.readdirSync(".lighthouseci").filter((f) => /^lhr-.*\.json$/.test(f));
@@ -88,6 +89,7 @@ jobs:
               }
             }
           '
+          exit "$lhci_code"
       - name: Install Playwright browser
         timeout-minutes: 12
         # Runner mirrors are sometimes slow: retry before calling it a failure.
