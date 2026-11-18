@@ -31,13 +31,16 @@ export function TaskRow({ task, today, onToggle, onStar, onOpen, onLongPress, so
   const hasMeta = Boolean(task.due) || progress !== undefined;
   const repeatText = repeatLabel(task, t, i18n.num);
   // Completing plays a short fade-and-collapse before the row moves to «Completed».
-  const [leaving, setLeaving] = useState(false);
+  // Tied to the version of the task it started on: when the task changes (a repeating one moves to
+  // its next date and stays in the list) the row comes back instead of staying collapsed.
+  const [leavingFor, setLeavingFor] = useState<number | null>(null);
+  const leaving = leavingFor === task.updatedAt;
   const timer = useRef(0);
   useEffect(() => () => window.clearTimeout(timer.current), []);
   const complete = () => {
     const calm = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? true;
     if (done || calm) return onToggle(task);
-    setLeaving(true);
+    setLeavingFor(task.updatedAt);
     timer.current = window.setTimeout(() => onToggle(task), 260);
   };
   const press = useLongPress(onLongPress && !pick ? () => onLongPress(task) : undefined);
