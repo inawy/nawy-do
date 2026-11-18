@@ -38,6 +38,7 @@ export const arMore = {
   'repeatEvery.monthly': 'كل {n} شهر',
   'repeatEvery.yearly': 'كل {n} سنة',
   'card.calendar': 'إضافة للتقويم',
+  'card.skip': 'تخطي هذه المرة',
   'menu.alerts': 'تفعيل تنبيهات الاستحقاق',
   'alerts.title': 'ناوي دو',
   'details.repeatEnd': 'ينتهي التكرار',
