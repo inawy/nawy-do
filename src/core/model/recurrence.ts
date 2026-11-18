@@ -1,5 +1,5 @@
 import { addDays, daysFromCivil, monthLength, parseCivil } from './civil';
-import type { Repeat, Task } from './types';
+import type { Repeat, Step, Task } from './types';
 
 const pad = (n: number, width: number): string => String(n).padStart(width, '0');
 
@@ -59,4 +59,17 @@ export const isRepeating = (task: Task): task is Task & { due: string; repeat: R
 export function seriesEnds(task: Task, next: string): boolean {
   if (task.repeatUntil !== undefined && next > task.repeatUntil) return true;
   return task.repeatTimes !== undefined && task.repeatTimes <= 1;
+}
+
+/**
+ * «Skip this time»: the patch that moves a repeating task to its next occurrence without
+ * completing it (the count of a limited series is kept; the steps start over). `null` when the
+ * task does not repeat or the next occurrence would fall after the end date.
+ */
+export function skipPatch(task: Task, today: string): { due: string; steps?: Step[] } | null {
+  if (!isRepeating(task)) return null;
+  const due = nextDue(task.due, task.repeat, today, task.repeatEvery);
+  if (task.repeatUntil !== undefined && due > task.repeatUntil) return null;
+  if (!task.steps) return { due };
+  return { due, steps: task.steps.map((s) => ({ ...s, done: false })) };
 }

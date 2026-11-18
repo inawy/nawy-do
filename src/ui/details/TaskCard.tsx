@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { listOf, type Task, type TaskList, type TaskPatch } from '@/core/model';
+import { listOf, skipPatch, type Task, type TaskList, type TaskPatch } from '@/core/model';
 import { useI18n } from '../i18n';
 import { repeatLabel } from '../i18n/repeatLabel';
 import { formatDue, formatTime } from '../i18n/format';
@@ -11,6 +11,7 @@ import {
   EditIcon,
   IconButton,
   ListIcon,
+  RepeatIcon,
   ShareIcon,
   StarIcon,
   TrashIcon,
@@ -58,6 +59,7 @@ export function TaskCard({
   const [copied, setCopied] = useState(false);
   const [confirming, setConfirming] = useState(false);
   const listId = listOf(task, lists);
+  const skip = skipPatch(task, today);
   const list = lists.find((l) => l.id === listId);
   const text = () => taskText(task, today, i18n, list?.name);
 
@@ -154,6 +156,12 @@ export function TaskCard({
             <CopyIcon />
             {t('card.copy')}
           </button>
+          {skip && (
+            <button type="button" onClick={() => onSave(skip)}>
+              <RepeatIcon />
+              {t('card.skip')}
+            </button>
+          )}
           {task.due && (
             <button type="button" onClick={onCalendar}>
               <CalendarIcon />

@@ -6,6 +6,7 @@ import {
   nextDue,
   parseTask,
   reopenTask,
+  skipPatch,
   updateTask,
   type Task,
 } from '@/core/model';
@@ -210,5 +211,30 @@ describe('remindBefore', () => {
     expect(parseTask({ ...timed, remindBefore: 0 }).ok).toBe(false);
     const dateOnly = { ...createTask('b', 'y', 1), due: '2026-11-20', remindBefore: 30 };
     expect(parseTask(dateOnly).ok).toBe(false);
+  });
+});
+
+describe('skipPatch', () => {
+  it('moves to the next occurrence and unchecks the steps', () => {
+    const task = repeating('2026-11-03', 'daily', {
+      steps: [{ id: 's', title: 'x', done: true }],
+    });
+    expect(skipPatch(task, T)).toEqual({
+      due: '2026-11-04',
+      steps: [{ id: 's', title: 'x', done: false }],
+    });
+    expect(skipPatch(repeating('2026-11-03', 'weekly', { repeatEvery: 2 }), T)).toEqual({
+      due: '2026-11-17',
+    });
+  });
+
+  it('is not offered without a repeat or when the next one passes the end date', () => {
+    expect(skipPatch(repeating('2026-11-03', undefined), T)).toBeNull();
+    expect(
+      skipPatch(repeating('2026-11-03', 'daily', { repeatUntil: '2026-11-03' }), T),
+    ).toBeNull();
+    expect(
+      skipPatch(repeating('2026-11-03', 'daily', { repeatUntil: '2026-11-04' }), T),
+    ).not.toBeNull();
   });
 });

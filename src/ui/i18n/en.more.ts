@@ -42,6 +42,7 @@ export const enMore: Record<keyof typeof arMore, string> = {
   'repeatEvery.monthly': 'Every {n} months',
   'repeatEvery.yearly': 'Every {n} years',
   'card.calendar': 'Add to calendar',
+  'card.skip': 'Skip this time',
   'menu.alerts': 'Turn on due alerts',
   'alerts.title': 'Nawy To Do',
   'details.repeatEnd': 'Ends',
