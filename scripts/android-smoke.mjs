@@ -40,6 +40,33 @@ try {
   await page.waitForTimeout(600);
   await shot('4-completed');
 
+  // Reordering by dragging the handle (a mouse drag over adb: a finger swipe is not driven here).
+  const adder = async (title) => {
+    await page.getByRole('button', { name: 'نية جديدة' }).click();
+    await page.getByLabel('ناوي تعمل إيه؟').fill(title);
+    await page.getByRole('button', { name: 'إضافة' }).click();
+    await page.getByRole('button', { name: `تفاصيل: ${title}` }).waitFor(wait);
+  };
+  for (const title of ['الأولى', 'الثانية', 'الثالثة']) await adder(title);
+  const order = async () =>
+    (await page.locator('.row .title').allTextContents()).filter((x) => x.startsWith('ال'));
+  console.log('before drag:', (await order()).join(' | '));
+  const grip = await page.getByRole('button', { name: 'تحريك: الثالثة' }).boundingBox();
+  const last = await page.locator('.row', { hasText: 'الأولى' }).boundingBox();
+  if (!grip || !last) throw new Error('rows not found for the drag');
+  await page.mouse.move(grip.x + grip.width / 2, grip.y + grip.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(grip.x + grip.width / 2, last.y + last.height - 4, { steps: 15 });
+  await page.mouse.up();
+  await page.waitForTimeout(500);
+  await shot('5-dragged');
+  const after = (await order()).join(' | ');
+  console.log('after drag:', after);
+  await page.reload();
+  const kept = (await order()).join(' | ');
+  console.log('after reload:', kept);
+  if (kept !== 'الثانية | الأولى | الثالثة') throw new Error(`the order after a drag was: ${kept}`);
+
   // `ready` can resolve while the worker is still «activating»: wait for it to finish.
   await page.waitForFunction(
     async () => (await navigator.serviceWorker.ready).active?.state === 'activated',
