@@ -14,7 +14,8 @@ if (!device) throw new Error('no Android device found');
 console.log('device:', device.model(), device.serial());
 
 const context = await device.launchBrowser({ locale: 'ar' });
-const page = await context.newPage();
+// Android Chrome cannot open a second page over this protocol: use the one it starts with.
+const page = context.pages()[0] ?? (await context.waitForEvent('page'));
 const shot = (name) => page.screenshot({ path: `screenshots-android/${name}.png` });
 const wait = { timeout: 30_000 };
 
