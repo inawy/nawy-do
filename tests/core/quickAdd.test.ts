@@ -31,6 +31,31 @@ describe('quick add', () => {
     expect(read('تمرين كل أسبوع')).toMatchObject({ title: 'تمرين', repeat: 'weekly', due: TODAY });
   });
 
+  it('reads «every N units», with Arabic digits and the dual forms', () => {
+    expect(read('اشرب دواء كل 3 أيام')).toMatchObject({
+      title: 'اشرب دواء',
+      repeat: 'daily',
+      repeatEvery: 3,
+      due: TODAY,
+    });
+    expect(read('حساب كل ٢ شهور')).toMatchObject({ repeat: 'monthly', repeatEvery: 2 });
+    expect(read('تقرير كل اسبوعين')).toMatchObject({ repeat: 'weekly', repeatEvery: 2 });
+    expect(read('call mom every 2 weeks')).toMatchObject({ repeat: 'weekly', repeatEvery: 2 });
+    expect(read('سماد كل 4 سنين')).toMatchObject({ repeat: 'yearly', repeatEvery: 4 });
+    expect(read('سماد كل سنتين')).toMatchObject({ repeat: 'yearly', repeatEvery: 2 });
+  });
+
+  it('«every 1» and a plain repeat carry no interval; a number too big stays text', () => {
+    expect(read('تمرين كل يوم').repeatEvery).toBeUndefined();
+    expect(read('تمرين كل 1 يوم').repeat).toBeUndefined();
+    expect(read('كل 100 يوم').repeat).toBeUndefined();
+  });
+
+  it('the interval reaches the task options', () => {
+    const q = quickTask('دواء كل 3 ايام', false, 'main', [], TODAY);
+    expect(q.options).toMatchObject({ repeat: 'daily', repeatEvery: 3 });
+  });
+
   it('reads English the same way', () => {
     expect(read('Buy milk tomorrow at 5pm')).toMatchObject({
       title: 'Buy milk',
