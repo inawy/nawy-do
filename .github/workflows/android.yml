@@ -1,0 +1,64 @@
+name: android
+
+# Real Chrome on an Android emulator. Separate from `ci` on purpose: it is slower and can fail
+# for emulator reasons, so it never blocks a merge. Run it by hand (Actions → android → Run
+# workflow) or by pushing a branch named `ci/android*`.
+on:
+  workflow_dispatch:
+  push:
+    branches: ['ci/android*']
+
+permissions:
+  contents: write # only to publish screenshots to the `ci-screenshots-android` branch
+
+jobs:
+  emulator:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec vite build
+      - name: Enable KVM (the emulator needs hardware acceleration)
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Serve the build
+        run: |
+          nohup pnpm exec vite preview --port 4173 --strictPort > preview.log 2>&1 &
+          for i in $(seq 1 30); do curl -sf http://localhost:4173/ > /dev/null && break; sleep 1; done
+      - name: Smoke test on Android (API 34, Google APIs image, which ships Chrome)
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          profile: pixel_7
+          disable-animations: true
+          script: |
+            adb reverse tcp:4173 tcp:4173
+            node scripts/android-smoke.mjs
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots-android
+          path: screenshots-android
+          if-no-files-found: ignore
+      - name: Publish screenshots to the ci-screenshots-android branch
+        if: always()
+        continue-on-error: true
+        run: |
+          [ -d screenshots-android ] || exit 0
+          cd screenshots-android
+          git init -q -b ci-screenshots-android
+          git config user.name "github-actions"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          git commit -qm "android screenshots of ${GITHUB_SHA}"
+          git push -qf "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" ci-screenshots-android

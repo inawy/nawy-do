@@ -11,3 +11,4 @@ __pycache__/
 .venv/
 screenshots/
 .lighthouseci/
+screenshots-android/
