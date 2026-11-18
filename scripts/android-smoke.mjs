@@ -1,3 +1,4 @@
+/* global navigator */
 // Smoke test of the production build in REAL Chrome on an Android emulator (CI only, see
 // .github/workflows/android.yml). The emulator reaches the preview server through `adb reverse`, so
 // the page is on `localhost` (a secure context: service worker, IndexedDB and install work).
