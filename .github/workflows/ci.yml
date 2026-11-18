@@ -81,6 +81,12 @@ jobs:
             }
             const lcp = rows.map((r) => Math.round(r.audits["largest-contentful-paint"].numericValue));
             console.log("LCP ms".padEnd(16), lcp.join(" / "));
+            for (const [id, c] of Object.entries(rows[0].categories)) {
+              for (const ref of c.auditRefs) {
+                const a = rows[0].audits[ref.id];
+                if (a.score !== null && a.score < 1 && ref.weight > 0) console.log("not perfect:", id, ref.id);
+              }
+            }
           '
       - name: Install Playwright browser
         timeout-minutes: 12
