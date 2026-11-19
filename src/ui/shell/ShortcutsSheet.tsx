@@ -1,9 +1,10 @@
 import { useI18n } from '../i18n';
+import type { MessageKey } from '../i18n/ar';
 import { CloseIcon, IconButton } from '../primitives';
 import { Sheet } from '../sheet';
 
 /** The keys and what they do. Space and Enter work on whatever row has focus, as on any control. */
-const ROWS: [keys: string[], label: string][] = [
+const ROWS: [keys: string[], label: MessageKey][] = [
   [['N'], 'shortcuts.new'],
   [['/'], 'shortcuts.search'],
   [['↑', '↓'], 'shortcuts.move'],
