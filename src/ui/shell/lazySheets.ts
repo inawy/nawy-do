@@ -9,3 +9,6 @@ export const BackupSheet = lazy(() =>
 export const ExportSheet = lazy(() =>
   import('./ExportSheet').then((m) => ({ default: m.ExportSheet })),
 );
+export const ShortcutsSheet = lazy(() =>
+  import('./ShortcutsSheet').then((m) => ({ default: m.ShortcutsSheet })),
+);

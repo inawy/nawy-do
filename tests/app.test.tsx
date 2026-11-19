@@ -384,4 +384,15 @@ describe('update banner', () => {
       ),
     );
   });
+  it('? opens the list of keyboard shortcuts, and the menu item does too', async () => {
+    render(<App db={db} now={now} today={today} />);
+    await screen.findByText(/مفيش نوايا/);
+    fireEvent.keyDown(window, { key: '?' });
+    const sheet = await screen.findByRole('dialog', { name: 'اختصارات لوحة المفاتيح' });
+    expect(sheet.textContent).toContain('نية جديدة');
+    fireEvent.click(screen.getByRole('button', { name: 'إغلاق' }));
+    fireEvent.click(screen.getByRole('button', { name: 'المزيد' }));
+    fireEvent.click(screen.getByRole('menuitem', { name: 'اختصارات لوحة المفاتيح' }));
+    expect(await screen.findByRole('dialog', { name: 'اختصارات لوحة المفاتيح' })).toBeTruthy();
+  });
 });
