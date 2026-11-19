@@ -68,6 +68,35 @@ try {
   console.log('after reload:', kept);
   if (kept !== 'الثانية | الأولى | الثالثة') throw new Error(`the order after a drag was: ${kept}`);
 
+  // Dropping a dragged intention on a list in the bottom navigation moves it there. A mouse drag
+  // again: a finger is not driven over adb, so this checks the layout and hit-testing in real
+  // Chrome, not the touch sensor.
+  await page.getByRole('button', { name: 'قائمة جديدة' }).click();
+  await page.getByLabel('اسم القائمة').fill('هدف');
+  await page.getByRole('button', { name: 'حفظ' }).click();
+  await page.getByRole('button', { name: /^نواياي/ }).click();
+  const goal = page.getByRole('button', { name: /^هدف/ });
+  await goal.scrollIntoViewIfNeeded();
+  const from = await page.getByRole('button', { name: 'تحريك: الثالثة' }).boundingBox();
+  const to = await goal.boundingBox();
+  if (!from || !to) throw new Error('boxes not found for the drop on a list');
+  await page.mouse.move(from.x + from.width / 2, from.y + from.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(from.x + from.width / 2 + 10, from.y + from.height / 2 + 10, { steps: 3 });
+  await page.mouse.move(to.x + to.width / 2, to.y + to.height / 2, { steps: 15 });
+  const over = await goal.getAttribute('data-drop-over');
+  await shot('7-drop-over');
+  await page.mouse.up();
+  console.log('drop target highlighted:', over !== null);
+  if (over === null)
+    throw new Error('the list in the navigation was not highlighted while dragging');
+  await page.getByText('الثالثة', { exact: true }).waitFor({ state: 'hidden', ...wait });
+  await goal.click();
+  await page.getByRole('heading', { name: 'هدف', level: 1 }).waitFor(wait);
+  await page.getByText('الثالثة', { exact: true }).waitFor(wait);
+  await shot('8-dropped');
+  console.log('drop on a list: ok');
+
   // `ready` can resolve while the worker is still «activating»: wait for it to finish.
   await page.waitForFunction(
     async () => (await navigator.serviceWorker.ready).active?.state === 'activated',
