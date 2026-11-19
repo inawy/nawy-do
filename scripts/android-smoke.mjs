@@ -75,6 +75,12 @@ try {
     wait,
   );
   console.log('service worker: activated');
+  // The keyboard shortcuts list opens from the «more» menu.
+  await page.getByRole('button', { name: 'المزيد' }).first().click();
+  await page.getByRole('menuitem', { name: 'اختصارات لوحة المفاتيح' }).click();
+  await page.getByRole('dialog', { name: 'اختصارات لوحة المفاتيح' }).waitFor(wait);
+  await page.waitForTimeout(500);
+  await shot('6-shortcuts');
   console.log('android smoke: ok');
 } catch (error) {
   await shot('failure').catch(() => {});
