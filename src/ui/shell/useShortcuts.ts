@@ -74,3 +74,18 @@ export function useShortcuts({ onNew, onSearch }: Actions): void {
     return () => window.removeEventListener('keydown', onKey);
   }, [onNew, onSearch]);
 }
+
+/** «?»: opens the shortcuts list. Same rules as the other keys: not while typing or in a sheet. */
+export function useHelpKey(onHelp: () => void): void {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey) return;
+      if (e.key !== '?' && e.key !== '؟') return;
+      if (typing(document.activeElement) || document.querySelector('[role="dialog"]')) return;
+      e.preventDefault();
+      onHelp();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onHelp]);
+}

@@ -1,11 +1,12 @@
 import { cleanup, fireEvent, render } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { useShortcuts } from '@/ui/shell/useShortcuts';
+import { useHelpKey, useShortcuts } from '@/ui/shell/useShortcuts';
 
 afterEach(cleanup);
 
-function Probe({ onNew = () => {}, onSearch = () => {} }) {
+function Probe({ onNew = () => {}, onSearch = () => {}, onHelp = () => {} }) {
   useShortcuts({ onNew, onSearch });
+  useHelpKey(onHelp);
   return (
     <div>
       <ul>
@@ -93,6 +94,25 @@ describe('keyboard shortcuts', () => {
     document.body.append(dialog);
     press('n');
     expect(onNew).not.toHaveBeenCalled();
+    dialog.remove();
+  });
+
+  it('? opens the help, but not while typing or with a sheet open', () => {
+    const onHelp = vi.fn();
+    const { getByLabelText } = render(<Probe onHelp={onHelp} />);
+    press('?');
+    press('؟');
+    expect(onHelp).toHaveBeenCalledTimes(2);
+    press('?', { ctrlKey: true });
+    getByLabelText('field').focus();
+    press('?');
+    expect(onHelp).toHaveBeenCalledTimes(2);
+    getByLabelText('field').blur();
+    const dialog = document.createElement('div');
+    dialog.setAttribute('role', 'dialog');
+    document.body.append(dialog);
+    press('?');
+    expect(onHelp).toHaveBeenCalledTimes(2);
     dialog.remove();
   });
 });

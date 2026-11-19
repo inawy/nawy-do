@@ -467,3 +467,39 @@
   line-height: 1.6;
   user-select: text;
 }
+
+.shortcuts {
+  margin: 0;
+  display: grid;
+  gap: 0.25rem;
+}
+.shortcut {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-block: 0.5rem;
+  border-block-end: 1px solid var(--line);
+}
+.shortcut:last-child {
+  border-block-end: 0;
+}
+.shortcut dt {
+  display: flex;
+  gap: 0.25rem;
+  flex: none;
+}
+.shortcut dd {
+  margin: 0;
+  text-align: start;
+}
+kbd {
+  min-inline-size: 1.75rem;
+  padding: 0.125rem 0.5rem;
+  border: 1px solid var(--line);
+  border-block-end-width: 2px;
+  border-radius: 6px;
+  font: inherit;
+  font-size: 0.85rem;
+  text-align: center;
+}

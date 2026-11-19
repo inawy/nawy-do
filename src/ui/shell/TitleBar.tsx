@@ -1,7 +1,11 @@
+import { Suspense, useCallback, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { SORT_MODES, type SortMode } from '@/core/model';
 import { useI18n } from '../i18n';
 import { Button, IconButton, SearchIcon, SortIcon } from '../primitives';
+import { ShortcutsSheet } from './lazySheets';
 import { MoreMenu, type MenuAction } from './MoreMenu';
+import { useHelpKey } from './useShortcuts';
 
 interface Props {
   title: string;
@@ -22,10 +26,14 @@ interface Props {
 /** The heading, search, the sort arrows and the «more» menu (select, list options). */
 export function TitleBar(p: Props) {
   const { t } = useI18n();
+  const [help, setHelp] = useState(false);
+  const openHelp = useCallback(() => setHelp(true), []);
+  useHelpKey(openHelp);
   const actions: MenuAction[] = [{ label: t('menu.select'), onPick: p.onSelect }];
   if (p.onClearDone) actions.push({ label: t('menu.clearDone'), onPick: p.onClearDone });
   if (p.onExport) actions.push({ label: t('menu.export'), onPick: p.onExport });
   if (p.onListOptions) actions.push({ label: t('menu.listOptions'), onPick: p.onListOptions });
+  actions.push({ label: t('menu.shortcuts'), onPick: openHelp });
   const sorts: MenuAction[] = SORT_MODES.map((mode) => ({
     label: t(`sort.${mode}`),
     checked: p.sort?.mode === mode,
@@ -49,6 +57,13 @@ export function TitleBar(p: Props) {
           </>
         )}
       </span>
+      {help &&
+        createPortal(
+          <Suspense fallback={null}>
+            <ShortcutsSheet onClose={() => setHelp(false)} />
+          </Suspense>,
+          document.body,
+        )}
     </div>
   );
 }
