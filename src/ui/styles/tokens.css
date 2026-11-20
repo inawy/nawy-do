@@ -8,7 +8,7 @@
   --line: var(--nawy-color-border);
   /* Light theme: the design-system brand (#3D7BFF) and danger (#D64545) reach only 3.6:1 and 4.1:1
      as text, and white on brand 3.8:1; these darker steps reach ≥ 4.5:1 (WCAG AA). To be
-     proposed upstream to inawy/design-system; see DESIGN-SYSTEM-CONFORMANCE. */
+     proposed upstream to nawy-dev/design-system; see DESIGN-SYSTEM-CONFORMANCE. */
   --brand: #2a60d8;
   --danger: #c03636;
   --ill-accent: var(--brand);

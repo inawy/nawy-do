@@ -1,6 +1,6 @@
 # المطابقة مع Nawy Design & Engineering System
 
-المرجع: [`inawy/design-system`](https://github.com/inawy/design-system) (قُرئ كاملًا في 2026-10-31: `AGENTS`، `ARCHITECTURE`، `TECHNOLOGY-STACK`، `ENGINEERING-STANDARDS`، `DESIGN-SYSTEM`، `tokens`، `components`، `foundations`، `patterns`، `DECISIONS/0001–0004`، المهارات، القالب).
+المرجع: [`nawy-dev/design-system`](https://github.com/nawy-dev/design-system) (قُرئ كاملًا في 2026-10-31: `AGENTS`، `ARCHITECTURE`، `TECHNOLOGY-STACK`، `ENGINEERING-STANDARDS`، `DESIGN-SYSTEM`، `tokens`، `components`، `foundations`، `patterns`، `DECISIONS/0001–0004`، المهارات، القالب).
 
 **القاعدة:** ذلك المستودع هو المرجع المشترك لهوية وهندسة كل منتجات ناوي. هذا المنتج يلتزم به، وأي انحراف **مكتوب هنا بسببه** (هو يصف نفسه «Default, not dogma»). ترتيب مصادر الحقيقة عند التعارض كما في `AGENTS.md` عنده: الكود الفعلي والاختبارات ثم قرارات المنتج ثم وثائق المعمارية.
 

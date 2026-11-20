@@ -1,5 +1,5 @@
 // Icons are the real Google Material Symbols (Outlined) SVG files in src/assets/icons, unmodified
-// (source and license: that folder's README and LICENSE; rule: inawy/design-system ADR 0002).
+// (source and license: that folder's README and LICENSE; rule: nawy-dev/design-system ADR 0002).
 // `vite-plugin-svgr` turns each into a component; fill/aria come from the svgr config in
 // vite.config.ts (currentColor, aria-hidden), so icons take the colour of the text around them.
 import AddSvg from '../../assets/icons/add.svg?react';
