@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import type { Task } from '@/core/model';
 import { localTimeMs } from '@/app/clock';
 import { isNativeApp } from '@/app/native/env';
+import type { PlannedAlert } from '@/app/native/plan';
 import type { AlertScheduler, NativePermission } from '@/app/native/scheduler';
 import { useNativeAlerts } from '@/app/native/useNativeAlerts';
 
@@ -16,7 +17,7 @@ function fake(state: NativePermission) {
     permission: vi.fn((ask: boolean) =>
       Promise.resolve(ask && state === 'prompt' ? ('granted' as const) : state),
     ),
-    replaceAll: vi.fn(() => Promise.resolve()),
+    replaceAll: vi.fn((_items: readonly PlannedAlert[]) => Promise.resolve()),
   };
   return s satisfies AlertScheduler;
 }

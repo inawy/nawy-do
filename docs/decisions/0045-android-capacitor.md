@@ -15,7 +15,7 @@
 4. **الإذن:** `POST_NOTIFICATIONS` يُطلب من القائمة كما في الويب. `SCHEDULE_EXACT_ALARM` بلا `USE_EXACT_ALARM` (سياسة Google تحصره في المنبّهات والتقاويم)؛ إن لم يمنحه المستخدم تُجدوَل إنذارات غير دقيقة قد تتأخر دقائق.
 5. **المشروع المولَّد:** `android/` يُنشأ في CI بـ`cap add android` ولا يُرفع (`/android/` في `.gitignore`). `tools/android/`: `patch_manifest.py` (أذونات)، `make_icons.py` (أيقونات من نفس علامة `icon.svg`)، `patch_gradle.py` (إصدار وتوقيع الإصدار النهائي من متغيرات البيئة)، و`debug.keystore` ثابت لتتحدّث نسخ التجربة فوق بعضها (مفتاح تجربة لا سرّ فيه).
 6. **CI:** `android-apk.yml` يدويًا أو على الفروع `native-*`/`native/**`: يبني APK تجريبيًا وينشره في إصدار تجريبي `android-debug`، ويجرّب `bundleRelease` بمفتاح مؤقت. لا يمنع الدمج.
-7. **`appId` = `do.nawy.app`**، **الاسم «ناوي دو»**. يثبت `appId` بعد أول رفع على Play، فلا يُغيَّر.
+7. **`appId` = `todo.nawy.app`** (على نمط `taqweem.nawy.app`: بترتيب النطاق لا معكوسًا)، **الاسم «ناوي دو»**. رُفض `do.nawy.app` لأن `do` كلمة محجوزة في Java وGradle يرفضها. يثبت `appId` بعد أول رفع على Play، فلا يُغيَّر.
 
 ## حدود صادقة
 

@@ -1,5 +1,5 @@
 {
-  "appId": "do.nawy.app",
+  "appId": "todo.nawy.app",
   "appName": "ناوي دو",
   "webDir": "dist",
   "android": { "allowMixedContent": false },
