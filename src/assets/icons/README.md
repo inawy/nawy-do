@@ -1,6 +1,6 @@
 # Icons — Google Material Symbols (Outlined)
 
-Source: <https://github.com/google/material-design-icons> at commit `10ecc14790612ca8fd164e3f4ffe9c16fc50d5b7`, files `symbols/web/<name>/materialsymbolsoutlined/<name>_24px.svg` (and `star_fill1_24px.svg` for the selected star), copied **unmodified** and named by their original symbol names. License: Apache License 2.0 (`LICENSE` here). See `inawy/design-system` → `components/README.md#icon-system`.
+Source: <https://github.com/google/material-design-icons> at commit `10ecc14790612ca8fd164e3f4ffe9c16fc50d5b7`, files `symbols/web/<name>/materialsymbolsoutlined/<name>_24px.svg` (and `star_fill1_24px.svg` for the selected star), copied **unmodified** and named by their original symbol names. License: Apache License 2.0 (`LICENSE` here). See `nawy-dev/design-system` → `components/README.md#icon-system`.
 
 | File                         | Used for                                               |
 | ---------------------------- | ------------------------------------------------------ |

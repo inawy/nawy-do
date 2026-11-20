@@ -1,12 +1,12 @@
 # خارطة التطوير — Nawy To Do (جوال أولًا)
 
-> **المرجع الأعلى:** [`inawy/design-system`](https://github.com/inawy/design-system). كل مرحلة هنا تُقاس عليه؛ الفجوات والانحرافات في [`DESIGN-SYSTEM-CONFORMANCE.md`](DESIGN-SYSTEM-CONFORMANCE.md). إصدارات الستاك الافتراضية (فحصها المرجع في 2026-10-31): Node 24 LTS · pnpm 12.7 · React 19.3 · Vite 8.3.5 · Tailwind 4.3.3 · Dexie 4.4.7 · Vitest 5.0.5 · TypeScript 7.0.2 · vite-plugin-svgr 5.2.0 — وتُتحقَّق فعليًا في CI قبل الاعتماد.
+> **المرجع الأعلى:** [`nawy-dev/design-system`](https://github.com/nawy-dev/design-system). كل مرحلة هنا تُقاس عليه؛ الفجوات والانحرافات في [`DESIGN-SYSTEM-CONFORMANCE.md`](DESIGN-SYSTEM-CONFORMANCE.md). إصدارات الستاك الافتراضية (فحصها المرجع في 2026-10-31): Node 24 LTS · pnpm 12.7 · React 19.3 · Vite 8.3.5 · Tailwind 4.3.3 · Dexie 4.4.7 · Vitest 5.0.5 · TypeScript 7.0.2 · vite-plugin-svgr 5.2.0 — وتُتحقَّق فعليًا في CI قبل الاعتماد.
 
 الهدف: تطبيق مهام بمستوى Google Tasks وMicrosoft To Do، **يعمل كأنه تطبيق أندرويد أصلي** (لمس وإيماءات وتثبيت ومشاركة)، ويصلح للويب والديسكتوب، بكود معياري يُصان ويتوسع. ثقيل الشغل يؤجَّل ولا يُرتجَل: كل مرحلة صغيرة، تُنشر، وتُراجَع قبل التي بعدها.
 
 ## 1. أين نحن (لقطات الإنتاج من CI)
 
-اللقطات تُلتقط آليًا من النسخة المبنية بشاشة Pixel 7 وديسكتوب، وتُنشر على الفرع [`ci-screenshots`](https://github.com/inawy/nawy-do/tree/ci-screenshots) (`android-1-main.png`، `android-2-details.png`، … و`chromium-*`). كل مرحلة تُقارن بها.
+اللقطات تُلتقط آليًا من النسخة المبنية بشاشة Pixel 7 وديسكتوب، وتُنشر على الفرع [`ci-screenshots`](https://github.com/nawy-dev/nawy-do/tree/ci-screenshots) (`android-1-main.png`، `android-2-details.png`، … و`chromium-*`). كل مرحلة تُقارن بها.
 
 ما تراه فيها اليوم، بصراحة:
 
