@@ -12,3 +12,6 @@ __pycache__/
 screenshots/
 .lighthouseci/
 screenshots-android/
+
+# Generated in CI by `npx cap add android` (ADR 0045), never committed.
+/android/
