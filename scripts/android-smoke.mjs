@@ -1,4 +1,4 @@
-/* global navigator */
+/* global navigator, getComputedStyle */
 // Smoke test of the production build in REAL Chrome on an Android emulator (CI only, see
 // .github/workflows/android.yml). The emulator reaches the preview server through `adb reverse`, so
 // the page is on `localhost` (a secure context: service worker, IndexedDB and install work).
@@ -85,11 +85,17 @@ try {
   await page.mouse.move(from.x + from.width / 2 + 10, from.y + from.height / 2 + 10, { steps: 3 });
   await page.mouse.move(to.x + to.width / 2, to.y + to.height / 2, { steps: 15 });
   const over = await goal.getAttribute('data-drop-over');
+  // Over the list the dragged row turns see-through, so the highlighted tab can be read under it.
+  const seeThrough = Number(
+    await page.locator('.row.dragging').evaluate((el) => getComputedStyle(el).opacity),
+  );
   await shot('7-drop-over');
   await page.mouse.up();
   console.log('drop target highlighted:', over !== null);
+  console.log('dragged row opacity over the list:', seeThrough);
   if (over === null)
     throw new Error('the list in the navigation was not highlighted while dragging');
+  if (!(seeThrough < 1)) throw new Error('the dragged row still hides the list it is over');
   await page.getByText('الثالثة', { exact: true }).waitFor({ state: 'hidden', ...wait });
   await goal.click();
   await page.getByRole('heading', { name: 'هدف', level: 1 }).waitFor(wait);

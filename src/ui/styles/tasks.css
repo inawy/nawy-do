@@ -300,6 +300,11 @@
 .row.dragging .grip {
   cursor: grabbing;
 }
+/* Over a list in the navigation the row turns see-through, so that list and its highlight stay
+   readable under it. Opacity only: the row keeps its box, which the drag library has measured. */
+body:has([data-drop-over]) .row.dragging {
+  opacity: 0.5;
+}
 .sr-only {
   position: absolute;
   inline-size: 1px;
