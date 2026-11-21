@@ -5,6 +5,8 @@ name: android-emulator
 # for emulator reasons, so it never blocks a merge.
 on:
   workflow_dispatch:
+  push:
+    branches: ['native/android-emulator*']
 
 permissions:
   contents: read
