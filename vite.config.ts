@@ -113,6 +113,8 @@ export default defineConfig({
       },
       workbox: {
         navigateFallback: 'index.html',
+        // The privacy page is its own static page: without this the worker would answer it with the app.
+        navigateFallbackDenylist: [/privacy\.html$/],
         // Store screenshots are for the install dialog only: not worth precaching.
         globIgnores: ['screenshots/**'],
         cleanupOutdatedCaches: true,
