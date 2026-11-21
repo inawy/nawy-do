@@ -9,9 +9,12 @@ import { join } from 'node:path';
 // import, export, calendar file, alerts, repeat end and lead time) brought it to ~160 / ~7 / ~168,
 // so js is raised to 170 and total to 190 on purpose. Next saving to make is lazy-loading the
 // rarely used sheets (trash, export, data) rather than raising this again.
+// The Android app (ADR 0045, 0046) adds the web fallbacks of its Capacitor plugins as lazy chunks
+// (~5 kB gzip, used only inside the app, never on the first screen): js goes to 178 on purpose,
+// `critical` is unchanged. Next saving: keep those chunks out of the browser's precache.
 // `critical` is what the first screen loads: the scripts index.html names (entry and the chunks
 // it preloads). Rarely opened sheets load on first use, so they count in `js` but not here.
-const BUDGET_KB = { critical: 160, js: 170, css: 8, total: 190 };
+const BUDGET_KB = { critical: 160, js: 178, css: 8, total: 192 };
 const dir = 'dist/assets';
 const sizes = { js: 0, css: 0 };
 for (const file of readdirSync(dir)) {

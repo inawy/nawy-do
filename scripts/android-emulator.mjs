@@ -105,6 +105,36 @@ await sleep(3000);
 const alarms = adb(`shell dumpsys alarm`);
 const held = alarms.split('\n').filter((l) => l.includes(PKG)).length;
 log('alarm lines mentioning the app:', held);
+
+// Backup out (ADR 0046): the WebView cannot download, so the file must be written to the app's cache
+// and the system share sheet must open for it.
+log(
+  'menu:',
+  JSON.stringify(
+    await ev(`${HELPERS}
+  const visible = (el) => el.getClientRects().length > 0;
+  const menu = [...document.querySelectorAll('button')].find((b) => visible(b) && b.getAttribute('aria-label') === 'القائمة الجانبية');
+  if (!menu) return { noDrawerButton: true };
+  menu.click(); await wait(800);
+  const mine = [...document.querySelectorAll('button.drawer-item')].find((e) => /بياناتي/.test(e.textContent));
+  if (!mine) return { items: [...document.querySelectorAll('button')].filter(visible).map((e) => e.textContent.trim()).slice(0, 15) };
+  mine.click(); await wait(1200);
+  const exp = [...document.querySelectorAll('button')].find((b) => visible(b) && /تنزيل نسخة احتياطية/.test(b.textContent));
+  if (!exp) return { noExport: document.body.innerText.slice(0, 200) };
+  exp.click(); await wait(3000);
+  return 'clicked';`),
+  ),
+);
+shot('share-sheet');
+const cache = adb(`shell run-as ${PKG} ls cache`);
+const windows = adb('shell dumpsys window windows');
+const wrote = /nawy-do-.*\.json/.test(cache);
+const chooser = /Chooser|Sharesheet|ShareSheet/i.test(windows);
+log('backup file in the app cache:', wrote, '| share sheet on screen:', chooser);
+if (!wrote || !chooser) {
+  log('FAILED: backup export through the share sheet');
+  process.exit(1);
+}
 ws.close();
 
 // The app goes to the background and its process is ended: the reminder has to come from the phone.
