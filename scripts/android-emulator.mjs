@@ -76,19 +76,26 @@ await ev(`${HELPERS} button(/نية جديدة/).click(); await wait(600);
   setInput(input, 'Emulator test'); await wait(300);
   button(/^\\s*إضافة/).click(); await wait(1500);`);
 await ev(`${HELPERS} button(/تفاصيل: Emulator test/).click(); await wait(1000);`);
+shot('details-open');
+log(
+  'page after opening the details:',
+  JSON.stringify(
+    await ev(
+      `return { dialogs: document.querySelectorAll('[role=dialog]').length, dates: document.querySelectorAll('input[type=date]').length, text: document.body.innerText.slice(0, 300) };`,
+    ),
+  ),
+);
 
 const when =
   await ev(`const d = new Date(Date.now() + 2 * 60000); const p = (n) => String(n).padStart(2, '0');
   return { date: d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()), time: p(d.getHours()) + ':' + p(d.getMinutes()) };`);
 log('due (device clock):', JSON.stringify(when));
 await ev(`${HELPERS}
-  const dlg = document.querySelector('[role=dialog]');
+  const dlg = document;
   setInput(dlg.querySelector('input[type=date]'), ${JSON.stringify(when.date)}); await wait(300);
   setInput(dlg.querySelector('input[type=time]'), ${JSON.stringify(when.time)}); await wait(300);`);
 shot('details');
-await ev(
-  `${HELPERS} button(/^\\s*حفظ/, document.querySelector('[role=dialog]')).click(); await wait(2500);`,
-);
+await ev(`${HELPERS} button(/^\\s*حفظ/).click(); await wait(2500);`);
 shot('saved');
 
 // Let the app hand the plan to the phone, then ask the phone (not the app) what it holds.
