@@ -52,9 +52,10 @@ const HELPERS = `
   const wait = (ms) => new Promise((r) => setTimeout(r, ms));
   const byLabel = (l) => document.querySelector('[aria-label="' + l + '"]');
   const setInput = (el, v) => {
-    const proto = el instanceof HTMLTextAreaElement ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype;
-    Object.getOwnPropertyDescriptor(proto, 'value').set.call(el, v);
+    if (!el) throw new Error('input not found for ' + v);
+    Object.getOwnPropertyDescriptor(Object.getPrototypeOf(el), 'value').set.call(el, v);
     el.dispatchEvent(new Event('input', { bubbles: true }));
+    el.dispatchEvent(new Event('change', { bubbles: true }));
   };
   const button = (re, root = document) => [...root.querySelectorAll('button')].find((b) => re.test(b.textContent + ' ' + (b.getAttribute('aria-label') ?? '')));
 `;
