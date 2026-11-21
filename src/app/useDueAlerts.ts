@@ -40,9 +40,11 @@ export function useDueAlerts(
   now: () => number,
   today: () => string,
   heading: string,
+  /** False in the Android app, whose own alarms (native/) ring even when the app is closed. */
+  enabled = true,
 ): (() => void) | undefined {
   const [permission, setPermission] = useState(() =>
-    supported() ? Notification.permission : 'denied',
+    enabled && supported() ? Notification.permission : 'denied',
   );
   const fired = useRef(new Set<string>());
   const day = today();

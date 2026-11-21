@@ -29,7 +29,7 @@ import {
   shareTextOnly,
 } from './files';
 import { installSignal } from './install';
-import { useDueAlerts } from './useDueAlerts';
+import { useAlerts } from './useAlerts';
 import { newId } from './ids';
 import { loadLang, loadSort, saveLang, saveSort } from './prefs';
 import { takeLaunch } from './launch';
@@ -72,7 +72,7 @@ export function App({ repositories, db, now = systemClock, today = systemToday }
     setLangState(l);
   };
   const i18n = makeI18n(lang);
-  const onAlerts = useDueAlerts(tasks.tasks, now, today, i18n.t('alerts.title'));
+  const onAlerts = useAlerts(tasks.tasks, now, today, i18n.t('alerts.title'));
   const exportLog = useExportLog(now);
   const [nudgeLater, setNudgeLater] = useState(false);
   const [dueLater, setDueLater] = useState(false);

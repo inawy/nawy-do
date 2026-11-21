@@ -4,6 +4,7 @@ import { registerSW } from 'virtual:pwa-register';
 import { App } from '@/app/App';
 import { prepareStorage } from '@/app/bootstrap';
 import { listenForInstall } from '@/app/install';
+import { isNativeApp } from '@/app/native/env';
 import { updateSignal } from '@/app/updateSignal';
 import { loadTheme, syncThemeColor } from '@/ui/theme';
 
@@ -23,8 +24,11 @@ void prepareStorage()
   });
 
 // Registered after the first render so it never delays it. A new version waits for the user.
-const updateSW = registerSW({
-  onNeedRefresh() {
-    updateSignal.set(() => void updateSW(true));
-  },
-});
+// Not inside the Android app: there the page ships in the app itself and Play delivers updates.
+if (!isNativeApp()) {
+  const updateSW = registerSW({
+    onNeedRefresh() {
+      updateSignal.set(() => void updateSW(true));
+    },
+  });
+}
