@@ -18,4 +18,10 @@ describe('PWA inputs', () => {
   it('never reloads silently', () => {
     expect(config).toContain("registerType: 'prompt'");
   });
+  it('serves the privacy page as itself, not as the app shell', () => {
+    expect(config).toContain('navigateFallbackDenylist: [/privacy\\.html$/]');
+    const page = readFileSync('public/privacy.html', 'utf8');
+    expect(page).toContain('سياسة الخصوصية');
+    expect(page).toContain('Privacy policy');
+  });
 });
