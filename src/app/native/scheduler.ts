@@ -1,3 +1,4 @@
+import { dateOfMs } from '../clock';
 import type { PlannedAlert } from './plan';
 
 // The one place that talks to the phone's notification system (ADR 0045). The plugin is loaded only
@@ -52,7 +53,7 @@ export function capacitorScheduler(channelName: string): AlertScheduler {
           title: channelName,
           body: i.title,
           channelId: CHANNEL_ID,
-          schedule: { at: new Date(i.atMs), allowWhileIdle: true },
+          schedule: { at: dateOfMs(i.atMs), allowWhileIdle: true },
         })),
       });
     },

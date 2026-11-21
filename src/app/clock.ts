@@ -30,3 +30,6 @@ export function localTimeMs(date: string, time: string): number {
   const [h = 0, mi = 0] = time.split(':').map(Number);
   return new Date(y, mo - 1, d, h, mi).getTime();
 }
+
+/** A `Date` for an instant in ms: what the phone's alarm API takes. */
+export const dateOfMs = (ms: number): Date => new Date(ms);

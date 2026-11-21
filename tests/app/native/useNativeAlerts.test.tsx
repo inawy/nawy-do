@@ -17,7 +17,7 @@ function fake(state: NativePermission) {
     permission: vi.fn((ask: boolean) =>
       Promise.resolve(ask && state === 'prompt' ? ('granted' as const) : state),
     ),
-    replaceAll: vi.fn((_items: readonly PlannedAlert[]) => Promise.resolve()),
+    replaceAll: vi.fn<(items: readonly PlannedAlert[]) => Promise<void>>(() => Promise.resolve()),
   };
   return s satisfies AlertScheduler;
 }
