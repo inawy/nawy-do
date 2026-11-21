@@ -113,11 +113,11 @@ log(
   JSON.stringify(
     await ev(`${HELPERS}
   const visible = (el) => el.getClientRects().length > 0;
-  const more = [...document.querySelectorAll('button')].find((b) => visible(b) && /المزيد/.test(b.getAttribute('aria-label') ?? b.textContent));
-  more.click(); await wait(800);
-  const items = [...document.querySelectorAll('[role=menuitem]')].filter(visible);
-  const mine = items.find((e) => /بياناتي/.test(e.textContent));
-  if (!mine) return { items: items.map((e) => e.textContent.trim()) };
+  const menu = [...document.querySelectorAll('button')].find((b) => visible(b) && b.getAttribute('aria-label') === 'القائمة الجانبية');
+  if (!menu) return { noDrawerButton: true };
+  menu.click(); await wait(800);
+  const mine = [...document.querySelectorAll('button.drawer-item')].find((e) => /بياناتي/.test(e.textContent));
+  if (!mine) return { items: [...document.querySelectorAll('button')].filter(visible).map((e) => e.textContent.trim()).slice(0, 15) };
   mine.click(); await wait(1200);
   const exp = [...document.querySelectorAll('button')].find((b) => visible(b) && /تنزيل نسخة احتياطية/.test(b.textContent));
   if (!exp) return { noExport: document.body.innerText.slice(0, 200) };
