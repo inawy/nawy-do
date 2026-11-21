@@ -108,9 +108,23 @@ log('alarm lines mentioning the app:', held);
 
 // Backup out (ADR 0046): the WebView cannot download, so the file must be written to the app's cache
 // and the system share sheet must open for it.
-await ev(`${HELPERS} button(/^\\s*المزيد/).click(); await wait(600);
-  [...document.querySelectorAll('[role=menuitem]')].find((e) => /بياناتي/.test(e.textContent)).click(); await wait(1000);
-  button(/تنزيل نسخة احتياطية/).click(); await wait(3000);`);
+log(
+  'menu:',
+  JSON.stringify(
+    await ev(`${HELPERS}
+  const visible = (el) => el.getClientRects().length > 0;
+  const more = [...document.querySelectorAll('button')].find((b) => visible(b) && /المزيد/.test(b.getAttribute('aria-label') ?? b.textContent));
+  more.click(); await wait(800);
+  const items = [...document.querySelectorAll('[role=menuitem]')].filter(visible);
+  const mine = items.find((e) => /بياناتي/.test(e.textContent));
+  if (!mine) return { items: items.map((e) => e.textContent.trim()) };
+  mine.click(); await wait(1200);
+  const exp = [...document.querySelectorAll('button')].find((b) => visible(b) && /تنزيل نسخة احتياطية/.test(b.textContent));
+  if (!exp) return { noExport: document.body.innerText.slice(0, 200) };
+  exp.click(); await wait(3000);
+  return 'clicked';`),
+  ),
+);
 shot('share-sheet');
 const cache = adb(`shell run-as ${PKG} ls cache`);
 const windows = adb('shell dumpsys window windows');
