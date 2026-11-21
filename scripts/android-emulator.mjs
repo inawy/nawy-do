@@ -75,7 +75,9 @@ await ev(`${HELPERS} button(/نية جديدة/).click(); await wait(600);
   const input = document.querySelector('input[aria-label="ناوي تعمل إيه؟"], [aria-label="ناوي تعمل إيه؟"]');
   setInput(input, 'Emulator test'); await wait(300);
   button(/^\\s*إضافة/).click(); await wait(1500);`);
-await ev(`${HELPERS} button(/تفاصيل: Emulator test/).click(); await wait(1000);`);
+await ev(
+  `${HELPERS} button(/تفاصيل: Emulator test/).click(); await wait(800); const edit = button(/^\\s*تعديل/); if (edit) { edit.click(); await wait(1000); }`,
+);
 shot('details-open');
 log(
   'page after opening the details:',
